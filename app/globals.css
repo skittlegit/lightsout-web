@@ -1,26 +1,193 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   LightsOut — editorial almanac theme
+   Tailwind v4 CSS-first config. No tailwind.config.ts.
+   ============================================================ */
+
+@theme {
+  /* Surfaces & ink */
+  --color-paper: #faf7f2;
+  --color-paper-deep: #f2eee6;
+  --color-ink: #0e0e0e;
+  --color-ink-soft: #1f1f1f;
+  --color-muted: #6b6862;
+  --color-rule: #d9d2c5;
+
+  /* F1 red */
+  --color-f1: #e10600;
+  --color-f1-deep: #c20500;
+
+  /* Team accents */
+  --color-team-mercedes: #27f4d2;
+  --color-team-ferrari: #e80020;
+  --color-team-redbull: #3671c6;
+  --color-team-mclaren: #ff8000;
+  --color-team-aston: #229971;
+  --color-team-alpine: #0093cc;
+  --color-team-williams: #64c4ff;
+  --color-team-racingbulls: #6692ff;
+  --color-team-sauber: #52e252;
+  --color-team-haas: #b6babd;
+  --color-team-cadillac: #ffd700;
+
+  /* Fonts (variables defined in layout.tsx via next/font) */
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Animation timings */
+  --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   Base
+   ============================================================ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "kern";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle paper grain overlay — radial gradient, fixed */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(14, 14, 14, 0.025) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(193, 5, 0, 0.015) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.18) 100%);
+  mix-blend-mode: multiply;
+}
+
+main,
+header,
+footer,
+section {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: var(--color-f1);
+  color: var(--color-paper);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ============================================================
+   Editorial typographic utilities
+   ============================================================ */
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.eyebrow-ink {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.eyebrow-red {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-f1);
+  font-weight: 600;
+}
+
+.rule-thin { border-top: 1px solid var(--color-rule); }
+.rule-red  { border-top: 2px solid var(--color-f1); }
+.rule-ink  { border-top: 1px solid var(--color-ink); }
+
+/* Italic-red final word in a serif headline */
+.headline {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+.headline em {
+  font-style: italic;
+  color: var(--color-f1);
+  font-weight: 400;
+}
+
+/* Hide horizontal scrollbars (macOS calendar strip) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+.pulse-dot {
+  animation: pulse-dot 1.4s var(--ease-editorial) infinite;
+}
+
+@keyframes colon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.colon-pulse {
+  animation: colon-pulse 1s steps(2, end) infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+.skeleton {
+  background: var(--color-paper-deep);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+.anchor-link {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  transition: color 200ms var(--ease-editorial);
+  display: block;
+  padding: 4px 0;
+}
+.anchor-link:hover { color: var(--color-ink); }
+
+.hover-lift { transition: transform 200ms var(--ease-editorial); }
+.hover-lift:hover { transform: translateY(-2px); }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
 }

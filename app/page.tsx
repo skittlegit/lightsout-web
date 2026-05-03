@@ -1,65 +1,152 @@
-import Image from "next/image";
+import { Suspense } from "react";
+import Masthead from "./components/Masthead";
+import Hero from "./components/Hero";
+import SeasonCalendar from "./components/SeasonCalendar";
+import DriversTable from "./components/DriversTable";
+import ConstructorsTable from "./components/ConstructorsTable";
+import PaddockIntelView from "./components/PaddockIntel";
+import Forecast from "./components/Forecast";
+import Footer from "./components/Footer";
+import SectionAnchors from "./components/SectionAnchors";
+import SmoothScroll from "./components/SmoothScroll";
+import Reveal from "./components/Reveal";
+import {
+  HeroSkeleton,
+  CalendarSkeleton,
+  ColumnSkeleton,
+  ForecastSkeleton,
+} from "./components/Skeletons";
+import {
+  getCalendar,
+  getConstructorStandings,
+  getDriverStandings,
+  getNextPrediction,
+  getPaddockIntel,
+} from "@/lib/api";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <SmoothScroll />
+      <SectionAnchors />
+
+      <main id="hero" className="flex-1 w-full">
+        <Reveal>
+          <Masthead />
+        </Reveal>
+
+        {/* Next Race */}
+        <Reveal delay={80}>
+          <Suspense fallback={<HeroSkeleton />}>
+            <HeroSection />
+          </Suspense>
+        </Reveal>
+
+        {/* Calendar */}
+        <Reveal delay={160}>
+          <Suspense fallback={<CalendarSkeleton />}>
+            <CalendarSection />
+          </Suspense>
+        </Reveal>
+
+        {/* Drivers / Constructors / Paddock — three-column block */}
+        <Reveal delay={240}>
+          <ThreeColumnBlock />
+        </Reveal>
+
+        {/* Forecast */}
+        <Reveal delay={320}>
+          <Suspense fallback={<ForecastSkeleton />}>
+            <ForecastSection />
+          </Suspense>
+        </Reveal>
+
+        <Footer />
       </main>
-    </div>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Async server components — each owns its own fetch                  */
+/* ------------------------------------------------------------------ */
+
+async function HeroSection() {
+  const cal = await getCalendar();
+  const next = pickNextRace(cal.rounds, cal.next_round);
+  if (!next) return null;
+  return <Hero race={next} totalRounds={cal.rounds.length} />;
+}
+
+async function CalendarSection() {
+  const cal = await getCalendar();
+  return (
+    <SeasonCalendar
+      rounds={cal.rounds}
+      nextRound={cal.next_round}
+      season={cal.season}
+    />
+  );
+}
+
+function ThreeColumnBlock() {
+  return (
+    <section className="px-6 md:px-10 py-14 md:py-20">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+        <div id="drivers">
+          <Suspense fallback={<ColumnSkeleton rows={10} />}>
+            <DriversColumn />
+          </Suspense>
+        </div>
+        <div id="constructors">
+          <Suspense fallback={<ColumnSkeleton rows={11} />}>
+            <ConstructorsColumn />
+          </Suspense>
+        </div>
+        <div id="paddock">
+          <Suspense fallback={<ColumnSkeleton rows={5} />}>
+            <PaddockColumn />
+          </Suspense>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function DriversColumn() {
+  const drivers = await getDriverStandings();
+  return <DriversTable drivers={drivers} />;
+}
+
+async function ConstructorsColumn() {
+  const teams = await getConstructorStandings();
+  return <ConstructorsTable teams={teams} />;
+}
+
+async function PaddockColumn() {
+  const intel = await getPaddockIntel();
+  return <PaddockIntelView intel={intel} />;
+}
+
+async function ForecastSection() {
+  const data = await getNextPrediction();
+  return <Forecast data={data} />;
+}
+
+/* ------------------------------------------------------------------ */
+
+function pickNextRace(
+  rounds: import("@/lib/types").Race[],
+  nextRound: number | null | undefined
+) {
+  if (nextRound != null) {
+    const r = rounds.find((x) => x.round === nextRound);
+    if (r) return r;
+  }
+  return (
+    rounds.find((r) => r.status === "next") ??
+    rounds.find((r) => r.status === "upcoming") ??
+    rounds[0] ??
+    null
   );
 }
