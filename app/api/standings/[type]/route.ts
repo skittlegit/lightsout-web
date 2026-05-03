@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { backendUrl } from "@/lib/api";
-import { MOCK_CONSTRUCTORS, MOCK_DRIVERS } from "@/lib/mocks";
+import { getConstructorStandings, getDriverStandings } from "@/lib/api";
 
 export const revalidate = 600;
 
@@ -9,19 +8,11 @@ export async function GET(
   { params }: { params: Promise<{ type: string }> }
 ) {
   const { type } = await params;
-  if (type !== "drivers" && type !== "constructors") {
-    return NextResponse.json({ error: "Unknown standings type" }, { status: 404 });
+  if (type === "drivers") {
+    return NextResponse.json(await getDriverStandings());
   }
-
-  try {
-    const res = await fetch(backendUrl(`/standings/${type}`), {
-      next: { revalidate: 600 },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (res.ok) return NextResponse.json(await res.json());
-  } catch {
-    // fall through to mock
+  if (type === "constructors") {
+    return NextResponse.json(await getConstructorStandings());
   }
-
-  return NextResponse.json(type === "drivers" ? MOCK_DRIVERS : MOCK_CONSTRUCTORS);
+  return NextResponse.json({ error: "Unknown standings type" }, { status: 404 });
 }

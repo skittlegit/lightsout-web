@@ -13,7 +13,6 @@ interface Props {
  * Cell value rendered only when probability >= 5%.
  */
 export default function PredictionHeatmap({ drivers }: Props) {
-  // Defensive: trim/pad to 20.
   const sorted = [...drivers]
     .sort((a, b) => a.expected_position - b.expected_position)
     .slice(0, 20);
@@ -45,7 +44,7 @@ export default function PredictionHeatmap({ drivers }: Props) {
               <td className="pr-3 py-0.5 whitespace-nowrap">
                 <div className="flex items-baseline gap-2">
                   <span className="font-mono tabular text-[10px] text-muted w-5">
-                    {String(d.expected_position).padStart(2, "0")}
+                    {String(Math.round(d.expected_position)).padStart(2, "0")}
                   </span>
                   <span className="font-display text-[14px]">
                     {d.driver_name}

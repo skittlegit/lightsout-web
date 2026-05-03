@@ -21,7 +21,8 @@ import {
   getConstructorStandings,
   getDriverStandings,
   getNextPrediction,
-  getPaddockIntel,
+  pickLastCompleted,
+  pickNextRace,
 } from "@/lib/api";
 
 export default function Home() {
@@ -49,7 +50,7 @@ export default function Home() {
           </Suspense>
         </Reveal>
 
-        {/* Drivers / Constructors / Paddock — three-column block */}
+        {/* Drivers / Constructors / Last Race — three-column block */}
         <Reveal delay={240}>
           <ThreeColumnBlock />
         </Reveal>
@@ -73,20 +74,14 @@ export default function Home() {
 
 async function HeroSection() {
   const cal = await getCalendar();
-  const next = pickNextRace(cal.rounds, cal.next_round);
+  const next = pickNextRace(cal.races);
   if (!next) return null;
-  return <Hero race={next} totalRounds={cal.rounds.length} />;
+  return <Hero race={next} totalRounds={cal.races.length} />;
 }
 
 async function CalendarSection() {
   const cal = await getCalendar();
-  return (
-    <SeasonCalendar
-      rounds={cal.rounds}
-      nextRound={cal.next_round}
-      season={cal.season}
-    />
-  );
+  return <SeasonCalendar races={cal.races} season={cal.season} />;
 }
 
 function ThreeColumnBlock() {
@@ -124,29 +119,12 @@ async function ConstructorsColumn() {
 }
 
 async function PaddockColumn() {
-  const intel = await getPaddockIntel();
-  return <PaddockIntelView intel={intel} />;
+  const [cal, drivers] = await Promise.all([getCalendar(), getDriverStandings()]);
+  const lastRace = pickLastCompleted(cal.races);
+  return <PaddockIntelView lastRace={lastRace} drivers={drivers} />;
 }
 
 async function ForecastSection() {
   const data = await getNextPrediction();
   return <Forecast data={data} />;
-}
-
-/* ------------------------------------------------------------------ */
-
-function pickNextRace(
-  rounds: import("@/lib/types").Race[],
-  nextRound: number | null | undefined
-) {
-  if (nextRound != null) {
-    const r = rounds.find((x) => x.round === nextRound);
-    if (r) return r;
-  }
-  return (
-    rounds.find((r) => r.status === "next") ??
-    rounds.find((r) => r.status === "upcoming") ??
-    rounds[0] ??
-    null
-  );
 }

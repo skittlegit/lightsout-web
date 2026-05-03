@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import CommandPaletteServer from "./components/CommandPaletteServer";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -35,9 +37,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Suspense fallback={null}>
+          <CommandPaletteServer />
+        </Suspense>
+      </body>
     </html>
   );
 }

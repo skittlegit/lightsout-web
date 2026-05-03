@@ -1,70 +1,89 @@
-import type { PaddockIntel } from "@/lib/types";
-import { teamColor } from "@/lib/format";
+import type { DriverStanding, Race } from "@/lib/types";
+import { abbreviateName, formatRaceDate, teamColor, teamShort } from "@/lib/format";
 import { SectionHead } from "./DriversTable";
+import Link from "next/link";
 
 interface Props {
-  intel: PaddockIntel | null;
+  lastRace: Race | null;
+  drivers: DriverStanding[];
 }
 
-export default function PaddockIntelView({ intel }: Props) {
+/**
+ * Last Race Recap — honest, real-data-only column.
+ * Shows the last completed race header + the top-3 championship snapshot
+ * (since the backend doesn't expose per-round podium results yet).
+ */
+export default function PaddockIntelView({ lastRace, drivers }: Props) {
+  const top3 = drivers.slice(0, 3);
+
   return (
     <div className="flex flex-col">
-      <SectionHead num="03" headHTML="Paddock" tail="Intel" />
+      <SectionHead num="03" headHTML="Last" tail="Race" />
 
-      {!intel ? (
+      {!lastRace ? (
         <p className="mt-6 text-sm text-muted">
           No completed rounds yet — check back after the season opener.
         </p>
       ) : (
         <>
-          <span className="eyebrow mt-6 block">
-            Last Race · {intel.race_name}
-          </span>
+          <Link
+            href={`/races/${lastRace.round}`}
+            className="mt-6 block border border-rule p-4 hover:border-ink transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+          >
+            <span className="eyebrow-red block">
+              Round {String(lastRace.round).padStart(2, "0")} · Completed
+            </span>
+            <div className="mt-2 font-display text-[22px] leading-tight">
+              {lastRace.race_name}
+            </div>
+            <div className="eyebrow mt-1.5">
+              {lastRace.circuit} · {formatRaceDate(lastRace.race_date)}
+            </div>
+            <div className="mt-3 font-mono text-[10px] tracking-[0.18em] uppercase text-f1">
+              View race detail →
+            </div>
+          </Link>
+
+          <span className="eyebrow mt-7 block">Championship · Top 3</span>
           <ul className="mt-3 flex flex-col">
-            {intel.podium.map((r) => (
-              <li
-                key={r.position}
-                className="relative grid grid-cols-[1.25rem_1fr_auto] gap-3 items-center py-2.5 border-b border-rule last:border-b-0"
-              >
-                <span
-                  aria-hidden
-                  className="absolute left-0 top-2 bottom-2 w-[3px]"
-                  style={{ background: teamColor(r.team_id) }}
-                />
-                <span className="font-mono tabular text-[12px] text-muted pl-2">
-                  P{r.position}
-                </span>
-                <div className="min-w-0">
-                  <div className="font-display text-[17px] leading-tight truncate">
-                    {r.driver_name}
-                  </div>
-                  <div className="eyebrow mt-0.5 truncate">
-                    {r.team} · {r.driver_code}
-                  </div>
-                </div>
-                <span className="font-mono tabular text-[12px] text-ink">
-                  {r.gap ?? ""}
-                </span>
-              </li>
-            ))}
+            {top3.map((d) => {
+              const color = teamColor(d.team);
+              return (
+                <li
+                  key={d.driver_code}
+                  className="relative grid grid-cols-[1.25rem_1fr_auto] gap-3 items-center py-2.5 border-b border-rule last:border-b-0"
+                >
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-2 bottom-2 w-[3px]"
+                    style={{ background: color }}
+                  />
+                  <span className="font-mono tabular text-[12px] text-muted pl-2">
+                    P{d.position}
+                  </span>
+                  <Link
+                    href={`/drivers/${d.driver_code.toLowerCase()}`}
+                    className="min-w-0 hover:text-f1 transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+                  >
+                    <div className="font-display text-[17px] leading-tight truncate">
+                      {abbreviateName(d.driver_name)}
+                    </div>
+                    <div className="eyebrow mt-0.5 truncate">
+                      {teamShort(d.team)} · {d.driver_code}
+                    </div>
+                  </Link>
+                  <span className="font-mono tabular text-[12px] text-ink">
+                    {d.points} <span className="eyebrow">PTS</span>
+                  </span>
+                </li>
+              );
+            })}
           </ul>
 
-          <div className="mt-7">
-            <div className="flex flex-wrap gap-2 mb-3">
-              {intel.tags.map((t) => (
-                <span
-                  key={t.label}
-                  className="font-mono text-[10px] tracking-[0.16em] px-2 py-1 border border-ink text-ink"
-                >
-                  {t.label}
-                </span>
-              ))}
-            </div>
-            <span className="eyebrow-red block mb-2">The Story</span>
-            <p className="font-display text-[19px] leading-snug italic text-ink-soft">
-              {intel.story}
-            </p>
-          </div>
+          <p className="mt-7 text-xs text-muted leading-relaxed">
+            Per-round podium results will appear here once the backend exposes
+            race results. Until then, the championship snapshot stands in.
+          </p>
         </>
       )}
     </div>

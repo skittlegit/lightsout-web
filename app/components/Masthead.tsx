@@ -1,4 +1,5 @@
 import { timeGreeting } from "@/lib/format";
+import PaletteTrigger from "./PaletteTrigger";
 
 export default function Masthead() {
   // Server-rendered: greeting based on the server's clock.
@@ -18,7 +19,10 @@ export default function Masthead() {
             </div>
             <span className="eyebrow">Personal Edition · F1 2026</span>
           </div>
-          <span className="eyebrow">{greeting.toUpperCase()}</span>
+          <div className="flex items-center gap-3">
+            <PaletteTrigger />
+            <span className="eyebrow hidden sm:inline">{greeting.toUpperCase()}</span>
+          </div>
         </div>
 
         <h1 className="headline mt-10 md:mt-14 text-[18vw] md:text-[14rem] leading-[0.9] tracking-tight">
