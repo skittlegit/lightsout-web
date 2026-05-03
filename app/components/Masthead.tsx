@@ -2,38 +2,33 @@ import { timeGreeting } from "@/lib/format";
 import PaletteTrigger from "./PaletteTrigger";
 
 export default function Masthead() {
-  // Server-rendered: greeting based on the server's clock.
-  // (Acceptable; for true client-local greeting we'd need a client component.)
   const greeting = timeGreeting();
 
   return (
-    <header className="px-6 md:px-10 pt-10 md:pt-14 pb-6">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="flex items-start justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div
-              aria-hidden
-              className="relative w-6 h-6 bg-ink"
-            >
+    <header className="pt-8 sm:pt-10 md:pt-14 pb-6">
+      <div className="container-max">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div aria-hidden className="relative w-6 h-6 bg-ink shrink-0">
               <span className="absolute right-[3px] top-[3px] w-[6px] h-[6px] rounded-full bg-f1" />
             </div>
-            <span className="eyebrow">Personal Edition · F1 2026</span>
+            <span className="eyebrow truncate">Personal Edition · F1 2026</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <PaletteTrigger />
-            <span className="eyebrow hidden sm:inline">{greeting.toUpperCase()}</span>
+            <span className="eyebrow hidden md:inline">{greeting.toUpperCase()}</span>
           </div>
         </div>
 
-        <h1 className="headline mt-10 md:mt-14 text-[18vw] md:text-[14rem] leading-[0.9] tracking-tight">
+        <h1 className="headline h-mark mt-8 sm:mt-10 md:mt-14">
           LightsOut<em>.</em>
         </h1>
 
-        <p className="eyebrow mt-4 md:mt-6">
+        <p className="eyebrow mt-3 sm:mt-4 md:mt-6">
           Every stat · Every race · Every prediction
         </p>
 
-        <div className="rule-red mt-6 md:mt-8" />
+        <div className="rule-red mt-5 sm:mt-6 md:mt-8" />
       </div>
     </header>
   );

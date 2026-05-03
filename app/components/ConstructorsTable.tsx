@@ -14,17 +14,18 @@ export default function ConstructorsTable({ teams }: Props) {
   return (
     <div className="flex flex-col">
       <SectionHead num="02" headHTML="Constructors'" tail="Cup" />
-      <ul className="mt-6 flex flex-col gap-4">
+      <ul className="mt-5 flex flex-col gap-3">
         {teams.map((t) => {
           const ratio = leader > 0 ? t.points / leader : 0;
+          const color = teamColor(t.team);
           return (
             <li key={t.team} className="flex flex-col gap-1.5 group">
               <Link
                 href={`/constructors/${teamSlug(t.team)}`}
-                className="flex items-baseline justify-between gap-3 focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+                className="flex items-baseline justify-between gap-3"
               >
                 <div className="flex items-baseline gap-3 min-w-0">
-                  <span className="font-mono tabular text-[12px] text-muted w-6">
+                  <span className="font-mono tabular text-[12px] text-muted w-7 shrink-0">
                     {String(t.position).padStart(2, "0")}
                   </span>
                   <span className="font-display text-[18px] truncate group-hover:text-f1 transition-colors">
@@ -36,12 +37,12 @@ export default function ConstructorsTable({ teams }: Props) {
                   <span className="eyebrow ml-1">PTS</span>
                 </span>
               </Link>
-              <div className="h-[6px] bg-paper-deep">
+              <div className="h-[5px] bg-paper-deep relative overflow-hidden">
                 <div
-                  className="h-full"
+                  className="h-full transition-[width] duration-500"
                   style={{
                     width: `${Math.max(2, ratio * 100)}%`,
-                    background: teamColor(t.team),
+                    background: color,
                   }}
                 />
               </div>

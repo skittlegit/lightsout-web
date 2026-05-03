@@ -8,17 +8,23 @@ interface Props {
 }
 
 export default function SeasonCalendar({ races, season }: Props) {
+  const completed = races.filter((r) => r.is_completed).length;
+
   return (
-    <section id="calendar" className="px-6 md:px-10 py-14 md:py-20">
-      <div className="max-w-[1280px] mx-auto">
+    <section id="calendar" className="section-y">
+      <div className="container-max">
         <SectionHeading
-          eyebrow={`${season} SEASON · ${races.length} ROUNDS`}
+          eyebrow={`${season} Season · ${races.length} rounds · ${completed} done`}
           headHTML="Season"
           tail="Calendar"
         />
 
-        <div className="mt-10 -mx-6 md:-mx-10">
-          <div className="overflow-x-auto no-scrollbar px-6 md:px-10">
+        <div className="mt-8 md:mt-10 -mx-[var(--gutter-x)] relative">
+          <div
+            className="overflow-x-auto no-scrollbar fade-x-edges scroll-snap-x px-[var(--gutter-x)] pb-2"
+            role="list"
+            aria-label={`${season} season rounds`}
+          >
             <ul className="flex gap-3 min-w-max">
               {races.map((r) => (
                 <CalendarCard key={r.round} race={r} />
@@ -46,11 +52,11 @@ export function SectionHeading({
     <div className="flex items-end justify-between gap-6 flex-wrap">
       <div>
         {prefix && <span className="eyebrow-red block mb-2">§ {prefix}</span>}
-        <h3 className="headline text-[12vw] md:text-[5rem] leading-[0.95]">
+        <h3 className="headline h-section">
           {headHTML} <em>{tail}</em>
         </h3>
       </div>
-      <span className="eyebrow text-right">{eyebrow}</span>
+      <span className="eyebrow text-right uppercase">{eyebrow}</span>
     </div>
   );
 }
@@ -60,18 +66,25 @@ function CalendarCard({ race }: { race: Race }) {
   const code = countryCode(race.country);
 
   const base =
-    "shrink-0 w-[170px] md:w-[200px] aspect-[4/5] flex flex-col justify-between p-4 transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2";
+    "shrink-0 w-[160px] sm:w-[180px] md:w-[200px] aspect-[4/5] flex flex-col justify-between p-4 transition-all duration-200 hover-lift";
+
   let variant = "bg-paper border border-rule hover:border-ink";
-  if (isNext) variant = "bg-ink text-paper";
-  else if (completed) variant = "bg-paper border border-rule opacity-50 hover:opacity-80";
+  if (isNext) variant = "bg-ink text-paper border border-ink";
+  else if (completed)
+    variant =
+      "bg-paper-deep border border-rule text-muted hover:text-ink hover:border-rule-strong";
 
   return (
-    <li>
-      <Link href={`/races/${race.round}`} className={`${base} ${variant}`}>
+    <li role="listitem">
+      <Link
+        href={`/races/${race.round}`}
+        className={`${base} ${variant}`}
+        aria-label={`${race.race_name}, round ${race.round}, ${formatRaceDate(race.race_date)}${isNext ? " · next race" : completed ? " · completed" : ""}`}
+      >
         <div className="flex items-start justify-between">
           <span
             className={`font-mono text-[10px] tracking-[0.16em] ${
-              isNext ? "text-paper/70" : "text-muted"
+              isNext ? "text-paper/70" : completed ? "text-muted-soft" : "text-muted"
             }`}
           >
             R{String(race.round).padStart(2, "0")}
@@ -79,19 +92,24 @@ function CalendarCard({ race }: { race: Race }) {
           {isNext && (
             <span className="pulse-dot inline-block w-[8px] h-[8px] rounded-full bg-f1" />
           )}
+          {completed && !isNext && (
+            <span className="font-mono text-[9px] tracking-[0.16em] text-muted-soft uppercase">
+              Done
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
           <span
             className={`font-mono tabular text-[11px] tracking-[0.18em] ${
-              isNext ? "text-f1" : completed ? "text-muted" : "text-ink"
+              isNext ? "text-f1" : completed ? "text-muted-soft" : "text-ink"
             }`}
           >
             {code}
           </span>
           <span
             className={`font-display italic text-2xl leading-tight ${
-              isNext ? "text-paper" : "text-ink"
+              isNext ? "text-paper" : completed ? "text-ink/70" : "text-ink"
             }`}
           >
             {race.country}

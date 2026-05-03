@@ -16,12 +16,12 @@ export default function Forecast({ data }: Props) {
   const mode: ModePrediction | null = data.post_quali ?? data.pre_quali;
 
   return (
-    <section id="forecast" className="px-6 md:px-10 py-14 md:py-20">
-      <div className="max-w-[1280px] mx-auto">
+    <section id="forecast" className="section-y">
+      <div className="container-max">
         <div className="flex items-end justify-between gap-6 flex-wrap">
           <div>
             <span className="eyebrow-red block mb-2">§ 04</span>
-            <h3 className="headline text-[12vw] md:text-[5rem] leading-[0.95]">
+            <h3 className="headline h-section">
               Race <em>Forecast</em>
             </h3>
           </div>
@@ -43,17 +43,20 @@ export default function Forecast({ data }: Props) {
 
 function EmptyState({ message }: { message: string | null }) {
   return (
-    <div className="mt-10 border border-rule p-8 md:p-12 bg-paper-deep/40">
+    <div className="mt-10 card card-deep p-7 md:p-12">
       <span className="eyebrow-red block">Forecast Unavailable</span>
-      <p className="mt-3 font-display italic text-2xl text-ink-soft max-w-2xl">
+      <p className="mt-3 font-display italic text-[clamp(1.25rem,3vw,1.7rem)] text-ink-soft max-w-2xl leading-snug">
         The prediction model has not been trained for the next round yet.
       </p>
       {message && (
         <p className="mt-3 text-sm text-muted max-w-xl">{message}</p>
       )}
       <p className="mt-3 text-sm text-muted max-w-xl">
-        Forecasts return when the lightsout-api <code className="font-mono">/predictions/next</code> endpoint
-        publishes a model version for this race.
+        Forecasts return when the lightsout-api{" "}
+        <code className="font-mono text-[12px] bg-paper-deep px-1.5 py-0.5">
+          /predictions/next
+        </code>{" "}
+        endpoint publishes a model version for this race.
       </p>
     </div>
   );
@@ -81,44 +84,48 @@ function ForecastBody({
 
   return (
     <>
-      {/* Callouts */}
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="mt-9 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-5">
         {pole && <PoleCallout pole={pole} />}
         {winner && <WinnerCallout winner={winner} />}
       </div>
 
-      {/* Top 5 */}
       <div className="mt-12">
-        <div className="flex items-baseline justify-between">
+        <div className="flex items-baseline justify-between gap-2 flex-wrap">
           <span className="eyebrow-ink">Top 5 · Win Probability</span>
           <span className="eyebrow">{simsK} Sims</span>
         </div>
         <ul className="mt-4 flex flex-col">
           {top5.map((d, i) => {
             const w = barLeader > 0 ? d.win_probability / barLeader : 0;
+            const color = teamColor(d.team);
             return (
               <li
                 key={d.driver_code}
-                className="grid grid-cols-[1.5rem_1fr_auto] gap-3 items-center py-3 border-b border-rule last:border-b-0"
+                className="row-hover relative grid grid-cols-[1.75rem_minmax(0,1fr)_auto] gap-3 items-center py-3 border-b border-rule last:border-b-0"
               >
-                <span className="font-mono tabular text-[12px] text-muted">
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-3 bottom-3 w-[3px]"
+                  style={{ background: color }}
+                />
+                <span className="font-mono tabular text-[12px] text-muted pl-3">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0">
-                  <div className="font-display text-[20px] leading-tight">
+                  <div className="font-display text-[19px] leading-tight truncate">
                     {d.driver_name}
                   </div>
-                  <div className="eyebrow mt-0.5">
+                  <div className="eyebrow mt-0.5 truncate">
                     {teamShort(d.team)} · EXP P{d.expected_position.toFixed(1)}
                   </div>
-                  <div className="mt-2 h-[3px] bg-paper-deep w-full max-w-[420px]">
+                  <div className="mt-2 h-[4px] bg-paper-deep w-full max-w-[420px]">
                     <div
-                      className="h-full bg-f1"
-                      style={{ width: `${Math.max(2, w * 100)}%` }}
+                      className="h-full transition-[width] duration-700"
+                      style={{ width: `${Math.max(2, w * 100)}%`, background: color }}
                     />
                   </div>
                 </div>
-                <span className="font-mono tabular text-[15px] text-ink">
+                <span className="font-mono tabular text-[15px] text-ink shrink-0">
                   {pct(d.win_probability)}
                 </span>
               </li>
@@ -127,7 +134,6 @@ function ForecastBody({
         </ul>
       </div>
 
-      {/* Heatmap toggle */}
       <details className="mt-10 group">
         <summary className="cursor-pointer list-none flex items-center justify-between border-y border-ink py-3 select-none">
           <span className="eyebrow-ink">Full Distribution Matrix · 20 × 20</span>
@@ -143,8 +149,7 @@ function ForecastBody({
         </div>
       </details>
 
-      {/* Footer eyebrow */}
-      <div className="mt-10 flex flex-wrap gap-x-6 gap-y-1">
+      <div className="mt-10 flex flex-wrap gap-x-5 gap-y-1">
         <span className="eyebrow">{stageLabel}</span>
         <span className="eyebrow">· {simsK} SIMS</span>
         <span className="eyebrow">· MODEL {mode.model_version.toUpperCase()}</span>
@@ -156,7 +161,7 @@ function ForecastBody({
 
 function PoleCallout({ pole }: { pole: PredictedPole }) {
   return (
-    <div className="hover-lift border border-rule bg-paper-deep/40 p-6 md:p-8 flex flex-col gap-4 relative">
+    <div className="card hover-lift card-deep p-6 md:p-8 flex flex-col gap-4 relative">
       <span
         aria-hidden
         className="absolute left-0 top-0 bottom-0 w-[3px]"
@@ -164,7 +169,7 @@ function PoleCallout({ pole }: { pole: PredictedPole }) {
       />
       <span className="eyebrow-red">Predicted Pole</span>
       <div>
-        <div className="font-display text-[44px] md:text-[56px] leading-[0.95]">
+        <div className="font-display text-[clamp(2rem,5vw,3.25rem)] leading-[0.95]">
           {pole.driver_name}
         </div>
         <div className="eyebrow mt-2">
@@ -173,7 +178,7 @@ function PoleCallout({ pole }: { pole: PredictedPole }) {
       </div>
       <div className="flex items-baseline justify-between mt-2">
         <span className="eyebrow">Confidence</span>
-        <span className="font-mono tabular text-[28px] text-f1">
+        <span className="numeric-lg text-f1">
           {pctShort(pole.confidence)}
         </span>
       </div>
@@ -183,7 +188,7 @@ function PoleCallout({ pole }: { pole: PredictedPole }) {
 
 function WinnerCallout({ winner }: { winner: DriverPrediction }) {
   return (
-    <div className="hover-lift border border-rule bg-paper-deep/40 p-6 md:p-8 flex flex-col gap-4 relative">
+    <div className="card hover-lift card-deep p-6 md:p-8 flex flex-col gap-4 relative">
       <span
         aria-hidden
         className="absolute left-0 top-0 bottom-0 w-[3px]"
@@ -191,7 +196,7 @@ function WinnerCallout({ winner }: { winner: DriverPrediction }) {
       />
       <span className="eyebrow-red">Predicted Winner</span>
       <div>
-        <div className="font-display text-[44px] md:text-[56px] leading-[0.95]">
+        <div className="font-display text-[clamp(2rem,5vw,3.25rem)] leading-[0.95]">
           {winner.driver_name}
         </div>
         <div className="eyebrow mt-2">
@@ -200,7 +205,7 @@ function WinnerCallout({ winner }: { winner: DriverPrediction }) {
       </div>
       <div className="flex items-baseline justify-between mt-2">
         <span className="eyebrow">Win Probability</span>
-        <span className="font-mono tabular text-[28px] text-f1">
+        <span className="numeric-lg text-f1">
           {pctShort(winner.win_probability)}
         </span>
       </div>

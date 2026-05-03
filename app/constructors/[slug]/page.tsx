@@ -88,30 +88,28 @@ export default async function ConstructorPage({
         label={teamShort(standing.team)}
       />
 
-      <section className="px-6 md:px-10 py-10 md:py-14">
-        <div className="max-w-[1280px] mx-auto">
+      <section className="section-y">
+        <div className="container-max">
           <span className="eyebrow-red block">
             P{standing.position} · Constructor
           </span>
 
-          <h1 className="headline mt-4 text-[14vw] md:text-[7.5rem] leading-[0.9]">
+          <h1 className="headline h-detail mt-4">
             <em style={{ color, fontStyle: "italic" }}>
               {teamShort(standing.team)}
             </em>
           </h1>
 
-          <div className="mt-6 flex items-center gap-4 flex-wrap">
+          <div className="mt-5 flex items-center gap-2 sm:gap-3 flex-wrap">
             {profile?.nationality && (
-              <span className="font-mono tabular text-[11px] tracking-[0.16em] text-muted">
-                {profile.nationality}
-              </span>
+              <span className="chip text-muted">{profile.nationality}</span>
             )}
             {profile?.url && (
               <a
                 href={profile.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-mono tabular text-[11px] tracking-[0.16em] text-muted underline decoration-rule hover:decoration-ink hover:text-ink transition-colors"
+                className="chip hover:border-ink hover:text-ink transition-colors"
               >
                 Reference ↗
               </a>
@@ -120,13 +118,13 @@ export default async function ConstructorPage({
 
           <div
             aria-hidden
-            className="mt-8 h-2 w-full"
+            className="mt-8 h-[6px] w-full"
             style={{ background: color }}
           />
 
           <div className="rule-thin mt-10" />
 
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-8">
+          <div className="mt-8 stat-strip grid-cols-2 md:grid-cols-4">
             <Stat label="Position" value={`P${standing.position}`} />
             <Stat label="Points" value={String(totalConstructorPoints)} />
             <Stat label="Wins" value={String(standing.wins)} />
@@ -268,9 +266,9 @@ export default async function ConstructorPage({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       <span className="eyebrow">{label}</span>
-      <span className="font-display text-[28px] md:text-[36px] leading-none">
+      <span className="font-display text-[clamp(1.75rem,4vw,2.4rem)] leading-none">
         {value}
       </span>
     </div>

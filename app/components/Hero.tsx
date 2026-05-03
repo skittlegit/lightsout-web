@@ -16,66 +16,70 @@ function targetISO(race: Race): string {
 export default function Hero({ race, totalRounds }: Props) {
   const { head, tail } = splitRaceName(race.race_name);
   const target = targetISO(race);
-  const roundLabel = `Round ${String(race.round).padStart(2, "0")} · Up Next`;
   const code = countryCode(race.country);
 
   return (
-    <section id="next" className="px-6 md:px-10 pt-6 pb-12">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="bg-ink text-paper p-8 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 lg:gap-16">
-          {/* LEFT */}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="eyebrow-red">{roundLabel}</span>
-              <span className="inline-flex items-center gap-2 border border-paper/20 px-2 py-1">
-                <span className="pulse-dot inline-block w-[6px] h-[6px] rounded-full bg-f1" />
-                <span className="font-mono text-[10px] tracking-[0.16em] text-paper">
+    <section id="next" className="pt-2 pb-12 md:pb-16">
+      <div className="container-max">
+        <div className="bg-ink text-paper relative overflow-hidden">
+          {/* Top hairline accent */}
+          <span aria-hidden className="absolute top-0 left-0 right-0 h-[2px] bg-f1" />
+
+          <div className="p-6 sm:p-8 md:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 md:gap-10 lg:gap-14">
+            {/* LEFT */}
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <span className="eyebrow-red">
+                  Round {String(race.round).padStart(2, "0")} · Up Next
+                </span>
+                <span className="chip chip-dark">
+                  <span className="pulse-dot inline-block w-[6px] h-[6px] rounded-full bg-f1" />
                   {code}
                 </span>
-              </span>
+              </div>
+
+              <Link
+                href={`/races/${race.round}`}
+                className="headline-link block mt-6 md:mt-8"
+              >
+                <h2 className="headline h-hero text-paper">
+                  {head}
+                  {tail && (
+                    <>
+                      {" "}
+                      <em className="text-f1">{tail}</em>
+                    </>
+                  )}
+                </h2>
+              </Link>
+
+              <div className="mt-8 md:mt-10 grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-8 max-w-3xl">
+                <Field label="Circuit" value={race.circuit} />
+                <Field label="Country" value={race.country} />
+                <Field
+                  label="Round"
+                  value={`${String(race.round).padStart(2, "0")} of ${String(totalRounds).padStart(2, "0")}`}
+                  mono
+                />
+                <Field
+                  label="Race Day"
+                  value={formatRaceFullDate(race.race_date)}
+                  mono
+                />
+              </div>
+
+              <Link
+                href={`/races/${race.round}`}
+                className="mt-7 md:mt-8 inline-flex items-center gap-2 self-start font-mono text-[11px] tracking-[0.2em] uppercase text-paper hover:text-f1 transition-colors border-b border-paper/30 hover:border-f1 pb-1"
+              >
+                View race detail <span aria-hidden>→</span>
+              </Link>
             </div>
 
-            <Link
-              href={`/races/${race.round}`}
-              className="block focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
-            >
-              <h2 className="headline text-paper mt-8 text-[14vw] md:text-[8.5rem] leading-[0.9] hover:text-paper/90 transition-colors">
-                {head}
-                {tail && (
-                  <>
-                    {" "}
-                    <em className="text-f1">{tail}</em>
-                  </>
-                )}
-              </h2>
-            </Link>
-
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-10 max-w-3xl">
-              <Field label="Circuit" value={race.circuit} />
-              <Field label="Country" value={race.country} />
-              <Field
-                label="Round"
-                value={`${String(race.round).padStart(2, "0")} of ${String(totalRounds).padStart(2, "0")}`}
-                mono
-              />
-              <Field
-                label="Race Day"
-                value={formatRaceFullDate(race.race_date)}
-                mono
-              />
+            {/* RIGHT — countdown */}
+            <div className="lg:border-l lg:border-paper/15 lg:pl-10 flex lg:items-end pt-4 lg:pt-0">
+              <Countdown targetISO={target} />
             </div>
-
-            <Link
-              href={`/races/${race.round}`}
-              className="mt-8 inline-flex items-center gap-2 self-start font-mono text-[11px] tracking-[0.18em] uppercase text-paper/80 hover:text-f1 transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
-            >
-              View race detail →
-            </Link>
-          </div>
-
-          {/* RIGHT — countdown */}
-          <div className="lg:border-l lg:border-paper/15 lg:pl-12 flex lg:items-end">
-            <Countdown targetISO={target} />
           </div>
         </div>
       </div>
@@ -94,9 +98,9 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5 min-w-0">
-      <span className="eyebrow text-paper/50">{label}</span>
+      <span className="eyebrow text-paper/55">{label}</span>
       <span
-        className={`text-paper text-sm md:text-base leading-snug ${
+        className={`text-paper text-[15px] md:text-[16px] leading-snug ${
           mono ? "font-mono tabular" : ""
         }`}
       >

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   LightsOut — editorial almanac theme
+   LightsOut — editorial almanac theme (Phase 2 polish)
    Tailwind v4 CSS-first config. No tailwind.config.ts.
    ============================================================ */
 
@@ -9,14 +9,18 @@
   /* Surfaces & ink */
   --color-paper: #faf7f2;
   --color-paper-deep: #f2eee6;
+  --color-paper-deeper: #ebe6db;
   --color-ink: #0e0e0e;
   --color-ink-soft: #1f1f1f;
-  --color-muted: #6b6862;
+  --color-muted: #5e5b55;        /* darker for AA on paper */
+  --color-muted-soft: #8a857c;
   --color-rule: #d9d2c5;
+  --color-rule-strong: #b8b0a0;
 
   /* F1 red */
   --color-f1: #e10600;
   --color-f1-deep: #c20500;
+  --color-f1-soft: #ff2a1f;
 
   /* Team accents */
   --color-team-mercedes: #27f4d2;
@@ -36,13 +40,32 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
 
-  /* Animation timings */
+  /* Motion */
   --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 160ms;
+  --dur-mid: 240ms;
+  --dur-slow: 480ms;
+
+  /* Layout */
+  --container-max: 1320px;
+  --gutter-x: clamp(1.25rem, 3.5vw, 2.5rem);
+  --section-y: clamp(3rem, 7vw, 5rem);
 }
 
 /* ============================================================
    Base
    ============================================================ */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 64px;
+  -webkit-text-size-adjust: 100%;
+}
 
 html,
 body {
@@ -52,13 +75,19 @@ body {
 
 body {
   font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.55;
   font-feature-settings: "ss01", "kern";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-/* Subtle paper grain overlay — radial gradient, fixed */
+@media (min-width: 1024px) {
+  body { font-size: 16px; }
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -66,71 +95,78 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 10%, rgba(14, 14, 14, 0.025) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(193, 5, 0, 0.015) 0%, transparent 60%),
-    radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.18) 100%);
+    radial-gradient(ellipse at 18% 8%, rgba(14, 14, 14, 0.028) 0%, transparent 55%),
+    radial-gradient(ellipse at 82% 88%, rgba(193, 5, 0, 0.018) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.16) 100%);
   mix-blend-mode: multiply;
 }
 
 main,
 header,
 footer,
-section {
-  position: relative;
-  z-index: 1;
+section { position: relative; z-index: 1; }
+
+::selection { background: var(--color-f1); color: var(--color-paper); }
+
+:focus-visible {
+  outline: 2px solid var(--color-f1);
+  outline-offset: 3px;
+  border-radius: 1px;
 }
 
-::selection {
-  background: var(--color-f1);
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: -100px;
+  transform: translateX(-50%);
+  background: var(--color-ink);
   color: var(--color-paper);
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 100;
+  transition: top var(--dur-fast) var(--ease-out-soft);
 }
+.skip-link:focus { top: 12px; }
+
+/* ============================================================
+   Typography utilities
+   ============================================================ */
 
 .tabular {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
 
-/* ============================================================
-   Editorial typographic utilities
-   ============================================================ */
+.font-display { font-family: var(--font-display); }
 
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  font-weight: 500;
-}
-
-.eyebrow-ink {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-ink);
-  font-weight: 500;
-}
-
+.eyebrow,
+.eyebrow-ink,
 .eyebrow-red {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-f1);
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1.2;
 }
+.eyebrow      { color: var(--color-muted); }
+.eyebrow-ink  { color: var(--color-ink); }
+.eyebrow-red  { color: var(--color-f1); font-weight: 600; }
 
-.rule-thin { border-top: 1px solid var(--color-rule); }
-.rule-red  { border-top: 2px solid var(--color-f1); }
-.rule-ink  { border-top: 1px solid var(--color-ink); }
+.rule-thin   { border-top: 1px solid var(--color-rule); }
+.rule-red    { border-top: 2px solid var(--color-f1); }
+.rule-ink    { border-top: 1px solid var(--color-ink); }
+.rule-strong { border-top: 1px solid var(--color-rule-strong); }
 
-/* Italic-red final word in a serif headline */
 .headline {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   line-height: 0.95;
+  text-wrap: balance;
 }
 .headline em {
   font-style: italic;
@@ -138,39 +174,53 @@ section {
   font-weight: 400;
 }
 
-/* Hide horizontal scrollbars (macOS calendar strip) */
+/* Fluid display sizes */
+.h-mark       { font-size: clamp(3.5rem, 16vw, 13rem);  letter-spacing: -0.04em; }
+.h-hero       { font-size: clamp(2.75rem, 11vw, 8rem); }
+.h-section    { font-size: clamp(2.25rem, 7.5vw, 4.75rem); }
+.h-subsection { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+.h-detail     { font-size: clamp(2.25rem, 8vw, 5rem); }
+
+.numeric-xl { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(2.5rem, 7vw, 3.5rem); line-height: 1; }
+.numeric-lg { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; }
+
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* ============================================================
-   Animations
+   Components / utilities
    ============================================================ */
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.85); }
+.container-max {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-x);
 }
-.pulse-dot {
-  animation: pulse-dot 1.4s var(--ease-editorial) infinite;
+.section-y { padding-block: var(--section-y); }
+
+.card {
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  transition: border-color var(--dur-fast) var(--ease-out-soft),
+              transform var(--dur-fast) var(--ease-out-soft);
+}
+.card:hover { border-color: var(--color-ink); }
+.card-deep { background: color-mix(in srgb, var(--color-paper-deep) 60%, var(--color-paper)); }
+
+.row-hover { transition: background-color var(--dur-fast) var(--ease-out-soft); }
+.row-hover:hover { background: color-mix(in srgb, var(--color-paper-deep) 50%, transparent); }
+
+.fade-x-edges {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
 }
 
-@keyframes colon-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--gutter-x);
 }
-.colon-pulse {
-  animation: colon-pulse 1s steps(2, end) infinite;
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 0.85; }
-}
-.skeleton {
-  background: var(--color-paper-deep);
-  animation: skeleton-pulse 1.6s ease-in-out infinite;
-  border-radius: 2px;
-}
+.scroll-snap-x > * { scroll-snap-align: start; }
 
 .anchor-link {
   font-family: var(--font-mono);
@@ -178,16 +228,131 @@ section {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-muted);
-  transition: color 200ms var(--ease-editorial);
+  transition: color var(--dur-fast) var(--ease-out-soft);
   display: block;
   padding: 4px 0;
+  position: relative;
 }
 .anchor-link:hover { color: var(--color-ink); }
+.anchor-link::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  width: 4px;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(-50%) scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+.anchor-link:hover::before { transform: translateY(-50%) scaleX(1); }
 
-.hover-lift { transition: transform 200ms var(--ease-editorial); }
+.hover-lift {
+  transition: transform var(--dur-fast) var(--ease-out-soft),
+              border-color var(--dur-fast) var(--ease-out-soft);
+}
 .hover-lift:hover { transform: translateY(-2px); }
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 24px;
+.headline-link {
+  display: inline-block;
+  position: relative;
+  text-decoration: none;
+}
+.headline-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.05em;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-mid) var(--ease-out-soft);
+}
+.headline-link:hover::after { transform: scaleX(1); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+.chip-dark {
+  border-color: rgba(250, 247, 242, 0.2);
+  background: transparent;
+  color: var(--color-paper);
+}
+
+/* stat-strip: applied alongside `grid grid-cols-N` for responsive count.
+   Hairline divider is achieved via 1px gap with rule-color bg. */
+.stat-strip {
+  display: grid;
+  gap: 1px;
+  background: var(--color-rule);
+  border: 1px solid var(--color-rule);
+}
+.stat-strip > * {
+  background: var(--color-paper);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .stat-strip > * { padding: 20px 22px; }
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.85); }
+}
+.pulse-dot { animation: pulse-dot 1.6s var(--ease-editorial) infinite; }
+
+@keyframes colon-pulse {
+  0%, 55%   { opacity: 0.92; }
+  75%, 100% { opacity: 0.4; }
+}
+.colon-pulse { animation: colon-pulse 1.6s var(--ease-out-soft) infinite; }
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
+}
+.skeleton {
+  background: var(--color-paper-deep);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pulse-dot, .colon-pulse, .skeleton { animation: none !important; }
+  .hover-lift:hover { transform: none !important; }
+  .headline-link::after { transition: none !important; }
 }

@@ -10,8 +10,6 @@ interface Props {
 
 /**
  * Last Race Recap — honest, real-data-only column.
- * Shows the last completed race header + the top-3 championship snapshot
- * (since the backend doesn't expose per-round podium results yet).
  */
 export default function PaddockIntelView({ lastRace, drivers }: Props) {
   const top3 = drivers.slice(0, 3);
@@ -28,19 +26,22 @@ export default function PaddockIntelView({ lastRace, drivers }: Props) {
         <>
           <Link
             href={`/races/${lastRace.round}`}
-            className="mt-6 block border border-rule p-4 hover:border-ink transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+            className="mt-6 block card hover-lift p-5 group"
           >
-            <span className="eyebrow-red block">
-              Round {String(lastRace.round).padStart(2, "0")} · Completed
-            </span>
-            <div className="mt-2 font-display text-[22px] leading-tight">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="eyebrow-red">
+                Round {String(lastRace.round).padStart(2, "0")} · Completed
+              </span>
+              <span className="eyebrow">
+                {formatRaceDate(lastRace.race_date)}
+              </span>
+            </div>
+            <div className="mt-3 font-display italic text-[clamp(1.25rem,2.5vw,1.6rem)] leading-tight group-hover:text-f1 transition-colors">
               {lastRace.race_name}
             </div>
-            <div className="eyebrow mt-1.5">
-              {lastRace.circuit} · {formatRaceDate(lastRace.race_date)}
-            </div>
-            <div className="mt-3 font-mono text-[10px] tracking-[0.18em] uppercase text-f1">
-              View race detail →
+            <div className="eyebrow mt-1.5">{lastRace.circuit}</div>
+            <div className="mt-4 font-mono text-[10px] tracking-[0.2em] uppercase text-f1 inline-flex items-center gap-1.5">
+              View race detail <span aria-hidden>→</span>
             </div>
           </Link>
 
@@ -51,29 +52,30 @@ export default function PaddockIntelView({ lastRace, drivers }: Props) {
               return (
                 <li
                   key={d.driver_code}
-                  className="relative grid grid-cols-[1.25rem_1fr_auto] gap-3 items-center py-2.5 border-b border-rule last:border-b-0"
+                  className="row-hover relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] gap-3 items-center py-2.5 border-b border-rule last:border-b-0 group"
                 >
                   <span
                     aria-hidden
                     className="absolute left-0 top-2 bottom-2 w-[3px]"
                     style={{ background: color }}
                   />
-                  <span className="font-mono tabular text-[12px] text-muted pl-2">
+                  <span className="font-mono tabular text-[12px] text-muted pl-3">
                     P{d.position}
                   </span>
                   <Link
                     href={`/drivers/${d.driver_code.toLowerCase()}`}
-                    className="min-w-0 hover:text-f1 transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+                    className="min-w-0"
                   >
-                    <div className="font-display text-[17px] leading-tight truncate">
+                    <div className="font-display text-[17px] leading-tight truncate group-hover:text-f1 transition-colors">
                       {abbreviateName(d.driver_name)}
                     </div>
                     <div className="eyebrow mt-0.5 truncate">
                       {teamShort(d.team)} · {d.driver_code}
                     </div>
                   </Link>
-                  <span className="font-mono tabular text-[12px] text-ink">
-                    {d.points} <span className="eyebrow">PTS</span>
+                  <span className="font-mono tabular text-[12px] text-ink shrink-0">
+                    {d.points}
+                    <span className="eyebrow ml-1">PTS</span>
                   </span>
                 </li>
               );

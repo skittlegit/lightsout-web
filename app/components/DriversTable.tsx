@@ -13,28 +13,28 @@ export default function DriversTable({ drivers }: Props) {
   return (
     <div className="flex flex-col">
       <SectionHead num="01" headHTML="Drivers'" tail="Championship" />
-      <ul className="mt-6 flex flex-col">
+      <ul className="mt-5 flex flex-col">
         {top.map((d) => {
           const ratio = leader > 0 ? d.points / leader : 0;
           const color = teamColor(d.team);
           return (
             <li
               key={d.driver_code}
-              className="relative grid grid-cols-[1.5rem_1fr_auto] gap-3 items-center py-3 border-b border-rule last:border-b-0 group"
+              className="row-hover relative grid grid-cols-[1.75rem_minmax(0,1fr)_auto] gap-3 items-center py-3 border-b border-rule last:border-b-0 group"
             >
-              {/* 3px team-color leading edge */}
+              {/* Team-color leading edge — thickens on hover */}
               <span
                 aria-hidden
-                className="absolute left-0 top-3 bottom-3 w-[3px]"
+                className="absolute left-0 top-3 bottom-3 w-[3px] group-hover:w-[4px] transition-[width] duration-150"
                 style={{ background: color }}
               />
-              <span className="font-mono tabular text-[12px] text-muted pl-2">
+              <span className="font-mono tabular text-[12px] text-muted pl-3">
                 {String(d.position).padStart(2, "0")}
               </span>
 
               <Link
                 href={`/drivers/${d.driver_code.toLowerCase()}`}
-                className="min-w-0 focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+                className="min-w-0"
               >
                 <div className="font-display text-[19px] leading-tight truncate group-hover:text-f1 transition-colors">
                   {abbreviateName(d.driver_name)}
@@ -51,7 +51,7 @@ export default function DriversTable({ drivers }: Props) {
                 </span>
                 <div className="w-[88px] h-[3px] bg-paper-deep">
                   <div
-                    className="h-full"
+                    className="h-full transition-[width] duration-500"
                     style={{
                       width: `${Math.max(2, ratio * 100)}%`,
                       background: color,
@@ -79,7 +79,7 @@ export function SectionHead({
   return (
     <div>
       <span className="eyebrow-red block">§ {num}</span>
-      <h3 className="headline mt-2 text-[8vw] md:text-[2.5rem] leading-[0.95]">
+      <h3 className="headline h-subsection mt-2">
         {headHTML} <em>{tail}</em>
       </h3>
       <div className="rule-thin mt-4" />

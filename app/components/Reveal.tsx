@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 
 interface Props {
@@ -11,21 +11,30 @@ interface Props {
 }
 
 /**
- * Subtle in-view reveal: opacity 0->1, translateY 12->0, 700ms.
- * Used by major sections only.
+ * Subtle in-view reveal: opacity 0->1, translateY 8->0, 520ms.
+ * No-ops for users with prefers-reduced-motion.
  */
 export default function Reveal({ children, delay = 0, className }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-10% 0px -10% 0px" });
+  const inView = useInView(ref, { once: true, margin: "-8% 0px -8% 0px" });
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return (
+      <div ref={ref} className={className}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 12 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
       transition={{
-        duration: 0.7,
-        ease: [0.22, 0.61, 0.36, 1],
+        duration: 0.52,
+        ease: [0.16, 1, 0.3, 1],
         delay: delay / 1000,
       }}
       className={className}

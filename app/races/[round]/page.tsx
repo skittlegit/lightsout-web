@@ -71,20 +71,16 @@ export default async function RacePage({
         label={`Round ${String(roundN).padStart(2, "0")}`}
       />
 
-      <section className="px-6 md:px-10 py-10 md:py-14">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex items-center gap-3 flex-wrap">
+      <section className="section-y">
+        <div className="container-max">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <span className={`eyebrow-red ${statusColor}`}>
               Round {String(roundN).padStart(2, "0")} · {status}
             </span>
-            <span className="inline-flex items-center gap-2 border border-rule px-2 py-1">
-              <span className="font-mono tabular text-[10px] tracking-[0.16em]">
-                {countryCode(race.country)}
-              </span>
-            </span>
+            <span className="chip">{countryCode(race.country)}</span>
           </div>
 
-          <h1 className="headline mt-6 text-[14vw] md:text-[8rem] leading-[0.9]">
+          <h1 className="headline h-detail mt-6">
             {head}
             {tail && (
               <>
@@ -94,7 +90,7 @@ export default async function RacePage({
             )}
           </h1>
 
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-8">
+          <div className="mt-8 stat-strip grid-cols-2 md:grid-cols-4">
             <Stat label="Country" value={race.country} />
             <Stat label="Circuit" value={race.circuit} />
             <Stat label="Race Day" value={formatRaceFullDate(race.race_date)} mono />
@@ -109,15 +105,15 @@ export default async function RacePage({
 
       {/* Circuit visual */}
       {circuit && (
-        <section className="px-6 md:px-10 py-6">
-          <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 items-stretch">
+        <section className="py-6">
+          <div className="container-max grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 items-stretch">
             <CircuitVisual circuit={circuit} variant="wide" />
             <div className="flex flex-col justify-end">
               <span className="eyebrow-red block">Layout</span>
-              <h3 className="headline mt-2 text-[8vw] md:text-[2.4rem]">
+              <h3 className="headline h-subsection mt-2">
                 Track <em>Card</em>
               </h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-muted max-w-md">
                 Geographic and reference data for {circuit.circuitName}.
                 Track outline is stylised — see Wikipedia link for the
                 survey-accurate layout.
@@ -134,18 +130,16 @@ export default async function RacePage({
           <QualifyingBlock results={quali?.QualifyingResults ?? []} />
         </>
       ) : prediction ? (
-        <section className="px-6 md:px-10">
-          <div className="max-w-[1280px] mx-auto">
-            <Forecast data={prediction} />
-          </div>
-        </section>
+        <Forecast data={prediction} />
       ) : (
-        <section className="px-6 md:px-10 py-10">
-          <div className="max-w-[1280px] mx-auto border border-rule p-8">
-            <span className="eyebrow-red block">Forecast</span>
-            <p className="mt-3 text-sm text-muted">
-              Prediction not yet generated for this round.
-            </p>
+        <section className="py-10">
+          <div className="container-max">
+            <div className="card card-deep p-7 md:p-10">
+              <span className="eyebrow-red block">Forecast</span>
+              <p className="mt-3 font-display italic text-[clamp(1.15rem,2.5vw,1.5rem)] text-ink-soft max-w-xl">
+                Prediction not yet generated for this round.
+              </p>
+            </div>
           </div>
         </section>
       )}
@@ -312,7 +306,7 @@ function Stat({
   mono?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       <span className="eyebrow">{label}</span>
       <span
         className={`text-[15px] md:text-[17px] leading-snug ${

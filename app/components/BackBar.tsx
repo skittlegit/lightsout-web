@@ -11,8 +11,8 @@ interface Props {
 
 export default function BackBar({ crumb, crumbHref, label }: Props) {
   return (
-    <header className="px-6 md:px-10 pt-8 md:pt-10 pb-4">
-      <div className="max-w-[1280px] mx-auto flex items-center justify-between gap-4">
+    <header className="pt-8 md:pt-10 pb-4">
+      <div className="container-max flex items-center justify-between gap-4">
         <nav className="flex items-center gap-2 font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
           <Link
             href="/"
@@ -41,7 +41,7 @@ export default function BackBar({ crumb, crumbHref, label }: Props) {
           ← Back
         </Link>
       </div>
-      <div className="max-w-[1280px] mx-auto mt-6 rule-thin" />
+      <div className="container-max mt-6"><div className="rule-thin" /></div>
     </header>
   );
 }

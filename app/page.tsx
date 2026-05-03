@@ -28,6 +28,7 @@ import {
 export default function Home() {
   return (
     <>
+      <a href="#hero" className="skip-link">Skip to content</a>
       <SmoothScroll />
       <SectionAnchors />
 
@@ -37,26 +38,26 @@ export default function Home() {
         </Reveal>
 
         {/* Next Race */}
-        <Reveal delay={80}>
+        <Reveal delay={60}>
           <Suspense fallback={<HeroSkeleton />}>
             <HeroSection />
           </Suspense>
         </Reveal>
 
         {/* Calendar */}
-        <Reveal delay={160}>
+        <Reveal delay={120}>
           <Suspense fallback={<CalendarSkeleton />}>
             <CalendarSection />
           </Suspense>
         </Reveal>
 
         {/* Drivers / Constructors / Last Race — three-column block */}
-        <Reveal delay={240}>
+        <Reveal delay={180}>
           <ThreeColumnBlock />
         </Reveal>
 
         {/* Forecast */}
-        <Reveal delay={320}>
+        <Reveal delay={220}>
           <Suspense fallback={<ForecastSkeleton />}>
             <ForecastSection />
           </Suspense>
@@ -86,8 +87,8 @@ async function CalendarSection() {
 
 function ThreeColumnBlock() {
   return (
-    <section className="px-6 md:px-10 py-14 md:py-20">
-      <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+    <section className="section-y">
+      <div className="container-max grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
         <div id="drivers">
           <Suspense fallback={<ColumnSkeleton rows={10} />}>
             <DriversColumn />
@@ -98,7 +99,7 @@ function ThreeColumnBlock() {
             <ConstructorsColumn />
           </Suspense>
         </div>
-        <div id="paddock">
+        <div id="paddock" className="md:col-span-2 lg:col-span-1">
           <Suspense fallback={<ColumnSkeleton rows={5} />}>
             <PaddockColumn />
           </Suspense>
