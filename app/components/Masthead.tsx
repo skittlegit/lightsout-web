@@ -28,7 +28,11 @@ export default function Masthead() {
           Every stat · Every race · Every prediction
         </p>
 
-        <div className="rule-red mt-5 sm:mt-6 md:mt-8" />
+        {/* Race accent: 2px f1 rule + thin checker strip */}
+        <div className="relative mt-5 sm:mt-6 md:mt-8" aria-hidden>
+          <div className="h-[2px] bg-f1" />
+          <div className="h-[8px] checker-strip checker-strip-sm mt-[1px] opacity-90" />
+        </div>
       </div>
     </header>
   );

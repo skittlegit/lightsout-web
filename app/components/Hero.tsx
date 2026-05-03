@@ -1,4 +1,5 @@
 import Countdown from "./Countdown";
+import ShiftLights from "./ShiftLights";
 import type { Race } from "@/lib/types";
 import { splitRaceName, formatRaceFullDate, countryCode } from "@/lib/format";
 import Link from "next/link";
@@ -22,10 +23,18 @@ export default function Hero({ race, totalRounds }: Props) {
     <section id="next" className="pt-2 pb-12 md:pb-16">
       <div className="container-max">
         <div className="bg-ink text-paper relative overflow-hidden">
-          {/* Top hairline accent */}
-          <span aria-hidden className="absolute top-0 left-0 right-0 h-[2px] bg-f1" />
+          {/* chevron racing texture + scanline HUD overlay */}
+          <div aria-hidden className="absolute inset-0 chevron-bg-soft pointer-events-none" />
+          <div aria-hidden className="absolute inset-0 scanline pointer-events-none" />
 
-          <div className="p-6 sm:p-8 md:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 md:gap-10 lg:gap-14">
+          {/* Top hairline + checker strip */}
+          <span aria-hidden className="absolute top-0 left-0 right-0 h-[3px] bg-f1" />
+          <div
+            aria-hidden
+            className="absolute top-[3px] left-0 right-0 h-[10px] checker-strip checker-strip-sm opacity-90"
+          />
+
+          <div className="relative pt-[24px] p-6 sm:p-8 md:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 md:gap-10 lg:gap-14">
             {/* LEFT */}
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
@@ -36,6 +45,7 @@ export default function Hero({ race, totalRounds }: Props) {
                   <span className="pulse-dot inline-block w-[6px] h-[6px] rounded-full bg-f1" />
                   {code}
                 </span>
+                <ShiftLights className="ml-auto sm:ml-0" />
               </div>
 
               <Link

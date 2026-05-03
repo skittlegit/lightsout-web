@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import SectionAnchors from "./components/SectionAnchors";
 import SmoothScroll from "./components/SmoothScroll";
 import Reveal from "./components/Reveal";
+import TickerSection from "./components/TickerSection";
 import {
   HeroSkeleton,
   CalendarSkeleton,
@@ -31,6 +32,11 @@ export default function Home() {
       <a href="#hero" className="skip-link">Skip to content</a>
       <SmoothScroll />
       <SectionAnchors />
+
+      {/* Top race-radio ticker */}
+      <Suspense fallback={<div className="h-[36px] bg-ink" aria-hidden />}>
+        <TickerSection />
+      </Suspense>
 
       <main id="hero" className="flex-1 w-full">
         <Reveal>
