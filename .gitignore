@@ -31,6 +31,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but commit the *.example templates — they carry no secrets and are the
+# reference for setting NEXT_PUBLIC_API_URL (must end in /api) in Vercel.
+!.env*.example
 
 # vercel
 .vercel
