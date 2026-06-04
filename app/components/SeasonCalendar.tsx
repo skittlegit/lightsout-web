@@ -21,6 +21,7 @@ export default function SeasonCalendar({ races, season }: Props) {
 
         <div className="mt-8 md:mt-10 -mx-[var(--gutter-x)] relative">
           <div
+            data-lenis-prevent
             className="overflow-x-auto no-scrollbar fade-x-edges scroll-snap-x px-[var(--gutter-x)] pb-2"
             role="list"
             aria-label={`${season} season rounds`}
@@ -89,14 +90,26 @@ function CalendarCard({ race }: { race: Race }) {
           >
             R{String(race.round).padStart(2, "0")}
           </span>
-          {isNext && (
-            <span className="pulse-dot inline-block w-[8px] h-[8px] rounded-full bg-f1" />
-          )}
-          {completed && !isNext && (
-            <span className="font-mono text-[9px] tracking-[0.16em] text-muted-soft uppercase">
-              Done
-            </span>
-          )}
+          <span className="flex items-center gap-1.5">
+            {race.has_sprint && (
+              <span
+                className={`font-mono text-[8px] tracking-[0.14em] uppercase px-1 py-[1px] border ${
+                  isNext ? "border-paper/40 text-paper/80" : "border-f1/50 text-f1"
+                }`}
+                title="Sprint weekend"
+              >
+                Sprint
+              </span>
+            )}
+            {isNext && (
+              <span className="pulse-dot inline-block w-[8px] h-[8px] rounded-full bg-f1" />
+            )}
+            {completed && !isNext && (
+              <span className="font-mono text-[9px] tracking-[0.16em] text-muted-soft uppercase">
+                Done
+              </span>
+            )}
+          </span>
         </div>
 
         <div className="flex flex-col gap-1">

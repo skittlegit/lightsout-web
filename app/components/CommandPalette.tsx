@@ -185,6 +185,7 @@ export default function CommandPalette({ items }: Props) {
 
         <div
           ref={listRef}
+          data-lenis-prevent
           className="max-h-[60vh] overflow-y-auto"
         >
           {grouped.length === 0 && (

@@ -199,7 +199,7 @@ export default async function ConstructorPage({
               No race results recorded yet for this constructor in 2026.
             </p>
           ) : (
-            <div className="mt-8 overflow-x-auto no-scrollbar">
+            <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
               <table className="w-full border-collapse min-w-[680px]">
                 <thead>
                   <tr className="text-left">

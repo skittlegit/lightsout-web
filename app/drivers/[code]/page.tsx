@@ -148,7 +148,7 @@ export default async function DriverPage({
               No race results recorded yet for this driver in 2026.
             </p>
           ) : (
-            <div className="mt-8 overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0">
+            <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="text-left">

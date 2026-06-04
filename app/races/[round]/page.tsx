@@ -164,7 +164,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
         </div>
         <div className="rule-thin mt-4" />
 
-        <div className="mt-8 overflow-x-auto no-scrollbar">
+        <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
           <table className="w-full border-collapse min-w-[720px]">
             <thead>
               <tr className="text-left">
@@ -246,7 +246,7 @@ function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
         </div>
         <div className="rule-thin mt-4" />
 
-        <div className="mt-8 overflow-x-auto no-scrollbar">
+        <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
           <table className="w-full border-collapse min-w-[680px]">
             <thead>
               <tr className="text-left">

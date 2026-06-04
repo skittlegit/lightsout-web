@@ -18,7 +18,10 @@ export default function PredictionHeatmap({ drivers }: Props) {
   const positions = Array.from({ length: 20 }, (_, i) => i + 1);
 
   return (
-    <div className="overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0 fade-x-edges">
+    <div
+      data-lenis-prevent
+      className="overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0 fade-x-edges"
+    >
       <table
         className="border-collapse min-w-[860px] w-full text-[10px]"
         role="table"

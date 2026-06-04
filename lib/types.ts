@@ -49,6 +49,7 @@ export interface Race {
   race_date: string; // ISO date "YYYY-MM-DD"
   is_next: boolean;
   is_completed: boolean;
+  has_sprint?: boolean;
 }
 
 export interface CalendarResponse {
