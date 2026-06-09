@@ -34,6 +34,21 @@ export function formatRaceDate(iso: string): string {
   return `${month} ${d.getUTCDate()}`;
 }
 
+/** Whole days from `now` until an ISO date (date-only). Negative once past. */
+export function daysUntil(iso: string, now: Date = new Date()): number {
+  const target = new Date(iso.slice(0, 10) + "T00:00:00Z").getTime();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.round((target - today) / 86400000);
+}
+
+/** Short human label for a day count: "Today", "Tomorrow", "In 12 days". */
+export function countdownLabel(days: number): string {
+  if (days < 0) return "Underway";
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return `In ${days} days`;
+}
+
 export function formatRaceFullDate(iso: string): string {
   const d = new Date(iso + (iso.length === 10 ? "T00:00:00Z" : ""));
   return new Intl.DateTimeFormat("en-US", {
@@ -160,20 +175,23 @@ export function countryCode(country: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* Heatmap color (gamma-corrected paper -> F1 deep red)               */
+/* Heatmap color (gamma-corrected surface -> F1 deep red)             */
+/* Uses CSS vars + color-mix so the scale adapts to light/dark theme:  */
+/* low probability blends into the current surface, high stays red.    */
 /* ------------------------------------------------------------------ */
 
+function heatmapT(p: number): number {
+  return Math.pow(Math.max(0, Math.min(1, p)), 0.45);
+}
+
 export function heatmapColor(p: number): string {
-  const clamped = Math.max(0, Math.min(1, p));
-  const t = Math.pow(clamped, 0.45);
-  const r = Math.round(0xfa + (0xc2 - 0xfa) * t);
-  const g = Math.round(0xf7 + (0x05 - 0xf7) * t);
-  const b = Math.round(0xf2 + (0x00 - 0xf2) * t);
-  return `rgb(${r}, ${g}, ${b})`;
+  const t = heatmapT(p);
+  return `color-mix(in srgb, var(--color-f1-deep) ${(t * 100).toFixed(1)}%, var(--color-paper))`;
 }
 
 export function heatmapTextColor(p: number): string {
-  return p >= 0.35 ? "#FAF7F2" : "#0E0E0E";
+  // Light text once the cell is red-dominant; otherwise the theme's ink.
+  return heatmapT(p) >= 0.6 ? "#FAF7F2" : "var(--color-ink)";
 }
 
 /* ------------------------------------------------------------------ */

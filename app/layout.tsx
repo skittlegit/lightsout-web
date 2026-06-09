@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
 };
 
+// Runs before first paint. The site is light by default and ignores OS
+// preference — it only goes dark if the user has explicitly toggled it.
+const themeScript = `(function(){try{if(localStorage.getItem('lo:theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,8 +42,12 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <Suspense fallback={null}>

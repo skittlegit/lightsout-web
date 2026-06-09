@@ -68,7 +68,7 @@ export default function PredictionHeatmap({ drivers }: Props) {
                       color: heatmapTextColor(p),
                       width: 28,
                       height: 26,
-                      borderRight: "1px solid rgba(217,210,197,0.4)",
+                      borderRight: "1px solid var(--color-rule)",
                     }}
                     title={`${d.driver_name} · P${i + 1} · ${(p * 100).toFixed(1)}%`}
                   >

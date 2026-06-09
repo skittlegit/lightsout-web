@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: `dark:` utilities activate under `.dark` on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    LightsOut — editorial almanac theme (Phase 2 polish)
    Tailwind v4 CSS-first config. No tailwind.config.ts.
@@ -54,6 +57,43 @@
 }
 
 /* ============================================================
+   Theme — light (default) / dark ("night race")
+   The neutral ramp is inverted under `.dark`; every `bg-paper`,
+   `text-ink`, `border-rule`, etc. follows automatically. F1 reds and
+   team accents are intentionally shared across both themes.
+   ============================================================ */
+
+:root { color-scheme: light; }
+
+:root.dark {
+  color-scheme: dark;
+  --color-paper: #0c0d0f;        /* page base — clean neutral near-black */
+  --color-paper-deep: #15161a;   /* cards / panels — clearly above base */
+  --color-paper-deeper: #1e2026; /* highest surface */
+  --color-ink: #f3f2ef;          /* primary text — near-white */
+  --color-ink-soft: #c9c8c5;
+  --color-muted: #a2a1a6;        /* secondary text — cool grey, AA on base */
+  --color-muted-soft: #6f6e74;
+  --color-rule: #2d2f35;         /* hairlines — visible so the grid still reads */
+  --color-rule-strong: #474a53;
+}
+
+/* Panels that stay a dark "cockpit" surface in BOTH themes (hero, ticker).
+   Re-pin the neutral ramp locally to its light-theme values so the
+   `bg-ink` / `text-paper` treatment inside them never flips. */
+.surface-invert {
+  --color-paper: #faf7f2;
+  --color-paper-deep: #f2eee6;
+  --color-paper-deeper: #ebe6db;
+  --color-ink: #0e0e0e;
+  --color-ink-soft: #1f1f1f;
+  --color-muted: #5e5b55;
+  --color-muted-soft: #8a857c;
+  --color-rule: #d9d2c5;
+  --color-rule-strong: #b8b0a0;
+}
+
+/* ============================================================
    Base
    ============================================================ */
 
@@ -99,6 +139,14 @@ body::before {
     radial-gradient(ellipse at 82% 88%, rgba(193, 5, 0, 0.018) 0%, transparent 60%),
     radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.16) 100%);
   mix-blend-mode: multiply;
+}
+
+/* On dark, a faint top-left light + bottom-right red glow instead of multiply. */
+:root.dark body::before {
+  background:
+    radial-gradient(ellipse at 18% 8%, rgba(255, 255, 255, 0.035) 0%, transparent 55%),
+    radial-gradient(ellipse at 82% 88%, rgba(255, 42, 31, 0.06) 0%, transparent 60%);
+  mix-blend-mode: screen;
 }
 
 main,
@@ -216,11 +264,13 @@ section { position: relative; z-index: 1; }
           mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
 }
 
+/* Proximity (not mandatory) so wheel/drag panning is never yanked back to a
+   snap point. Snap targets are the cards themselves (`.snap-start`), not the
+   single flex track, so every round is a valid resting point. */
 .scroll-snap-x {
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
   scroll-padding-left: var(--gutter-x);
 }
-.scroll-snap-x > * { scroll-snap-align: start; }
 
 .anchor-link {
   font-family: var(--font-mono);

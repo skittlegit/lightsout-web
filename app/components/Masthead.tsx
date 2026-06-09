@@ -1,5 +1,6 @@
 import { timeGreeting } from "@/lib/format";
 import PaletteTrigger from "./PaletteTrigger";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Masthead() {
   const greeting = timeGreeting();
@@ -16,6 +17,7 @@ export default function Masthead() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <PaletteTrigger />
+            <ThemeToggle />
             <span className="eyebrow hidden md:inline">{greeting.toUpperCase()}</span>
           </div>
         </div>

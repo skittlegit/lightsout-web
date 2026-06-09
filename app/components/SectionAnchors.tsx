@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Anchor {
   id: string;
@@ -64,6 +65,12 @@ export default function SectionAnchors() {
           </a>
         );
       })}
+
+      {/* Separate routed tools (not in-page sections). */}
+      <span aria-hidden className="my-1.5 ml-[1px] h-px w-5 bg-rule" />
+      <Link href="/compare" className="anchor-link" style={{ color: "var(--color-f1)" }}>
+        ◆ Head to Head
+      </Link>
     </nav>
   );
 }

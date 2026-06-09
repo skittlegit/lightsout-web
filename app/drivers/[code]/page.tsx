@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
 import Footer from "@/app/components/Footer";
@@ -92,6 +93,12 @@ export default async function DriverPage({
                   className="chip hover:border-ink transition-colors"
                 >
                   {teamShort(standing.team)}
+                </Link>
+                <Link
+                  href={`/compare?a=${upperCode}` as Route}
+                  className="chip hover:border-f1 hover:text-f1 transition-colors"
+                >
+                  Compare ⤳
                 </Link>
                 {profile?.permanentNumber && (
                   <span className="chip text-muted">

@@ -15,7 +15,7 @@ interface Props {
 export default function Ticker({ items }: Props) {
   if (!items.length) return null;
   return (
-    <div className="ticker" role="marquee" aria-label="Race feed">
+    <div className="ticker surface-invert" role="marquee" aria-label="Race feed">
       <div className="ticker__edge ticker__edge--l" aria-hidden />
       <div className="ticker__edge ticker__edge--r" aria-hidden />
       <div className="ticker__track">

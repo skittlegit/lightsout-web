@@ -1,6 +1,5 @@
 import type { Race } from "@/lib/types";
-import { formatRaceDate, countryCode } from "@/lib/format";
-import Link from "next/link";
+import CalendarBoard from "./CalendarBoard";
 
 interface Props {
   races: Race[];
@@ -19,19 +18,8 @@ export default function SeasonCalendar({ races, season }: Props) {
           tail="Calendar"
         />
 
-        <div className="mt-8 md:mt-10 -mx-[var(--gutter-x)] relative">
-          <div
-            data-lenis-prevent
-            className="overflow-x-auto no-scrollbar fade-x-edges scroll-snap-x px-[var(--gutter-x)] pb-2"
-            role="list"
-            aria-label={`${season} season rounds`}
-          >
-            <ul className="flex gap-3 min-w-max">
-              {races.map((r) => (
-                <CalendarCard key={r.round} race={r} />
-              ))}
-            </ul>
-          </div>
+        <div className="mt-8 md:mt-10">
+          <CalendarBoard races={races} season={season} />
         </div>
       </div>
     </section>
@@ -59,83 +47,5 @@ export function SectionHeading({
       </div>
       <span className="eyebrow text-right uppercase">{eyebrow}</span>
     </div>
-  );
-}
-
-function CalendarCard({ race }: { race: Race }) {
-  const { is_next: isNext, is_completed: completed } = race;
-  const code = countryCode(race.country);
-
-  const base =
-    "shrink-0 w-[160px] sm:w-[180px] md:w-[200px] aspect-[4/5] flex flex-col justify-between p-4 transition-all duration-200 hover-lift";
-
-  let variant = "bg-paper border border-rule hover:border-ink";
-  if (isNext) variant = "bg-ink text-paper border border-ink";
-  else if (completed)
-    variant =
-      "bg-paper-deep border border-rule text-muted hover:text-ink hover:border-rule-strong";
-
-  return (
-    <li role="listitem">
-      <Link
-        href={`/races/${race.round}`}
-        className={`${base} ${variant}`}
-        aria-label={`${race.race_name}, round ${race.round}, ${formatRaceDate(race.race_date)}${isNext ? " · next race" : completed ? " · completed" : ""}`}
-      >
-        <div className="flex items-start justify-between">
-          <span
-            className={`font-mono text-[10px] tracking-[0.16em] ${
-              isNext ? "text-paper/70" : completed ? "text-muted-soft" : "text-muted"
-            }`}
-          >
-            R{String(race.round).padStart(2, "0")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            {race.has_sprint && (
-              <span
-                className={`font-mono text-[8px] tracking-[0.14em] uppercase px-1 py-[1px] border ${
-                  isNext ? "border-paper/40 text-paper/80" : "border-f1/50 text-f1"
-                }`}
-                title="Sprint weekend"
-              >
-                Sprint
-              </span>
-            )}
-            {isNext && (
-              <span className="pulse-dot inline-block w-[8px] h-[8px] rounded-full bg-f1" />
-            )}
-            {completed && !isNext && (
-              <span className="font-mono text-[9px] tracking-[0.16em] text-muted-soft uppercase">
-                Done
-              </span>
-            )}
-          </span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span
-            className={`font-mono tabular text-[11px] tracking-[0.18em] ${
-              isNext ? "text-f1" : completed ? "text-muted-soft" : "text-ink"
-            }`}
-          >
-            {code}
-          </span>
-          <span
-            className={`font-display italic text-2xl leading-tight ${
-              isNext ? "text-paper" : completed ? "text-ink/70" : "text-ink"
-            }`}
-          >
-            {race.country}
-          </span>
-          <span
-            className={`font-mono tabular text-[10px] tracking-[0.12em] mt-2 uppercase ${
-              isNext ? "text-paper/60" : "text-muted"
-            }`}
-          >
-            {formatRaceDate(race.race_date)}
-          </span>
-        </div>
-      </Link>
-    </li>
   );
 }

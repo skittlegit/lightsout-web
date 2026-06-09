@@ -14,6 +14,7 @@ import {
   teamShort,
 } from "@/lib/format";
 import { teamSlug } from "@/lib/slug";
+import { raceRecap, gridDelta, type RaceRecap } from "@/lib/recap";
 import type { JolpicaRaceResult, JolpicaQualifyingResult } from "@/lib/jolpica";
 
 export const revalidate = 600;
@@ -50,6 +51,9 @@ export default async function RacePage({
     race.is_completed ? getQualifying(roundN) : Promise.resolve(null),
     race.is_completed ? Promise.resolve(null) : getPrediction(roundN),
   ]);
+
+  const raceResults = results?.Results ?? [];
+  const recap = race.is_completed ? raceRecap(raceResults) : null;
 
   const { head, tail } = splitRaceName(race.race_name);
   const status = race.is_completed
@@ -103,6 +107,9 @@ export default async function RacePage({
         </div>
       </section>
 
+      {/* Race recap — podium + headline facts (completed rounds only) */}
+      {recap && <RaceRecapBlock results={raceResults} recap={recap} />}
+
       {/* Circuit visual */}
       {circuit && (
         <section className="py-6">
@@ -126,7 +133,7 @@ export default async function RacePage({
       {/* If completed: results + quali. If upcoming: prediction. */}
       {race.is_completed ? (
         <>
-          <ResultsBlock results={results?.Results ?? []} />
+          <ResultsBlock results={raceResults} />
           <QualifyingBlock results={quali?.QualifyingResults ?? []} />
         </>
       ) : prediction ? (
@@ -146,6 +153,174 @@ export default async function RacePage({
 
       <Footer />
     </main>
+  );
+}
+
+/* --------------------------- Recap --------------------------- */
+
+function RaceRecapBlock({
+  results,
+  recap,
+}: {
+  results: JolpicaRaceResult[];
+  recap: RaceRecap;
+}) {
+  const top3 = [...results]
+    .sort((a, b) => Number(a.position) - Number(b.position))
+    .slice(0, 3);
+
+  const name = (r: JolpicaRaceResult | null) =>
+    r ? r.Driver.familyName : "—";
+
+  return (
+    <section className="py-8 md:py-10">
+      <div className="container-max">
+        <div className="flex items-end justify-between gap-6 flex-wrap">
+          <h2 className="headline h-subsection">
+            On the <em>Podium</em>
+          </h2>
+          <span className="eyebrow">Top 3 · Final</span>
+        </div>
+        <div className="rule-thin mt-4" />
+
+        {/* Podium steps — P2 / P1 / P3 with P1 tallest. */}
+        <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4 items-end max-w-[760px] mx-auto">
+          <PodiumStep r={top3[1]} rank={2} riser="h-[110px] sm:h-[140px]" />
+          <PodiumStep r={top3[0]} rank={1} riser="h-[140px] sm:h-[180px]" />
+          <PodiumStep r={top3[2]} rank={3} riser="h-[90px] sm:h-[118px]" />
+        </div>
+
+        {/* Headline facts */}
+        <div className="mt-10 stat-strip grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          <RecapCell
+            label="Winner"
+            value={name(recap.winner)}
+            sub={recap.winner ? teamShort(recap.winner.Constructor.name) : undefined}
+            color={recap.winner ? teamColor(recap.winner.Constructor.name) : undefined}
+          />
+          <RecapCell
+            label="Pole"
+            value={name(recap.pole)}
+            sub={recap.pole ? "Started P1" : undefined}
+          />
+          <RecapCell
+            label="Fastest Lap"
+            value={name(recap.fastestLap)}
+            sub={recap.fastestLapTime ?? undefined}
+          />
+          <RecapCell
+            label="Biggest Mover"
+            value={recap.biggestMover ? recap.biggestMover.result.Driver.familyName : "—"}
+            sub={recap.biggestMover ? `+${recap.biggestMover.gained} places` : undefined}
+          />
+          <RecapCell
+            label="DNFs"
+            value={String(recap.dnfs)}
+            sub={`${recap.classified} classified`}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PodiumStep({
+  r,
+  rank,
+  riser,
+}: {
+  r?: JolpicaRaceResult;
+  rank: number;
+  riser: string;
+}) {
+  if (!r) return <div aria-hidden />;
+  const color = teamColor(r.Constructor.name);
+  const code = r.Driver.code ?? "";
+  const gap = rank === 1 ? r.Time?.time ?? "" : r.Time?.time ?? r.status;
+
+  return (
+    <div className="flex flex-col">
+      <div className="mb-2 text-center min-w-0">
+        <Link
+          href={code ? `/drivers/${code.toLowerCase()}` : "#"}
+          className="group block min-w-0"
+        >
+          <span
+            className="font-mono tabular text-[10px] tracking-[0.16em] block"
+            style={{ color }}
+          >
+            {code || teamShort(r.Constructor.name)}
+          </span>
+          <span className="font-display italic text-[clamp(0.95rem,2.4vw,1.3rem)] leading-tight block truncate group-hover:text-f1 transition-colors">
+            {r.Driver.familyName}
+          </span>
+          <span className="eyebrow block truncate mt-0.5">
+            {teamShort(r.Constructor.name)}
+          </span>
+        </Link>
+      </div>
+      <div
+        className={`relative ${riser} border border-rule bg-paper-deep flex flex-col items-center pt-3`}
+      >
+        <span
+          aria-hidden
+          className="absolute top-0 left-0 right-0 h-[4px]"
+          style={{ background: color }}
+        />
+        <span className="font-display text-[clamp(1.9rem,6vw,3.25rem)] leading-none">
+          {rank}
+        </span>
+        <span className="eyebrow mt-1.5">
+          {rank === 1 ? "Winner" : `P${rank}`}
+        </span>
+        <span className="font-mono tabular text-[10px] text-muted mt-auto mb-2.5 px-1 text-center truncate max-w-full">
+          {gap}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function RecapCell({
+  label,
+  value,
+  sub,
+  color,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  color?: string;
+}) {
+  return (
+    <div>
+      <span className="eyebrow flex items-center gap-1.5">
+        {color && (
+          <span aria-hidden className="inline-block w-[8px] h-[8px]" style={{ background: color }} />
+        )}
+        {label}
+      </span>
+      <span className="font-display text-[clamp(1.05rem,2.4vw,1.45rem)] leading-tight block truncate">
+        {value}
+      </span>
+      {sub && (
+        <span className="font-mono tabular text-[10px] tracking-[0.06em] text-muted block truncate">
+          {sub}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function GridDelta({ delta }: { delta: number | null }) {
+  if (delta === null || delta === 0) {
+    return <span className="text-muted-soft">—</span>;
+  }
+  const gained = delta > 0;
+  return (
+    <span className={gained ? "text-ink" : "text-muted"}>
+      <span aria-hidden>{gained ? "▲" : "▼"}</span> {Math.abs(delta)}
+    </span>
   );
 }
 
@@ -172,6 +347,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
                 <Th>Driver</Th>
                 <Th>Team</Th>
                 <Th>Grid</Th>
+                <Th>+/−</Th>
                 <Th>Laps</Th>
                 <Th>Time / Status</Th>
                 <Th>Pts</Th>
@@ -210,6 +386,9 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
                       </Link>
                     </Td>
                     <Td mono>{r.grid}</Td>
+                    <Td mono>
+                      <GridDelta delta={gridDelta(r)} />
+                    </Td>
                     <Td mono>{r.laps}</Td>
                     <Td mono>
                       {r.Time?.time ?? r.status}

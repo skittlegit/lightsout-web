@@ -22,7 +22,7 @@ export default function Hero({ race, totalRounds }: Props) {
   return (
     <section id="next" className="pt-2 pb-12 md:pb-16">
       <div className="container-max">
-        <div className="bg-ink text-paper relative overflow-hidden">
+        <div className="surface-invert bg-ink text-paper relative overflow-hidden">
           {/* chevron racing texture + scanline HUD overlay */}
           <div aria-hidden className="absolute inset-0 chevron-bg-soft pointer-events-none" />
           <div aria-hidden className="absolute inset-0 scanline pointer-events-none" />

@@ -63,6 +63,13 @@ export default function DriversTable({ drivers }: Props) {
           );
         })}
       </ul>
+
+      <Link
+        href="/compare"
+        className="mt-4 inline-flex items-center gap-2 self-start font-mono text-[10px] tracking-[0.18em] uppercase text-muted hover:text-f1 transition-colors border-b border-rule hover:border-f1 pb-1"
+      >
+        Compare drivers <span aria-hidden>⤳</span>
+      </Link>
     </div>
   );
 }
