@@ -26,6 +26,11 @@ import {
   pickNextRace,
 } from "@/lib/api";
 
+// Allow the forecast's server render up to 30s: the backend's /predictions/next
+// can take several seconds cold, and the default serverless cap would abort it
+// (falling back to the mock). Vercel Hobby permits up to 60s.
+export const maxDuration = 30;
+
 export default function Home() {
   return (
     <>

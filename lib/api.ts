@@ -34,11 +34,15 @@ export function backendUrl(path: string): string {
   return `${BASE}${path}${sep}season=${SEASON}`;
 }
 
-async function tryGet<T>(path: string, revalidate: number): Promise<T | null> {
+async function tryGet<T>(
+  path: string,
+  revalidate: number,
+  timeoutMs = 8000,
+): Promise<T | null> {
   try {
     const res = await fetch(backendUrl(path), {
       next: { revalidate },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -60,8 +64,13 @@ export async function getCalendar(): Promise<CalendarResponse> {
 }
 
 export async function getNextPrediction(): Promise<PredictionResponse> {
+  // /predictions/next is the slow endpoint (current-season form fetches + Monte
+  // Carlo); a cold compute runs ~8s and a woken free-tier instance far longer.
+  // Give it a generous timeout so the real forecast renders instead of falling
+  // back to the mock. Paired with maxDuration on the page so the serverless
+  // function isn't killed first, and an external keep-warm ping on the backend.
   return (
-    (await tryGet<PredictionResponse>("/predictions/next", 1800)) ??
+    (await tryGet<PredictionResponse>("/predictions/next", 1800, 25000)) ??
     MOCK_PREDICTIONS_UNAVAILABLE
   );
 }
