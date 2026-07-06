@@ -60,7 +60,10 @@ export async function getConstructorStandings(): Promise<ConstructorStanding[]> 
 }
 
 export async function getCalendar(): Promise<CalendarResponse> {
-  return (await tryGet<CalendarResponse>("/calendar", 86400)) ?? MOCK_CALENDAR;
+  // 30 min, not 24h: the calendar's is_next / is_completed flags flip the moment
+  // a race finishes, and the hero + "next race" derive from them. A day-long
+  // cache left a completed race showing as "up next" long after the checkered flag.
+  return (await tryGet<CalendarResponse>("/calendar", 1800)) ?? MOCK_CALENDAR;
 }
 
 export async function getNextPrediction(): Promise<PredictionResponse> {
