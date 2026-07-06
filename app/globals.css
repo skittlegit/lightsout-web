@@ -235,6 +235,9 @@ section { position: relative; z-index: 1; }
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
+/* <summary> chevron: `list-none` covers modern engines; older WebKit needs this. */
+summary::-webkit-details-marker { display: none; }
+
 /* ============================================================
    Components / utilities
    ============================================================ */
@@ -259,17 +262,43 @@ section { position: relative; z-index: 1; }
 .row-hover { transition: background-color var(--dur-fast) var(--ease-out-soft); }
 .row-hover:hover { background: color-mix(in srgb, var(--color-paper-deep) 50%, transparent); }
 
-.fade-x-edges {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
-          mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+/* Horizontal data scroller (HScroll.tsx) — thin themed scrollbar that only
+   appears when content actually overflows, plus dynamic edge-fade hints. */
+.hscroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-strong) transparent;
+  overscroll-behavior-x: contain;
 }
+.hscroll::-webkit-scrollbar { height: 6px; }
+.hscroll::-webkit-scrollbar-track { background: transparent; }
+.hscroll::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 3px; }
 
-/* Proximity (not mandatory) so wheel/drag panning is never yanked back to a
-   snap point. Snap targets are the cards themselves (`.snap-start`), not the
-   single flex track, so every round is a valid resting point. */
+/* Edge fades toggled from JS: visible only on a side with more content, so
+   nothing is veiled once you've scrolled all the way there. */
+.hscroll-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity var(--dur-mid) var(--ease-out-soft);
+}
+.hscroll-fade--l { left: 0;  background: linear-gradient(90deg, var(--color-paper), transparent); }
+.hscroll-fade--r { right: 0; background: linear-gradient(-90deg, var(--color-paper), transparent); }
+
+/* Snap assists touch flicks. Snap targets are the cards themselves
+   (`.snap-start`), so every round is a valid resting point. */
 .scroll-snap-x {
   scroll-snap-type: x proximity;
   scroll-padding-left: var(--gutter-x);
+  overscroll-behavior-x: contain;
+}
+/* On mouse/trackpad the wheel + drag handlers pan by assigning scrollLeft,
+   and each assignment re-snaps — the strip judders and the far end can
+   become unreachable. Fine pointers pan free; touch keeps the snap. */
+@media (pointer: fine) {
+  .scroll-snap-x { scroll-snap-type: none; }
 }
 
 .anchor-link {

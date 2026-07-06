@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
 import Footer from "@/app/components/Footer";
+import HScroll from "@/app/components/HScroll";
 import { getConstructorStandings, getDriverStandings, getCalendar } from "@/lib/api";
 import {
   getConstructors,
@@ -200,7 +201,7 @@ export default async function ConstructorPage({
               No race results recorded yet for this constructor in {calRes.season}.
             </p>
           ) : (
-            <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
+            <HScroll className="mt-8" ariaLabel="Race log">
               <table className="w-full border-collapse min-w-[680px]">
                 <thead>
                   <tr className="text-left">
@@ -250,7 +251,7 @@ export default async function ConstructorPage({
                   })}
                 </tbody>
               </table>
-            </div>
+            </HScroll>
           )}
 
           <p className="mt-6 text-[11px] text-muted leading-relaxed">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useDragPan } from "./useDragPan";
 
 interface Props {
   children: React.ReactNode;
@@ -18,7 +19,12 @@ interface Props {
  *   • click-and-drag to pan with a mouse
  *   • ← / → keys when the strip is focused
  *   • auto-centres the next race on mount so you land where it matters
+ *   • edge fades that appear only where more rounds exist
  *   • a thin progress rule that doubles as a "there's more →" hint
+ *
+ * Scroll snap is disabled for fine pointers in CSS (`.scroll-snap-x`): the
+ * wheel/drag handlers pan by assigning scrollLeft, and re-snapping after each
+ * assignment made the strip judder and the last rounds unreachable.
  */
 export default function CalendarScroller({ children, ariaLabel }: Props) {
   const ref = useRef<HTMLDivElement>(null);
@@ -44,6 +50,8 @@ export default function CalendarScroller({ children, ariaLabel }: Props) {
     el.addEventListener("scroll", sync, { passive: true });
     const ro = new ResizeObserver(sync);
     ro.observe(el);
+    // The track can widen without the container resizing (fonts, data).
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
     return () => {
       el.removeEventListener("scroll", sync);
       ro.disconnect();
@@ -72,7 +80,10 @@ export default function CalendarScroller({ children, ariaLabel }: Props) {
       if (max <= 0) return;
       // Horizontal intent (trackpad / shift-wheel) is already handled natively.
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      const delta = e.deltaY;
+      // Normalise: Firefox reports line (1) / page (2) deltas, not pixels.
+      let delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 16;
+      else if (e.deltaMode === 2) delta *= el.clientWidth;
       if (delta === 0) return;
       const left = el.scrollLeft;
       if ((delta < 0 && left <= 0) || (delta > 0 && left >= max - 1)) return;
@@ -84,57 +95,7 @@ export default function CalendarScroller({ children, ariaLabel }: Props) {
   }, []);
 
   // Click-and-drag to pan (mouse only — touch already pans natively).
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let startX = 0;
-    let startLeft = 0;
-    let down = false;
-    let dragging = false;
-
-    const onDown = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" || e.button !== 0) return;
-      down = true;
-      dragging = false;
-      startX = e.clientX;
-      startLeft = el.scrollLeft;
-    };
-    const onMove = (e: PointerEvent) => {
-      if (!down) return;
-      const dx = e.clientX - startX;
-      if (!dragging) {
-        if (Math.abs(dx) < 6) return;
-        dragging = true;
-        el.setPointerCapture(e.pointerId);
-        el.style.cursor = "grabbing";
-      }
-      e.preventDefault();
-      el.scrollLeft = startLeft - dx;
-    };
-    const end = () => {
-      down = false;
-      el.style.cursor = "";
-      // Swallow the click that fires after a real drag so cards don't navigate.
-      if (dragging) {
-        const swallow = (ev: MouseEvent) => {
-          ev.stopPropagation();
-          ev.preventDefault();
-        };
-        el.addEventListener("click", swallow, { capture: true, once: true });
-      }
-    };
-
-    el.addEventListener("pointerdown", onDown);
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerup", end);
-    el.addEventListener("pointercancel", end);
-    return () => {
-      el.removeEventListener("pointerdown", onDown);
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerup", end);
-      el.removeEventListener("pointercancel", end);
-    };
-  }, []);
+  useDragPan(ref);
 
   const nudge = useCallback((dir: 1 | -1) => {
     const el = ref.current;
@@ -157,17 +118,32 @@ export default function CalendarScroller({ children, ariaLabel }: Props) {
       <ArrowButton dir="left" hidden={atStart} onClick={() => nudge(-1)} />
       <ArrowButton dir="right" hidden={atEnd} onClick={() => nudge(1)} />
 
-      <div
-        ref={ref}
-        data-lenis-prevent
-        role="region"
-        tabIndex={0}
-        onKeyDown={onKeyDown}
-        aria-label={`${ariaLabel} (scrollable — use arrow keys, drag, or scroll)`}
-        className="overflow-x-auto no-scrollbar fade-x-edges scroll-snap-x px-[var(--gutter-x)] pb-2 cursor-grab focus-visible:outline-none"
-      >
-        {/* role="list" restores semantics Safari drops from display:flex lists */}
-        <ul role="list" className="flex gap-3 min-w-max">{children}</ul>
+      <div className="relative">
+        <div
+          ref={ref}
+          data-lenis-prevent
+          role="region"
+          tabIndex={0}
+          onKeyDown={onKeyDown}
+          aria-label={`${ariaLabel} (scrollable — use arrow keys, drag, or scroll)`}
+          className="overflow-x-auto no-scrollbar scroll-snap-x px-[var(--gutter-x)] pb-2 cursor-grab focus-visible:outline-none"
+        >
+          {/* role="list" restores semantics Safari drops from display:flex lists */}
+          <ul role="list" className="flex gap-3 min-w-max">{children}</ul>
+        </div>
+
+        {/* Edge fades — only where more rounds exist, so the first and last
+            cards are fully visible once you've reached them. */}
+        <span
+          aria-hidden
+          className="hscroll-fade hscroll-fade--l"
+          style={{ opacity: atStart ? 0 : 1 }}
+        />
+        <span
+          aria-hidden
+          className="hscroll-fade hscroll-fade--r"
+          style={{ opacity: atEnd ? 0 : 1 }}
+        />
       </div>
 
       {/* Progress rule — fills as you move, hints that more rounds exist. */}

@@ -4,6 +4,7 @@ import BackBar from "@/app/components/BackBar";
 import Footer from "@/app/components/Footer";
 import CircuitVisual from "@/app/components/CircuitVisual";
 import Forecast from "@/app/components/Forecast";
+import HScroll from "@/app/components/HScroll";
 import { getCalendar, getPrediction } from "@/lib/api";
 import { getCircuit, getRaceResults, getQualifying } from "@/lib/jolpica";
 import {
@@ -349,7 +350,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
         </div>
         <div className="rule-thin mt-4" />
 
-        <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
+        <HScroll className="mt-8" ariaLabel="Race results">
           <table className="w-full border-collapse min-w-[720px]">
             <thead>
               <tr className="text-left">
@@ -414,7 +415,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
               })}
             </tbody>
           </table>
-        </div>
+        </HScroll>
       </div>
     </section>
   );
@@ -435,7 +436,7 @@ function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
         </div>
         <div className="rule-thin mt-4" />
 
-        <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">
+        <HScroll className="mt-8" ariaLabel="Qualifying results">
           <table className="w-full border-collapse min-w-[680px]">
             <thead>
               <tr className="text-left">
@@ -479,7 +480,7 @@ function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
               })}
             </tbody>
           </table>
-        </div>
+        </HScroll>
       </div>
     </section>
   );

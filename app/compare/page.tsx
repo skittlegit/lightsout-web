@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BackBar from "@/app/components/BackBar";
 import Footer from "@/app/components/Footer";
+import HScroll from "@/app/components/HScroll";
 import CompareSelectors, {
   type CompareOption,
 } from "@/app/components/CompareSelectors";
@@ -227,10 +228,7 @@ export default async function ComparePage({
               No completed rounds yet where both drivers have a recorded result.
             </p>
           ) : (
-            <div
-              data-lenis-prevent
-              className="mt-6 overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0"
-            >
+            <HScroll className="mt-6" bleed ariaLabel="Race by race comparison">
               <table className="w-full border-collapse min-w-[560px]">
                 <thead>
                   <tr className="text-left">
@@ -285,7 +283,7 @@ export default async function ComparePage({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </HScroll>
           )}
 
           <p className="mt-6 text-[11px] text-muted leading-relaxed">

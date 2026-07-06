@@ -37,6 +37,7 @@ export default function CommandPalette({ items }: Props) {
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   const allItems = useMemo(() => [...SECTIONS, ...items], [items]);
 
@@ -100,14 +101,18 @@ export default function CommandPalette({ items }: Props) {
     };
   }, [open]);
 
-  // Focus input when open; restore body scroll
+  // Focus input when open; on close restore scroll + hand focus back to
+  // whatever opened the palette (trigger button, etc.).
   useEffect(() => {
     if (open) {
+      restoreFocusRef.current = document.activeElement as HTMLElement | null;
       document.body.style.overflow = "hidden";
       // wait a frame so the modal is mounted
       requestAnimationFrame(() => inputRef.current?.focus());
     } else {
       document.body.style.overflow = "";
+      restoreFocusRef.current?.focus();
+      restoreFocusRef.current = null;
     }
     return () => {
       document.body.style.overflow = "";
@@ -156,6 +161,17 @@ export default function CommandPalette({ items }: Props) {
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
+      onKeyDown={(e) => {
+        // Focus lives in the input (arrows drive the list); don't let Tab
+        // wander to the page behind the modal.
+        if (e.key === "Tab") {
+          e.preventDefault();
+          inputRef.current?.focus();
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          close();
+        }
+      }}
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4"
     >
       {/* backdrop */}

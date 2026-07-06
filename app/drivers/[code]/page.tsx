@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
 import Footer from "@/app/components/Footer";
+import HScroll from "@/app/components/HScroll";
 import { getDriverStandings, getCalendar } from "@/lib/api";
 import { getDrivers, getDriverResults } from "@/lib/jolpica";
 import { driverIdFromCode, teamSlug } from "@/lib/slug";
@@ -154,7 +155,7 @@ export default async function DriverPage({
               No race results recorded yet for this driver in {cal.season}.
             </p>
           ) : (
-            <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0">
+            <HScroll className="mt-8" bleed ariaLabel="Season results">
               <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="text-left">
@@ -211,7 +212,7 @@ export default async function DriverPage({
                   })}
                 </tbody>
               </table>
-            </div>
+            </HScroll>
           )}
 
           <p className="mt-6 text-[11px] text-muted leading-relaxed">
