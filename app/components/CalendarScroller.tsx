@@ -166,7 +166,8 @@ export default function CalendarScroller({ children, ariaLabel }: Props) {
         aria-label={`${ariaLabel} (scrollable — use arrow keys, drag, or scroll)`}
         className="overflow-x-auto no-scrollbar fade-x-edges scroll-snap-x px-[var(--gutter-x)] pb-2 cursor-grab focus-visible:outline-none"
       >
-        <ul className="flex gap-3 min-w-max">{children}</ul>
+        {/* role="list" restores semantics Safari drops from display:flex lists */}
+        <ul role="list" className="flex gap-3 min-w-max">{children}</ul>
       </div>
 
       {/* Progress rule — fills as you move, hints that more rounds exist. */}

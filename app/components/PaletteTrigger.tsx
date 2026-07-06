@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const noopSubscribe = () => () => {};
+/* SSR-safe Apple-platform sniff: false on the server + first paint, real
+   value once hydrated — no effect, no cascading render. */
+function useIsMac(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => /mac|iphone|ipad|ipod/i.test(navigator.userAgent),
+    () => false
+  );
+}
 
 export default function PaletteTrigger() {
-  const [isMac, setIsMac] = useState(false);
-
-  useEffect(() => {
-    setIsMac(/mac|iphone|ipad|ipod/i.test(navigator.platform));
-  }, []);
+  const isMac = useIsMac();
 
   function open() {
     window.dispatchEvent(new Event("lightsout:open-palette"));

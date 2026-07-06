@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import CommandPaletteServer from "./components/CommandPaletteServer";
+import { SEASON } from "@/lib/api";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -24,9 +25,24 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LightsOut · F1 2026",
-  description: "Every stat. Every race. Every prediction.",
+  title: {
+    default: `LightsOut · F1 ${SEASON}`,
+    template: "%s · LightsOut",
+  },
+  description: `Formula 1 ${SEASON} season hub — calendar, standings, race results, driver head-to-heads, and Monte Carlo race forecasts.`,
   icons: { icon: "/favicon.svg" },
+  openGraph: {
+    siteName: "LightsOut",
+    type: "website",
+    title: `LightsOut · F1 ${SEASON}`,
+    description: "Every stat. Every race. Every prediction.",
+  },
+};
+
+export const viewport: Viewport = {
+  // Matches --color-paper; the dark theme is a user toggle (class-based), not
+  // OS-derived, so a single light chrome color is the honest default.
+  themeColor: "#faf7f2",
 };
 
 // Runs before first paint. The site is light by default and ignores OS

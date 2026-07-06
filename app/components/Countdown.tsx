@@ -42,10 +42,16 @@ export default function Countdown({ targetISO }: Props) {
   // SSR + first paint: render fixed scaffolding (zeros) to avoid hydration shift
   const p = parts ?? { d: 0, h: 0, m: 0, s: 0, past: false };
 
+  // role="timer" is not a live region, so screen readers announce this only on
+  // focus — never once per second. Seconds are left out of the label on purpose.
+  const srLabel = p.past
+    ? "Race in progress"
+    : `${p.d} days ${p.h} hours ${p.m} minutes until lights out`;
+
   return (
     <div className="flex flex-col items-start lg:items-end gap-3 w-full lg:w-auto">
       <span className="eyebrow text-paper/60">Lights Out In</span>
-      <div className="flex items-baseline" aria-live="polite" aria-atomic="true">
+      <div className="flex items-baseline" role="timer" aria-label={srLabel}>
         <Cell value={p.d} />
         <Colon />
         <Cell value={p.h} />

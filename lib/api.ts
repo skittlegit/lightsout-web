@@ -23,7 +23,7 @@ import {
  * mock data so the UI is never broken in dev or in unrelated previews.
  */
 
-const SEASON = process.env.NEXT_PUBLIC_SEASON ?? "2026";
+export const SEASON = process.env.NEXT_PUBLIC_SEASON ?? "2026";
 const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "https://lightsout-api.up.railway.app/api").replace(
   /\/$/,
   ""

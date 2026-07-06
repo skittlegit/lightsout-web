@@ -25,7 +25,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const pretty = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return { title: `${pretty} · Constructor · LightsOut` };
+  return { title: `${pretty} · Constructor` };
 }
 
 export default async function ConstructorPage({
@@ -35,6 +35,7 @@ export default async function ConstructorPage({
 }) {
   const { slug } = await params;
   const teamId = teamFromSlug(slug);
+  if (!teamId) notFound();
 
   const [conStandings, drvStandings, calRes, jolpicaCons] = await Promise.all([
     getConstructorStandings(),
@@ -196,7 +197,7 @@ export default async function ConstructorPage({
 
           {conResults.length === 0 ? (
             <p className="mt-8 text-sm text-muted">
-              No race results recorded yet for this constructor in 2026.
+              No race results recorded yet for this constructor in {calRes.season}.
             </p>
           ) : (
             <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar">

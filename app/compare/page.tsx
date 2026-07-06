@@ -15,7 +15,9 @@ import type { DriverStanding } from "@/lib/types";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Head to Head · Drivers · LightsOut",
+  title: "Head to Head · Drivers",
+  description:
+    "Compare any two drivers side by side — points, podiums, average finish, and race-by-race results.",
 };
 
 function first(v: string | string[] | undefined): string | undefined {

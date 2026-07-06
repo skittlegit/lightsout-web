@@ -26,7 +26,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }) {
   const { code } = await params;
-  return { title: `${code.toUpperCase()} · Driver · LightsOut` };
+  return { title: `${code.toUpperCase()} · Driver` };
 }
 
 export default async function DriverPage({
@@ -36,22 +36,21 @@ export default async function DriverPage({
 }) {
   const { code } = await params;
   const upperCode = code.toUpperCase();
+  const jolpicaId = driverIdFromCode(upperCode);
 
-  const [standings, allDrivers, cal] = await Promise.all([
+  const [standings, allDrivers, cal, seasonResults] = await Promise.all([
     getDriverStandings(),
     getDrivers(),
     getCalendar(),
+    jolpicaId ? getDriverResults(jolpicaId) : Promise.resolve([]),
   ]);
 
   const standing = standings.find((d) => d.driver_code === upperCode);
   if (!standing) notFound();
 
-  const jolpicaId = driverIdFromCode(upperCode);
   const profile = jolpicaId
     ? allDrivers.find((d) => d.driverId === jolpicaId)
     : allDrivers.find((d) => d.code?.toUpperCase() === upperCode);
-
-  const seasonResults = jolpicaId ? await getDriverResults(jolpicaId) : [];
 
   const racesByRound = new Map<number, Race>();
   for (const r of cal.races) racesByRound.set(r.round, r);
@@ -146,13 +145,13 @@ export default async function DriverPage({
             <h2 className="headline h-subsection">
               Season <em>Form</em>
             </h2>
-            <span className="eyebrow">2026 · {seasonResults.length} rounds logged</span>
+            <span className="eyebrow">{cal.season} · {seasonResults.length} rounds logged</span>
           </div>
           <div className="rule-thin mt-4" />
 
           {seasonResults.length === 0 ? (
             <p className="mt-8 text-sm text-muted">
-              No race results recorded yet for this driver in 2026.
+              No race results recorded yet for this driver in {cal.season}.
             </p>
           ) : (
             <div data-lenis-prevent className="mt-8 overflow-x-auto no-scrollbar -mx-[var(--gutter-x)] md:mx-0 px-[var(--gutter-x)] md:px-0">

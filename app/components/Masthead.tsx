@@ -1,10 +1,9 @@
-import { timeGreeting } from "@/lib/format";
+import { SEASON } from "@/lib/api";
+import Greeting from "./Greeting";
 import PaletteTrigger from "./PaletteTrigger";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Masthead() {
-  const greeting = timeGreeting();
-
   return (
     <header className="pt-8 sm:pt-10 md:pt-14 pb-6">
       <div className="container-max">
@@ -13,12 +12,12 @@ export default function Masthead() {
             <div aria-hidden className="relative w-6 h-6 bg-ink shrink-0">
               <span className="absolute right-[3px] top-[3px] w-[6px] h-[6px] rounded-full bg-f1" />
             </div>
-            <span className="eyebrow truncate">Personal Edition · F1 2026</span>
+            <span className="eyebrow truncate">Personal Edition · F1 {SEASON}</span>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <PaletteTrigger />
             <ThemeToggle />
-            <span className="eyebrow hidden md:inline">{greeting.toUpperCase()}</span>
+            <Greeting />
           </div>
         </div>
 

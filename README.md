@@ -1,35 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LightsOut — F1 Season Hub
 
-## Getting Started
+Editorial-style Formula 1 web app: season calendar, championship standings,
+race results, driver head-to-heads, and Monte Carlo race forecasts.
 
-First, run the development server:
+Built with **Next.js 16 (App Router, Turbopack)**, **Tailwind CSS v4**
+(CSS-first config, no `tailwind.config`), **Framer Motion**, and **Lenis**
+smooth scrolling. Light/dark theme with a class-based toggle.
+
+## Data sources
+
+| Source | Used for |
+| --- | --- |
+| [lightsout-api](https://lightsout-api.up.railway.app) (FastAPI backend) | Calendar, standings, race predictions |
+| [Jolpica F1](https://api.jolpi.ca) (Ergast-compatible, no key) | Per-race results, qualifying, driver/constructor/circuit identity |
+
+All fetching happens in server components (`lib/api.ts`, `lib/jolpica.ts`)
+with ISR revalidation. If the backend is unreachable, the UI falls back to
+deterministic mock data (`lib/mocks.ts`) so pages never render broken.
+
+## Getting started
 
 ```bash
+cp .env.local.example .env.local   # then adjust values
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment
 
-## Learn More
+| Variable | Notes |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | **Must end in `/api`** — paths are built as `${BASE}/calendar`, etc. Without the suffix every call 404s and the UI silently shows mock data. |
+| `NEXT_PUBLIC_SEASON` | Season year, e.g. `2026`. |
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev        # dev server
+npm run build      # production build
+npm run start      # serve the production build
+npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure
 
-## Deploy on Vercel
+```text
+app/
+  page.tsx               # homepage — hero, calendar, standings, forecast
+  races/[round]/         # race detail: results, qualifying, recap, forecast
+  drivers/[code]/        # driver profile + season form
+  constructors/[slug]/   # constructor profile, lineup, race log
+  compare/               # driver head-to-head (?a=VER&b=NOR)
+  api/                   # JSON proxies of the backend (calendar, standings, predictions)
+  components/            # server + client components
+lib/
+  api.ts                 # lightsout-api data layer (ISR + mock fallback)
+  jolpica.ts             # Jolpica/Ergast wrapper
+  compare.ts, recap.ts   # pure derivation helpers
+  format.ts, slug.ts     # display + identifier mapping
+  ics.ts                 # add-to-calendar (.ics) generation
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Conventions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- This repo runs a Next.js version newer than most training data — read
+  `node_modules/next/dist/docs/` before changing framework-facing code
+  (see `AGENTS.md`).
+- Caching uses the pre-Cache-Components model: `fetch` with
+  `next.revalidate` plus route-segment `revalidate` exports.

@@ -52,7 +52,7 @@ export function driverCodeFromId(id: string): string | null {
 
 /* ---------------- Team display string -> jolpica constructorId ----- */
 
-const TEAM_TO_CONSTRUCTOR_ID: Partial<Record<TeamId, string>> = {
+const TEAM_TO_CONSTRUCTOR_ID: Record<TeamId, string> = {
   mercedes: "mercedes",
   ferrari: "ferrari",
   red_bull: "red_bull",
@@ -76,6 +76,11 @@ export function teamSlug(team: string): string {
   return teamId(team).replace(/_/g, "-");
 }
 
-export function teamFromSlug(slug: string): TeamId {
-  return slug.replace(/-/g, "_") as TeamId;
+/**
+ * Validated: null for slugs that aren't a real team, so pages can 404 instead
+ * of falling through `teamId()`'s haas default and rendering the wrong team.
+ */
+export function teamFromSlug(slug: string): TeamId | null {
+  const id = slug.replace(/-/g, "_");
+  return id in TEAM_TO_CONSTRUCTOR_ID ? (id as TeamId) : null;
 }

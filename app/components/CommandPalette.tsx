@@ -114,10 +114,10 @@ export default function CommandPalette({ items }: Props) {
     };
   }, [open]);
 
-  // Reset active when filter changes
-  useEffect(() => {
-    setActive(0);
-  }, [query]);
+  function onQueryChange(value: string) {
+    setQuery(value);
+    setActive(0); // reset selection whenever the filter changes
+  }
 
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Escape") {
@@ -173,7 +173,7 @@ export default function CommandPalette({ items }: Props) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => onQueryChange(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Drivers, constructors, rounds, sections…"
             className="flex-1 bg-transparent outline-none text-[16px] font-display placeholder:text-muted/70"

@@ -29,7 +29,17 @@ export async function generateMetadata({
   params: Promise<Params>;
 }) {
   const { round } = await params;
-  return { title: `Round ${round} · Race · LightsOut` };
+  const roundN = Number(round);
+  // getCalendar() is deduped with the page's own call, so this costs nothing.
+  const race = Number.isFinite(roundN)
+    ? (await getCalendar()).races.find((r) => r.round === roundN)
+    : undefined;
+  return {
+    title: race ? `${race.race_name} · Round ${round}` : `Round ${round} · Race`,
+    description: race
+      ? `${race.race_name} at ${race.circuit} — results, qualifying, and forecast.`
+      : undefined,
+  };
 }
 
 export default async function RacePage({
