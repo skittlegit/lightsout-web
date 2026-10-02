@@ -19,6 +19,8 @@ with ISR revalidation. Calendar and standings fall back to live Jolpica, then
 the verified snapshot in `lib/data/base-data.json`. Calendar flags are recalculated
 from today's UTC date. Forecast failures show the actual next race with an
 unavailable state. They never substitute demo predictions.
+Forecast requests bypass Vercel's data cache and use Render's prediction cache,
+so newly deployed models and manual forecast refreshes are visible immediately.
 
 `npm run refresh:data` updates the offline snapshot from Render. The weekly
 `refresh-base-data` workflow also commits a refreshed snapshot on Tuesdays.

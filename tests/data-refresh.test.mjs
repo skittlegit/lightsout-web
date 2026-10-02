@@ -57,6 +57,25 @@ test("unavailable forecast uses the calendar's next race instead of Miami", asyn
   assert.equal(prediction.pre_quali, null);
 });
 
+test("forecasts bypass Vercel cache so a Render model reload is visible", async () => {
+  let options;
+  const api = loadApi({}, async (_url, requestOptions) => {
+    options = requestOptions;
+    return { ok: true, json: async () => ({ round: 16, status: "ok" }) };
+  });
+  await api.getNextPrediction();
+  assert.equal(options.cache, "no-store");
+  assert.equal(options.next, undefined);
+  await api.getPrediction(16);
+  assert.equal(options.cache, "no-store");
+});
+
+test("Next.js dynamic rendering signals are rethrown rather than shown as forecast failures", async () => {
+  const error = Object.assign(new Error("dynamic rendering"), { digest: "DYNAMIC_SERVER_USAGE" });
+  const api = loadApi({}, async () => { throw error; });
+  await assert.rejects(api.getNextPrediction(), (caught) => caught === error);
+});
+
 test("live Jolpica calendar is used when backend fails", async () => {
   const api = loadApi({}, async (url) => {
     if (url.includes("onrender.com")) return { ok: false, status: 503 };

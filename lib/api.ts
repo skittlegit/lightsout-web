@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import { calendarForToday, fallbackCalendar, fallbackConstructors, fallbackDrivers } from "./base-data";
 import { getSeasonCalendar, getSeasonDriverStandings, getSeasonConstructorStandings } from "./jolpica";
+import { unstable_rethrow } from "next/navigation";
 
 /**
  * Server-side data layer for LightsOut.
@@ -37,7 +38,7 @@ async function tryGet<T>(
 ): Promise<T | null> {
   try {
     const res = await fetch(backendUrl(path), {
-      next: { revalidate },
+      ...(revalidate === 0 ? { cache: "no-store" as const } : { next: { revalidate } }),
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok) {
@@ -46,6 +47,7 @@ async function tryGet<T>(
     }
     return (await res.json()) as T;
   } catch (error) {
+    unstable_rethrow(error);
     console.warn(`LightsOut ${path} fetch failed`, error instanceof Error ? error.message : error);
     return null;
   }
@@ -76,7 +78,9 @@ export async function getNextPrediction(): Promise<PredictionResponse> {
   // Give it a generous timeout so the real forecast renders instead of falling
   // back to the mock. Paired with maxDuration on the page so the serverless
   // function isn't killed first, and an external keep-warm ping on the backend.
-  const prediction = await tryGet<PredictionResponse>("/predictions/next", 1800, 25000);
+  // Render already caches forecasts and invalidates them on model reload.
+  // A second Vercel cache can retain an old model through a backend deploy.
+  const prediction = await tryGet<PredictionResponse>("/predictions/next", 0, 25000);
   if (prediction) return prediction;
   const next = pickNextRace((await getCalendar()).races);
   return {
@@ -89,7 +93,7 @@ export async function getNextPrediction(): Promise<PredictionResponse> {
 }
 
 export async function getPrediction(round: number): Promise<PredictionResponse | null> {
-  return await tryGet<PredictionResponse>(`/predictions/${round}`, 1800);
+  return await tryGet<PredictionResponse>(`/predictions/${round}`, 0);
 }
 
 /** Helper used by Hero/page to pick "next" race from a CalendarResponse. */
