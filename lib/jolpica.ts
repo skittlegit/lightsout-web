@@ -10,6 +10,8 @@
 const JOLPICA_BASE = "https://api.jolpi.ca/ergast/f1";
 const SEASON = process.env.NEXT_PUBLIC_SEASON ?? "2026";
 
+import type { CalendarResponse, ConstructorStanding, DriverStanding } from "./types";
+
 interface MRData<T> {
   MRData: T;
 }
@@ -105,6 +107,38 @@ async function jget<T>(path: string, revalidate: number): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+export async function getSeasonCalendar(): Promise<CalendarResponse | null> {
+  const data = await jget<{ RaceTable: RaceTable }>(`/${SEASON}.json?limit=100`, 1800);
+  if (!data?.RaceTable.Races.length) return null;
+  return { season: Number(SEASON), races: data.RaceTable.Races.map((race) => ({
+    season: Number(race.season), round: Number(race.round), race_name: race.raceName,
+    circuit: race.Circuit.circuitName, country: race.Circuit.Location.country,
+    race_date: race.date, is_completed: false, is_next: false, has_sprint: "Sprint" in race,
+  })) };
+}
+
+export async function getSeasonDriverStandings(): Promise<DriverStanding[] | null> {
+  const data = await jget<{ StandingsTable: { StandingsLists: { DriverStandings: {
+    position: string; points: string; wins: string; Driver: JolpicaDriver; Constructors: JolpicaConstructor[];
+  }[] }[] } }>(`/${SEASON}/driverStandings.json?limit=100`, 600);
+  const rows = data?.StandingsTable.StandingsLists[0]?.DriverStandings;
+  return rows?.map((row) => ({
+    position: Number(row.position), points: Number(row.points), wins: Number(row.wins),
+    driver_code: row.Driver.code ?? row.Driver.familyName.slice(0, 3).toUpperCase(),
+    driver_name: `${row.Driver.givenName} ${row.Driver.familyName}`, team: row.Constructors[0]?.name ?? "",
+  })) ?? null;
+}
+
+export async function getSeasonConstructorStandings(): Promise<ConstructorStanding[] | null> {
+  const data = await jget<{ StandingsTable: { StandingsLists: { ConstructorStandings: {
+    position: string; points: string; wins: string; Constructor: JolpicaConstructor;
+  }[] }[] } }>(`/${SEASON}/constructorStandings.json?limit=100`, 600);
+  const rows = data?.StandingsTable.StandingsLists[0]?.ConstructorStandings;
+  return rows?.map((row) => ({
+    position: Number(row.position), points: Number(row.points), wins: Number(row.wins), team: row.Constructor.name,
+  })) ?? null;
 }
 
 /* ---------------- Drivers / Constructors ---------------- */

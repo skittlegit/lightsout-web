@@ -46,17 +46,13 @@ function EmptyState({ message }: { message: string | null }) {
     <div className="mt-10 card card-deep p-7 md:p-12">
       <span className="eyebrow-red block">Forecast Unavailable</span>
       <p className="mt-3 font-display italic text-[clamp(1.25rem,3vw,1.7rem)] text-ink-soft max-w-2xl leading-snug">
-        The prediction model has not been trained for the next round yet.
+        The forecast is temporarily unavailable. Please check back shortly.
       </p>
       {message && (
         <p className="mt-3 text-sm text-muted max-w-xl">{message}</p>
       )}
       <p className="mt-3 text-sm text-muted max-w-xl">
-        Forecasts return when the lightsout-api{" "}
-        <code className="font-mono text-[12px] bg-paper-deep px-1.5 py-0.5">
-          /predictions/next
-        </code>{" "}
-        endpoint publishes a model version for this race.
+        Forecasts refresh as new race and qualifying data becomes available.
       </p>
     </div>
   );
@@ -136,7 +132,7 @@ function ForecastBody({
 
       <details className="mt-10 group">
         <summary className="cursor-pointer list-none flex items-center justify-between border-y border-ink py-3 select-none">
-          <span className="eyebrow-ink">Full Distribution Matrix · 20 × 20</span>
+          <span className="eyebrow-ink">Full Distribution Matrix · {mode.drivers.length} × {mode.drivers[0]?.position_distribution.length ?? 0}</span>
           <span className="eyebrow group-open:hidden">Expand +</span>
           <span className="eyebrow hidden group-open:inline">Collapse −</span>
         </summary>

@@ -14,9 +14,9 @@ const stickyCell = {
 } as const;
 
 /**
- * Server-rendered 20×20 heatmap.
+ * Server-rendered heatmap for the full race field.
  * Rows: drivers sorted by expected_position.
- * Cols: positions P1..P20.
+ * Cols: all finishing positions returned by the forecast.
  *
  * Wrapped in HScroll so the matrix is actually reachable with a mouse; the
  * driver column stays pinned while the position columns scroll. The table
@@ -24,11 +24,9 @@ const stickyCell = {
  * misrender in Chromium.
  */
 export default function PredictionHeatmap({ drivers }: Props) {
-  const sorted = [...drivers]
-    .sort((a, b) => a.expected_position - b.expected_position)
-    .slice(0, 20);
+  const sorted = [...drivers].sort((a, b) => a.expected_position - b.expected_position);
 
-  const positions = Array.from({ length: 20 }, (_, i) => i + 1);
+  const positions = Array.from({ length: Math.max(0, ...drivers.map((driver) => driver.position_distribution.length)) }, (_, i) => i + 1);
 
   return (
     <HScroll
@@ -77,7 +75,7 @@ export default function PredictionHeatmap({ drivers }: Props) {
                   </span>
                 </div>
               </th>
-              {d.position_distribution.slice(0, 20).map((p, i) => {
+              {d.position_distribution.map((p, i) => {
                 const showValue = p >= 0.05;
                 return (
                   <td

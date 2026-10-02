@@ -76,7 +76,7 @@ export interface DriverPrediction {
   win_probability: number;
   podium_probability: number;
   points_probability: number;
-  /** Length 20, sums to 1.0; index k = P(finish in P(k+1)) */
+  /** One probability per finishing position (at least 20); sums to 1.0. */
   position_distribution: number[];
 }
 

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "refresh:data": "node scripts/refresh-base-data.mjs",
+    "test:data": "node --test tests/data-refresh.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",

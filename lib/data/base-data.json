@@ -1,0 +1,517 @@
+{
+  "season": 2026,
+  "fetched_at": "2026-10-02T07:47:28.578Z",
+  "source": "https://lightsout-api.onrender.com/api",
+  "calendar": {
+    "season": 2026,
+    "races": [
+      {
+        "season": 2026,
+        "round": 1,
+        "race_name": "Australian Grand Prix",
+        "circuit": "Albert Park Grand Prix Circuit",
+        "country": "Australia",
+        "race_date": "2026-03-08",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 2,
+        "race_name": "Chinese Grand Prix",
+        "circuit": "Shanghai International Circuit",
+        "country": "China",
+        "race_date": "2026-03-15",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 3,
+        "race_name": "Japanese Grand Prix",
+        "circuit": "Suzuka Circuit",
+        "country": "Japan",
+        "race_date": "2026-03-29",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 4,
+        "race_name": "Miami Grand Prix",
+        "circuit": "Miami International Autodrome",
+        "country": "USA",
+        "race_date": "2026-05-03",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 5,
+        "race_name": "Canadian Grand Prix",
+        "circuit": "Circuit Gilles Villeneuve",
+        "country": "Canada",
+        "race_date": "2026-05-24",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 6,
+        "race_name": "Monaco Grand Prix",
+        "circuit": "Circuit de Monaco",
+        "country": "Monaco",
+        "race_date": "2026-06-07",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 7,
+        "race_name": "Barcelona Grand Prix",
+        "circuit": "Circuit de Barcelona-Catalunya",
+        "country": "Spain",
+        "race_date": "2026-06-14",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 8,
+        "race_name": "Austrian Grand Prix",
+        "circuit": "Red Bull Ring",
+        "country": "Austria",
+        "race_date": "2026-06-28",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 9,
+        "race_name": "British Grand Prix",
+        "circuit": "Silverstone Circuit",
+        "country": "UK",
+        "race_date": "2026-07-05",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 10,
+        "race_name": "Belgian Grand Prix",
+        "circuit": "Circuit de Spa-Francorchamps",
+        "country": "Belgium",
+        "race_date": "2026-07-19",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 11,
+        "race_name": "Hungarian Grand Prix",
+        "circuit": "Hungaroring",
+        "country": "Hungary",
+        "race_date": "2026-07-26",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 12,
+        "race_name": "Dutch Grand Prix",
+        "circuit": "Circuit Park Zandvoort",
+        "country": "Netherlands",
+        "race_date": "2026-08-23",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 13,
+        "race_name": "Italian Grand Prix",
+        "circuit": "Autodromo Nazionale di Monza",
+        "country": "Italy",
+        "race_date": "2026-09-06",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 14,
+        "race_name": "Spanish Grand Prix",
+        "circuit": "Madring",
+        "country": "Spain",
+        "race_date": "2026-09-13",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 15,
+        "race_name": "Azerbaijan Grand Prix",
+        "circuit": "Baku City Circuit",
+        "country": "Azerbaijan",
+        "race_date": "2026-09-26",
+        "is_next": false,
+        "is_completed": true,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 16,
+        "race_name": "Bahrain Grand Prix in Malaysia",
+        "circuit": "Sepang International Circuit",
+        "country": "Malaysia",
+        "race_date": "2026-10-04",
+        "is_next": true,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 17,
+        "race_name": "Singapore Grand Prix",
+        "circuit": "Marina Bay Street Circuit",
+        "country": "Singapore",
+        "race_date": "2026-10-11",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": true
+      },
+      {
+        "season": 2026,
+        "round": 18,
+        "race_name": "United States Grand Prix",
+        "circuit": "Circuit of the Americas",
+        "country": "USA",
+        "race_date": "2026-10-25",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 19,
+        "race_name": "Mexico City Grand Prix",
+        "circuit": "Autódromo Hermanos Rodríguez",
+        "country": "Mexico",
+        "race_date": "2026-11-01",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 20,
+        "race_name": "Brazilian Grand Prix",
+        "circuit": "Autódromo José Carlos Pace",
+        "country": "Brazil",
+        "race_date": "2026-11-08",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 21,
+        "race_name": "Las Vegas Grand Prix",
+        "circuit": "Las Vegas Strip Street Circuit",
+        "country": "USA",
+        "race_date": "2026-11-22",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 22,
+        "race_name": "Qatar Grand Prix",
+        "circuit": "Lusail International Circuit",
+        "country": "Qatar",
+        "race_date": "2026-11-29",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      },
+      {
+        "season": 2026,
+        "round": 23,
+        "race_name": "Abu Dhabi Grand Prix",
+        "circuit": "Yas Marina Circuit",
+        "country": "UAE",
+        "race_date": "2026-12-06",
+        "is_next": false,
+        "is_completed": false,
+        "has_sprint": false
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "position": 1,
+      "driver_code": "ANT",
+      "driver_name": "Andrea Kimi Antonelli",
+      "team": "Mercedes",
+      "points": 302,
+      "wins": 8
+    },
+    {
+      "position": 2,
+      "driver_code": "RUS",
+      "driver_name": "George Russell",
+      "team": "Mercedes",
+      "points": 236,
+      "wins": 3
+    },
+    {
+      "position": 3,
+      "driver_code": "HAM",
+      "driver_name": "Lewis Hamilton",
+      "team": "Ferrari",
+      "points": 199,
+      "wins": 1
+    },
+    {
+      "position": 4,
+      "driver_code": "NOR",
+      "driver_name": "Lando Norris",
+      "team": "McLaren",
+      "points": 186,
+      "wins": 2
+    },
+    {
+      "position": 5,
+      "driver_code": "LEC",
+      "driver_name": "Charles Leclerc",
+      "team": "Ferrari",
+      "points": 179,
+      "wins": 1
+    },
+    {
+      "position": 6,
+      "driver_code": "VER",
+      "driver_name": "Max Verstappen",
+      "team": "Red Bull",
+      "points": 163,
+      "wins": 0
+    },
+    {
+      "position": 7,
+      "driver_code": "PIA",
+      "driver_name": "Oscar Piastri",
+      "team": "McLaren",
+      "points": 120,
+      "wins": 0
+    },
+    {
+      "position": 8,
+      "driver_code": "HAD",
+      "driver_name": "Isack Hadjar",
+      "team": "Red Bull",
+      "points": 86,
+      "wins": 0
+    },
+    {
+      "position": 9,
+      "driver_code": "LAW",
+      "driver_name": "Liam Lawson",
+      "team": "RB F1 Team",
+      "points": 59,
+      "wins": 0
+    },
+    {
+      "position": 10,
+      "driver_code": "GAS",
+      "driver_name": "Pierre Gasly",
+      "team": "Alpine F1 Team",
+      "points": 41,
+      "wins": 0
+    },
+    {
+      "position": 11,
+      "driver_code": "LIN",
+      "driver_name": "Arvid Lindblad",
+      "team": "RB F1 Team",
+      "points": 37,
+      "wins": 0
+    },
+    {
+      "position": 12,
+      "driver_code": "COL",
+      "driver_name": "Franco Colapinto",
+      "team": "Alpine F1 Team",
+      "points": 27,
+      "wins": 0
+    },
+    {
+      "position": 13,
+      "driver_code": "BEA",
+      "driver_name": "Oliver Bearman",
+      "team": "Haas F1 Team",
+      "points": 20,
+      "wins": 0
+    },
+    {
+      "position": 14,
+      "driver_code": "BOR",
+      "driver_name": "Gabriel Bortoleto",
+      "team": "Audi",
+      "points": 10,
+      "wins": 0
+    },
+    {
+      "position": 15,
+      "driver_code": "HUL",
+      "driver_name": "Nico Hülkenberg",
+      "team": "Audi",
+      "points": 7,
+      "wins": 0
+    },
+    {
+      "position": 16,
+      "driver_code": "OCO",
+      "driver_name": "Esteban Ocon",
+      "team": "Haas F1 Team",
+      "points": 7,
+      "wins": 0
+    },
+    {
+      "position": 17,
+      "driver_code": "SAI",
+      "driver_name": "Carlos Sainz",
+      "team": "Williams",
+      "points": 7,
+      "wins": 0
+    },
+    {
+      "position": 18,
+      "driver_code": "ALB",
+      "driver_name": "Alexander Albon",
+      "team": "Williams",
+      "points": 5,
+      "wins": 0
+    },
+    {
+      "position": 19,
+      "driver_code": "ALO",
+      "driver_name": "Fernando Alonso",
+      "team": "Aston Martin",
+      "points": 3,
+      "wins": 0
+    },
+    {
+      "position": 20,
+      "driver_code": "TSU",
+      "driver_name": "Yuki Tsunoda",
+      "team": "RB F1 Team",
+      "points": 1,
+      "wins": 0
+    },
+    {
+      "position": 21,
+      "driver_code": "STR",
+      "driver_name": "Lance Stroll",
+      "team": "Aston Martin",
+      "points": 0,
+      "wins": 0
+    },
+    {
+      "position": 22,
+      "driver_code": "BOT",
+      "driver_name": "Valtteri Bottas",
+      "team": "Cadillac F1 Team",
+      "points": 0,
+      "wins": 0
+    },
+    {
+      "position": 23,
+      "driver_code": "PER",
+      "driver_name": "Sergio Pérez",
+      "team": "Cadillac F1 Team",
+      "points": 0,
+      "wins": 0
+    }
+  ],
+  "constructors": [
+    {
+      "position": 1,
+      "team": "Mercedes",
+      "points": 538,
+      "wins": 11
+    },
+    {
+      "position": 2,
+      "team": "Ferrari",
+      "points": 378,
+      "wins": 2
+    },
+    {
+      "position": 3,
+      "team": "McLaren",
+      "points": 306,
+      "wins": 2
+    },
+    {
+      "position": 4,
+      "team": "Red Bull",
+      "points": 263,
+      "wins": 0
+    },
+    {
+      "position": 5,
+      "team": "RB F1 Team",
+      "points": 83,
+      "wins": 0
+    },
+    {
+      "position": 6,
+      "team": "Alpine F1 Team",
+      "points": 68,
+      "wins": 0
+    },
+    {
+      "position": 7,
+      "team": "Haas F1 Team",
+      "points": 27,
+      "wins": 0
+    },
+    {
+      "position": 8,
+      "team": "Audi",
+      "points": 17,
+      "wins": 0
+    },
+    {
+      "position": 9,
+      "team": "Williams",
+      "points": 12,
+      "wins": 0
+    },
+    {
+      "position": 10,
+      "team": "Aston Martin",
+      "points": 3,
+      "wins": 0
+    },
+    {
+      "position": 11,
+      "team": "Cadillac F1 Team",
+      "points": 0,
+      "wins": 0
+    }
+  ]
+}
