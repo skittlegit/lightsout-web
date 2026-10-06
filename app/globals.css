@@ -301,31 +301,54 @@ summary::-webkit-details-marker { display: none; }
   .scroll-snap-x { scroll-snap-type: none; }
 }
 
-.anchor-link {
+/* Section rail (SectionAnchors.tsx): dots at rest, label chip on hover/focus. */
+.rail-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 22px;
+  width: 22px;
+  color: var(--color-muted-soft);
+  transition: color var(--dur-fast) var(--ease-out-soft);
+}
+.rail-link:hover,
+.rail-link:focus-visible,
+.rail-link[data-active] { color: var(--color-ink); }
+.rail-link--accent { color: var(--color-f1); }
+.rail-dot {
+  width: 6px;
+  height: 6px;
+  margin-left: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.55;
+  transition: transform var(--dur-fast) var(--ease-out-soft),
+              opacity var(--dur-fast) var(--ease-out-soft),
+              width var(--dur-mid) var(--ease-out-soft);
+}
+.rail-link[data-active] .rail-dot { width: 14px; opacity: 1; background: var(--color-f1); }
+.rail-link:hover .rail-dot { opacity: 1; transform: scale(1.2); }
+.rail-dot--diamond { border-radius: 1px; transform: rotate(45deg); opacity: 1; }
+.rail-link:hover .rail-dot--diamond { transform: rotate(45deg) scale(1.2); }
+.rail-label {
+  position: absolute;
+  left: 26px;
+  white-space: nowrap;
+  padding: 3px 8px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-muted);
-  transition: color var(--dur-fast) var(--ease-out-soft);
-  display: block;
-  padding: 4px 0;
-  position: relative;
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  opacity: 0;
+  transform: translateX(-4px);
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out-soft),
+              transform var(--dur-fast) var(--ease-out-soft);
 }
-.anchor-link:hover { color: var(--color-ink); }
-.anchor-link::before {
-  content: "";
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  width: 4px;
-  height: 1px;
-  background: currentColor;
-  transform: translateY(-50%) scaleX(0);
-  transform-origin: right center;
-  transition: transform var(--dur-fast) var(--ease-out-soft);
-}
-.anchor-link:hover::before { transform: translateY(-50%) scaleX(1); }
+.rail-link:hover .rail-label,
+.rail-link:focus-visible .rail-label { opacity: 1; transform: translateX(0); }
 
 .hover-lift {
   transition: transform var(--dur-fast) var(--ease-out-soft),
@@ -571,4 +594,15 @@ summary::-webkit-details-marker { display: none; }
   .shift-lights__dot { animation: none !important; background: #2a0707 !important; }
   .hover-lift:hover { transform: none !important; }
   .headline-link::after { transition: none !important; }
+}
+
+/* Hero track outline (TrackOutline): the lap line traces itself in once. */
+.track-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: track-draw 2.4s var(--ease-editorial) 0.3s forwards;
+}
+@keyframes track-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .track-draw { animation: none; stroke-dashoffset: 0; }
 }

@@ -15,7 +15,7 @@ import {
   teamShort,
 } from "@/lib/format";
 import { teamSlug } from "@/lib/slug";
-import { raceRecap, gridDelta, type RaceRecap } from "@/lib/recap";
+import { raceRecap, gridDelta, finishGap, type RaceRecap } from "@/lib/recap";
 import type { JolpicaRaceResult, JolpicaQualifyingResult } from "@/lib/jolpica";
 
 export const revalidate = 600;
@@ -339,11 +339,12 @@ function GridDelta({ delta }: { delta: number | null }) {
 
 function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
   if (!results.length) return null;
+  const winnerLaps = Math.max(...results.map((r) => Number(r.laps) || 0));
   return (
-    <section className="px-6 md:px-10 py-10 md:py-14">
-      <div className="max-w-[1280px] mx-auto">
+    <section className="py-10 md:py-14">
+      <div className="container-max">
         <div className="flex items-end justify-between gap-6 flex-wrap">
-          <h2 className="headline text-[10vw] md:text-[3rem]">
+          <h2 className="headline h-subsection">
             Race <em>Results</em>
           </h2>
           <span className="eyebrow">FINAL CLASSIFICATION</span>
@@ -402,7 +403,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
                     </Td>
                     <Td mono>{r.laps}</Td>
                     <Td mono>
-                      {r.Time?.time ?? r.status}
+                      {finishGap(r, winnerLaps)}
                       {r.FastestLap?.rank === "1" && (
                         <span className="ml-2 inline-block px-1.5 border border-f1 text-f1 text-[9px] tracking-[0.16em]">
                           FL
@@ -426,10 +427,10 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
 function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
   if (!results.length) return null;
   return (
-    <section className="px-6 md:px-10 py-10 pb-16 md:pb-24">
-      <div className="max-w-[1280px] mx-auto">
+    <section className="py-10 pb-16 md:pb-24">
+      <div className="container-max">
         <div className="flex items-end justify-between gap-6 flex-wrap">
-          <h2 className="headline text-[10vw] md:text-[3rem]">
+          <h2 className="headline h-subsection">
             Qualifying <em>Splits</em>
           </h2>
           <span className="eyebrow">Q1 · Q2 · Q3</span>

@@ -1,4 +1,5 @@
 import type { DriverStanding, Race } from "@/lib/types";
+import type { JolpicaRaceResult } from "@/lib/jolpica";
 import { abbreviateName, formatRaceDate, teamColor, teamShort } from "@/lib/format";
 import { SectionHead } from "./DriversTable";
 import Link from "next/link";
@@ -7,12 +8,14 @@ import type { Route } from "next";
 interface Props {
   lastRace: Race | null;
   drivers: DriverStanding[];
+  /** Last race's top three finishers (empty if results aren't published yet). */
+  podium: JolpicaRaceResult[];
 }
 
 /**
  * Last Race Recap — honest, real-data-only column.
  */
-export default function PaddockIntelView({ lastRace, drivers }: Props) {
+export default function PaddockIntelView({ lastRace, drivers, podium }: Props) {
   const top3 = drivers.slice(0, 3);
 
   return (
@@ -41,6 +44,7 @@ export default function PaddockIntelView({ lastRace, drivers }: Props) {
               {lastRace.race_name}
             </div>
             <div className="eyebrow mt-1.5">{lastRace.circuit}</div>
+            {podium.length > 0 && <PodiumList podium={podium} />}
             <div className="mt-4 font-mono text-[10px] tracking-[0.2em] uppercase text-f1 inline-flex items-center gap-1.5">
               View race detail <span aria-hidden>→</span>
             </div>
@@ -86,14 +90,28 @@ export default function PaddockIntelView({ lastRace, drivers }: Props) {
           {drivers.length >= 2 && (
             <TitleFight a={drivers[0]} b={drivers[1]} />
           )}
-
-          <p className="mt-7 text-xs text-muted leading-relaxed">
-            Per-round podium results will appear here once the backend exposes
-            race results. Until then, the championship snapshot stands in.
-          </p>
         </>
       )}
     </div>
+  );
+}
+
+/** Final top three, P1 emphasised, gaps from the official classification. */
+function PodiumList({ podium }: { podium: JolpicaRaceResult[] }) {
+  return (
+    <ol className="mt-4 flex flex-col border-t border-rule">
+      {podium.map((r, i) => (
+        <li key={r.Driver.driverId} className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-baseline gap-2 py-2 border-b border-rule">
+          <span className={`font-mono tabular text-[11px] ${i === 0 ? "text-f1" : "text-muted"}`}>P{r.position}</span>
+          <span className="min-w-0 truncate">
+            <span aria-hidden className="inline-block w-[6px] h-[6px] rounded-full mr-2 align-middle" style={{ background: teamColor(r.Constructor.name) }} />
+            <span className={`font-display ${i === 0 ? "text-[17px]" : "text-[15px]"}`}>{r.Driver.familyName}</span>
+            <span className="eyebrow ml-2">{teamShort(r.Constructor.name)}</span>
+          </span>
+          <span className="font-mono tabular text-[11px] text-muted">{i === 0 ? "WIN" : r.Time?.time ?? r.status}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 

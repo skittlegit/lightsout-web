@@ -286,3 +286,40 @@ function DataCell({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+/**
+ * Bare track outline for dark surfaces (the homepage hero): halo, tarmac and
+ * a lap line that draws itself in once. Renders nothing for circuits without
+ * a traced outline, so the hero never shows the generic placeholder.
+ */
+export function TrackOutline({
+  circuitId,
+  label,
+  className,
+}: {
+  circuitId: string;
+  label: string;
+  className?: string;
+}) {
+  const meta = CIRCUITS[circuitId];
+  if (!meta) return null;
+  return (
+    <svg viewBox="0 0 200 100" className={className} role="img" aria-label={`${label} layout`}>
+      <path d={meta.d} fill="none" stroke="rgba(225,6,0,0.22)" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round" />
+      <path d={meta.d} fill="none" stroke="rgba(250,247,242,0.12)" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
+      <path
+        d={meta.d}
+        pathLength={100}
+        className="track-draw"
+        fill="none"
+        stroke="#faf7f2"
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <circle cx={meta.start[0]} cy={meta.start[1]} r="2.4" fill="#e10600">
+        <animate attributeName="opacity" values="1;0.35;1" dur="1.6s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  );
+}

@@ -22,6 +22,10 @@ unavailable state. They never substitute demo predictions.
 Forecast requests bypass Vercel's data cache and use Render's prediction cache,
 so newly deployed models and manual forecast refreshes are visible immediately.
 
+Race start times come from `race_time` (UTC) and render in the visitor's own
+timezone. The forecast shows the Open-Meteo weather the model used, a win /
+podium / points odds board, and the full position matrix.
+
 `npm run refresh:data` updates the offline snapshot from Render. The weekly
 `refresh-base-data` workflow also commits a refreshed snapshot on Tuesdays.
 

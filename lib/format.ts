@@ -34,6 +34,16 @@ export function formatRaceDate(iso: string): string {
   return `${month} ${d.getUTCDate()}`;
 }
 
+/**
+ * Race start as a UTC instant. Jolpica times are UTC ("12:00:00Z"); fall back
+ * to 13:00 UTC when a snapshot predates race_time. Night races start hours
+ * away from 13:00, so the real time matters for countdowns.
+ */
+export function raceStartISO(raceDate: string, raceTime?: string | null): string {
+  const hhmm = raceTime?.match(/^\d{2}:\d{2}/)?.[0] ?? "13:00";
+  return `${raceDate.slice(0, 10)}T${hhmm}:00Z`;
+}
+
 /** Whole days from `now` until an ISO date (date-only). Negative once past. */
 export function daysUntil(iso: string, now: Date = new Date()): number {
   const target = new Date(iso.slice(0, 10) + "T00:00:00Z").getTime();

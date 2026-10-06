@@ -136,9 +136,9 @@ export default async function ConstructorPage({
       </section>
 
       {/* Lineup */}
-      <section className="px-6 md:px-10 py-10">
-        <div className="max-w-[1280px] mx-auto">
-          <h2 className="headline text-[10vw] md:text-[3rem]">
+      <section className="py-10">
+        <div className="container-max">
+          <h2 className="headline h-subsection">
             Race <em>Lineup</em>
           </h2>
           <div className="rule-thin mt-4" />
@@ -186,10 +186,10 @@ export default async function ConstructorPage({
       </section>
 
       {/* Results */}
-      <section className="px-6 md:px-10 py-10 pb-16 md:pb-24">
-        <div className="max-w-[1280px] mx-auto">
+      <section className="py-10 pb-16 md:pb-24">
+        <div className="container-max">
           <div className="flex items-end justify-between gap-6 flex-wrap">
-            <h2 className="headline text-[10vw] md:text-[3rem]">
+            <h2 className="headline h-subsection">
               Race <em>Log</em>
             </h2>
             <span className="eyebrow">{conResults.length} ROUNDS LOGGED</span>

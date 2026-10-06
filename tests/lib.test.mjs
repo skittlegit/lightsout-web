@@ -26,3 +26,12 @@ test("ics is a timed UTC event when the race start is known, all-day otherwise",
   assert.match(timed, /DTSTART:20261011T120000Z\r\nDTEND:20261011T140000Z/);
   assert.match(buildRaceIcs(race), /DTSTART;VALUE=DATE:20261011\r\nDTEND;VALUE=DATE:20261012/);
 });
+
+test("lapped finishers show laps down instead of a stray seconds gap", async () => {
+  const { finishGap } = await import("../lib/recap.ts");
+  const row = (laps, status, time) => ({ laps: String(laps), status, ...(time ? { Time: { time } } : {}) });
+  assert.equal(finishGap(row(68, "Finished", "+10.768"), 68), "+10.768");
+  assert.equal(finishGap(row(67, "Lapped", "+5.033"), 68), "+1 Lap");
+  assert.equal(finishGap(row(64, "Lapped"), 68), "+4 Laps");
+  assert.equal(finishGap(row(38, "Retired"), 68), "Retired");
+});

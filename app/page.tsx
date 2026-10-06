@@ -25,6 +25,7 @@ import {
   pickLastCompleted,
   pickNextRace,
 } from "@/lib/api";
+import { getCircuit, getRaceResults } from "@/lib/jolpica";
 
 // Allow the forecast's server render up to 60s: the backend's /predictions/next
 // can take several seconds cold, and the default serverless cap would abort it
@@ -89,7 +90,8 @@ async function HeroSection() {
   const cal = await getCalendar();
   const next = pickNextRace(cal.races);
   if (!next) return null;
-  return <Hero race={next} totalRounds={cal.races.length} />;
+  const circuit = await getCircuit(next.round);
+  return <Hero race={next} totalRounds={cal.races.length} circuitId={circuit?.circuitId} />;
 }
 
 async function CalendarSection() {
@@ -134,7 +136,11 @@ async function ConstructorsColumn() {
 async function PaddockColumn() {
   const [cal, drivers] = await Promise.all([getCalendar(), getDriverStandings()]);
   const lastRace = pickLastCompleted(cal.races);
-  return <PaddockIntelView lastRace={lastRace} drivers={drivers} />;
+  const results = lastRace ? await getRaceResults(lastRace.round) : null;
+  const podium = [...(results?.Results ?? [])]
+    .sort((a, b) => Number(a.position) - Number(b.position))
+    .slice(0, 3);
+  return <PaddockIntelView lastRace={lastRace} drivers={drivers} podium={podium} />;
 }
 
 async function ForecastSection() {

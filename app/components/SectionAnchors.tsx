@@ -46,10 +46,12 @@ export default function SectionAnchors() {
     return () => obs.disconnect();
   }, []);
 
+  // A dot rail, not a text column: at xl widths the page gutter is narrower
+  // than the labels, so labels only surface on hover/focus, over a paper chip.
   return (
     <nav
       aria-label="Section navigation"
-      className="hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 z-30 flex-col gap-1"
+      className="hidden xl:flex fixed left-4 top-1/2 -translate-y-1/2 z-30 flex-col gap-0.5"
     >
       {ANCHORS.map((a) => {
         const isActive = active === a.id;
@@ -57,19 +59,21 @@ export default function SectionAnchors() {
           <a
             key={a.href}
             href={a.href}
-            className="anchor-link"
-            style={isActive ? { color: "var(--color-ink)" } : undefined}
+            className="rail-link"
+            data-active={isActive || undefined}
             aria-current={isActive ? "true" : undefined}
           >
-            {a.label}
+            <span aria-hidden className="rail-dot" />
+            <span className="rail-label">{a.label}</span>
           </a>
         );
       })}
 
       {/* Separate routed tools (not in-page sections). */}
-      <span aria-hidden className="my-1.5 ml-[1px] h-px w-5 bg-rule" />
-      <Link href="/compare" className="anchor-link" style={{ color: "var(--color-f1)" }}>
-        ◆ Head to Head
+      <span aria-hidden className="my-1.5 ml-[5px] h-px w-3 bg-rule" />
+      <Link href="/compare" className="rail-link rail-link--accent">
+        <span aria-hidden className="rail-dot rail-dot--diamond" />
+        <span className="rail-label">Head to Head</span>
       </Link>
     </nav>
   );

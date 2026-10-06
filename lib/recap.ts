@@ -65,6 +65,19 @@ export function raceRecap(results: JolpicaRaceResult[]): RaceRecap | null {
   };
 }
 
+/**
+ * Gap column text. Jolpica sometimes attaches a seconds gap to cars that
+ * finished laps down; show "+N Lap(s)" whenever a classified car completed
+ * fewer laps than the winner, otherwise the official time or status.
+ */
+export function finishGap(result: JolpicaRaceResult, winnerLaps: number): string {
+  const lapsDown = winnerLaps - Number(result.laps);
+  if (isClassified(result.status) && Number.isFinite(lapsDown) && lapsDown > 0) {
+    return `+${lapsDown} Lap${lapsDown === 1 ? "" : "s"}`;
+  }
+  return result.Time?.time ?? result.status;
+}
+
 /** Grid → finish delta for a single result; null when not meaningfully comparable. */
 export function gridDelta(result: JolpicaRaceResult): number | null {
   const grid = Number(result.grid);

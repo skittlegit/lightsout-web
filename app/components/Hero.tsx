@@ -1,24 +1,21 @@
 import Countdown from "./Countdown";
 import ShiftLights from "./ShiftLights";
+import LocalStartTime from "./LocalStartTime";
+import { TrackOutline } from "./CircuitVisual";
 import type { Race } from "@/lib/types";
-import { splitRaceName, formatRaceFullDate, countryCode } from "@/lib/format";
+import { splitRaceName, formatRaceFullDate, countryCode, raceStartISO } from "@/lib/format";
 import Link from "next/link";
 
 interface Props {
   race: Race;
   totalRounds: number;
+  /** Jolpica circuitId, for the track outline above the countdown. */
+  circuitId?: string;
 }
 
-function targetISO(race: Race): string {
-  // Jolpica start times are UTC ("12:00:00Z"); fall back to 13:00 UTC when a
-  // snapshot predates race_time. Night races start hours away from 13:00.
-  const time = race.race_time?.match(/^\d{2}:\d{2}(:\d{2})?/)?.[0] ?? "13:00:00";
-  return `${race.race_date}T${time}Z`;
-}
-
-export default function Hero({ race, totalRounds }: Props) {
+export default function Hero({ race, totalRounds, circuitId }: Props) {
   const { head, tail } = splitRaceName(race.race_name);
-  const target = targetISO(race);
+  const target = raceStartISO(race.race_date, race.race_time);
   const code = countryCode(race.country);
 
   return (
@@ -73,11 +70,11 @@ export default function Hero({ race, totalRounds }: Props) {
                   value={`${String(race.round).padStart(2, "0")} of ${String(totalRounds).padStart(2, "0")}`}
                   mono
                 />
-                <Field
-                  label="Race Day"
-                  value={formatRaceFullDate(race.race_date)}
-                  mono
-                />
+                {race.race_time ? (
+                  <Field label="Lights Out · Your Time" value={<LocalStartTime iso={target} />} mono />
+                ) : (
+                  <Field label="Race Day" value={formatRaceFullDate(race.race_date)} mono />
+                )}
               </div>
 
               <Link
@@ -89,8 +86,17 @@ export default function Hero({ race, totalRounds }: Props) {
             </div>
 
             {/* RIGHT — countdown */}
-            <div className="lg:border-l lg:border-paper/15 lg:pl-10 flex lg:items-end pt-4 lg:pt-0">
-              <Countdown targetISO={target} />
+            <div className="lg:border-l lg:border-paper/15 lg:pl-10 flex flex-col justify-between gap-8 pt-4 lg:pt-0">
+              {circuitId && (
+                <TrackOutline
+                  circuitId={circuitId}
+                  label={race.circuit}
+                  className="hidden sm:block w-full max-w-[420px] lg:ml-auto h-auto"
+                />
+              )}
+              <div className="flex lg:justify-end">
+                <Countdown targetISO={target} />
+              </div>
             </div>
           </div>
         </div>
@@ -105,7 +111,7 @@ function Field({
   mono,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   mono?: boolean;
 }) {
   return (
