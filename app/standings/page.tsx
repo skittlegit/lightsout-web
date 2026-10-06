@@ -35,8 +35,7 @@ export default async function StandingsPage() {
     <main className="flex-1 w-full">
       <PageHeader
         kicker={`${cal.season} season · after round ${done} of ${cal.races.length}`}
-        title="Championship"
-        accent="standings"
+        title="Championship standings"
         description={
           drivers[0] && drivers[1]
             ? `${drivers[0].driver_name} leads ${drivers[1].driver_name} by ${drivers[0].points - drivers[1].points} points with ${cal.races.length - done} rounds to go.`

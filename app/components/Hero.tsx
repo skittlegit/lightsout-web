@@ -1,6 +1,6 @@
 import Countdown from "./Countdown";
 import LocalStartTime from "./LocalStartTime";
-import { TrackOutline } from "./CircuitVisual";
+import { TrackOutline } from "./Circuit";
 import type { Race } from "@/lib/types";
 import { splitRaceName, formatRaceFullDate, countryCode, raceStartISO } from "@/lib/format";
 import Link from "next/link";
@@ -81,7 +81,7 @@ export default function Hero({ race, totalRounds, circuitId }: Props) {
 function Fact({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1 min-w-0">
-      <dt className="text-[12.5px] text-muted">{label}</dt>
+      <dt className="eyebrow">{label}</dt>
       <dd className="text-[15px] text-ink leading-snug">{value}</dd>
     </div>
   );

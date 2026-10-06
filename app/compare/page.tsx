@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
-import BackBar from "@/app/components/BackBar";
-import HScroll from "@/app/components/HScroll";
+import DriverName from "@/app/components/DriverName";
+import SectionTitle, { PageHeader } from "@/app/components/SectionTitle";
+import { TableCard } from "@/app/components/ui";
 import CompareSelectors, {
   type CompareOption,
 } from "@/app/components/CompareSelectors";
@@ -85,8 +87,8 @@ export default async function ComparePage({
   if (!sA || !sB) {
     return (
       <main className="flex-1 w-full">
-        <BackBar crumb="Drivers" crumbHref="/drivers" label="Head to Head" />
-        <section className="section-y">
+        <PageHeader kicker="Driver comparison" title="Head to head" />
+        <section>
           <div className="container-max">
             <p className="text-muted">Standings are unavailable right now.</p>
           </div>
@@ -140,70 +142,46 @@ export default async function ComparePage({
 
   return (
     <main className="flex-1 w-full">
-      <BackBar crumb="Drivers" crumbHref="/drivers" label="Head to Head" />
+      <PageHeader
+        kicker="Driver comparison"
+        title="Head to head"
+        description="Pick any two drivers to compare their season side by side."
+      />
 
-      <section className="section-y">
+      <section>
         <div className="container-max">
-          <span className="eyebrow-red block">Driver Comparison</span>
-          <h1 className="headline h-detail mt-2">
-            Head to <em>Head</em>
-          </h1>
+          <CompareSelectors options={options} a={codeA} b={codeB} />
 
-          <div className="mt-8 md:mt-10">
-            <CompareSelectors options={options} a={codeA} b={codeB} />
+          {/* Driver cards, same style as the driver grid */}
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            <DriverHead standing={sA} color={colorA} />
+            <DriverHead standing={sB} color={colorB} />
           </div>
 
-          {/* Identity band */}
-          <div className="mt-10 grid grid-cols-[1fr_auto_1fr] items-stretch gap-3 sm:gap-6">
-            <DriverHead standing={sA} color={colorA} align="left" />
-            <div className="flex items-center justify-center">
-              <span className="font-mono text-[11px] tracking-[0.2em] text-muted-soft uppercase">
-                vs
-              </span>
+          {/* Who finished ahead */}
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TallyCard label="Finished ahead in the race" a={h2h.raceWinsA} b={h2h.raceWinsB} codeA={codeA} codeB={codeB} colorA={colorA} colorB={colorB} />
+            <TallyCard label="Started ahead on the grid" a={h2h.qualWinsA} b={h2h.qualWinsB} codeA={codeA} codeB={codeB} colorA={colorA} colorB={colorB} />
+          </div>
+
+          {/* Season stats */}
+          <div className="mt-4 card overflow-hidden">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 h-12 border-b border-rule">
+              <span className="font-display font-extrabold text-right">{codeA}</span>
+              <span className="eyebrow text-center min-w-[120px]">Season</span>
+              <span className="font-display font-extrabold">{codeB}</span>
             </div>
-            <DriverHead standing={sB} color={colorB} align="right" />
-          </div>
-
-          {/* H2H tallies */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <TallyCard
-              label="Race finishes — ahead"
-              a={h2h.raceWinsA}
-              b={h2h.raceWinsB}
-              colorA={colorA}
-              colorB={colorB}
-            />
-            <TallyCard
-              label="Qualifying (grid) — ahead"
-              a={h2h.qualWinsA}
-              b={h2h.qualWinsB}
-              colorA={colorA}
-              colorB={colorB}
-            />
-          </div>
-
-          {/* Stat comparison */}
-          <div className="mt-10 border-t border-rule">
             {rows.map((r) => (
-              <div
-                key={r.label}
-                className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6 border-b border-rule py-3.5 row-hover"
-              >
+              <div key={r.label} className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-3 border-b border-rule last:border-b-0 row-hover">
                 <span
-                  className={`font-mono tabular text-right text-[15px] sm:text-base ${
-                    r.better === "a" ? "font-semibold" : "text-muted"
-                  }`}
+                  className={`text-right tabular text-[16px] ${r.better === "a" ? "font-display font-extrabold" : "text-muted"}`}
                   style={r.better === "a" ? { color: inkOf(colorA) } : undefined}
                 >
                   {r.aStr}
                 </span>
-                <span className="eyebrow text-center whitespace-nowrap min-w-[96px] sm:min-w-[140px]">
-                  {r.label}
-                </span>
+                <span className="eyebrow text-center whitespace-nowrap min-w-[120px]">{r.label}</span>
                 <span
-                  className={`font-mono tabular text-left text-[15px] sm:text-base ${
-                    r.better === "b" ? "font-semibold" : "text-muted"
-                  }`}
+                  className={`tabular text-[16px] ${r.better === "b" ? "font-display font-extrabold" : "text-muted"}`}
                   style={r.better === "b" ? { color: inkOf(colorB) } : undefined}
                 >
                   {r.bStr}
@@ -215,68 +193,41 @@ export default async function ComparePage({
       </section>
 
       {/* Per-race breakdown */}
-      <section className="pb-16 md:pb-24">
+      <section className="section-y">
         <div className="container-max">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
-            <h2 className="headline h-subsection">
-              Race by <em>Race</em>
-            </h2>
-            <span className="eyebrow">
-              {sharedRounds} shared {sharedRounds === 1 ? "round" : "rounds"}
-            </span>
-          </div>
-          <div className="rule-thin mt-4" />
-
+          <SectionTitle
+            kicker={`${sharedRounds} shared ${sharedRounds === 1 ? "round" : "rounds"}`}
+            title="Race by race"
+          />
           {sharedRounds === 0 ? (
-            <p className="mt-8 text-sm text-muted">
-              No completed rounds yet where both drivers have a recorded result.
-            </p>
+            <p className="mt-6 text-sm text-muted">No completed rounds yet where both drivers have a recorded result.</p>
           ) : (
-            <HScroll className="mt-6" bleed ariaLabel="Race by race comparison">
-              <table className="w-full border-collapse min-w-[560px]">
+            <div className="mt-6">
+              <TableCard minWidth={560}>
                 <thead>
-                  <tr className="text-left">
-                    <Th>R</Th>
-                    <Th>Race</Th>
-                    <Th className="text-right">{codeA}</Th>
-                    <Th className="text-right">{codeB}</Th>
-                    <Th className="text-right">Ahead</Th>
+                  <tr>
+                    <th className="w-14">Rnd</th>
+                    <th>Grand Prix</th>
+                    <th className="num">{codeA}</th>
+                    <th className="num">{codeB}</th>
+                    <th className="num">Ahead</th>
                   </tr>
                 </thead>
                 <tbody>
                   {h2h.rows.map((row) => (
-                    <tr key={row.round} className="row-hover border-t border-rule">
-                      <Td mono>{String(row.round).padStart(2, "0")}</Td>
-                      <Td>
-                        <Link
-                          href={`/races/${row.round}`}
-                          className="font-display font-semibold hover:text-f1 transition-colors"
-                        >
+                    <tr key={row.round}>
+                      <td className="font-display font-bold text-muted">{String(row.round).padStart(2, "0")}</td>
+                      <td>
+                        <Link href={`/races/${row.round}` as Route} className="font-semibold hover:text-f1 transition-colors">
                           {row.raceName}
                         </Link>
-                      </Td>
-                      <ResultCell
-                        dnf={row.aDnf}
-                        text={row.aText}
-                        pos={row.aPos}
-                        win={row.winner === "a"}
-                        color={colorA}
-                      />
-                      <ResultCell
-                        dnf={row.bDnf}
-                        text={row.bText}
-                        pos={row.bPos}
-                        win={row.winner === "b"}
-                        color={colorB}
-                      />
-                      <td className="py-3 pr-1 text-right">
+                      </td>
+                      <ResultCell dnf={row.aDnf} text={row.aText} pos={row.aPos} win={row.winner === "a"} />
+                      <ResultCell dnf={row.bDnf} text={row.bText} pos={row.bPos} win={row.winner === "b"} />
+                      <td className="num">
                         {row.winner ? (
-                          <span
-                            className="font-mono text-[11px] tracking-[0.12em] font-semibold"
-                            style={{
-                              color: row.winner === "a" ? colorA : colorB,
-                            }}
-                          >
+                          <span className="inline-flex items-center gap-2 font-display font-bold">
+                            <span aria-hidden className="team-pip !h-4" style={{ background: row.winner === "a" ? colorA : colorB }} />
                             {row.winner === "a" ? codeA : codeB}
                           </span>
                         ) : (
@@ -286,50 +237,34 @@ export default async function ComparePage({
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </HScroll>
+              </TableCard>
+            </div>
           )}
-
-          <p className="mt-6 text-[11px] text-muted leading-relaxed">
-            Standings from the lightsout-api backend; per-race results via the
-            Jolpica F1 (Ergast-compatible) API. Qualifying head-to-head is based
-            on starting grid position.
-          </p>
         </div>
       </section>
-
     </main>
   );
 }
 
-function DriverHead({
-  standing,
-  color,
-  align,
-}: {
-  standing: DriverStanding;
-  color: string;
-  align: "left" | "right";
-}) {
-  const right = align === "right";
+/** Driver card in the team-colour style used by the driver grid. */
+function DriverHead({ standing, color }: { standing: DriverStanding; color: string }) {
   return (
     <Link
-      href={`/drivers/${standing.driver_code.toLowerCase()}`}
-      className={`group flex flex-col gap-2 min-w-0 ${right ? "items-end text-right" : ""}`}
+      href={`/drivers/${standing.driver_code.toLowerCase()}` as Route}
+      className="team-card p-5 sm:p-6 flex flex-col gap-6 min-h-[170px]"
+      style={{ "--team": color } as CSSProperties}
     >
-      <span aria-hidden className="block w-full h-[5px]" style={{ background: color }} />
-      <span
-        className="font-mono tabular text-[12px] font-bold tracking-[0.1em]"
-        style={{ color: inkOf(color) }}
-      >
-        {standing.driver_code}
-      </span>
-      <span className="font-display font-semibold text-[clamp(1.4rem,4.5vw,2.4rem)] leading-[1.05] truncate max-w-full group-hover:text-f1 transition-colors">
-        {standing.driver_name}
-      </span>
-      <span className="eyebrow truncate max-w-full">
-        P{standing.position} · {teamShort(standing.team)}
-      </span>
+      <div className="flex items-start justify-between gap-3">
+        <span className="font-display text-[26px] font-extrabold leading-none">P{standing.position}</span>
+        <span className="text-right">
+          <span className="block font-display text-[22px] font-extrabold leading-none">{standing.points}</span>
+          <span className="block text-[11px] font-semibold uppercase tracking-[0.06em] text-white/70 mt-1">Pts</span>
+        </span>
+      </div>
+      <div className="mt-auto min-w-0">
+        <DriverName name={standing.driver_name} className="block text-[clamp(1rem,2.4vw,1.5rem)] truncate" />
+        <div className="text-[13px] text-white/75 mt-1">{teamShort(standing.team)}</div>
+      </div>
     </Link>
   );
 }
@@ -338,36 +273,36 @@ function TallyCard({
   label,
   a,
   b,
+  codeA,
+  codeB,
   colorA,
   colorB,
 }: {
   label: string;
   a: number;
   b: number;
+  codeA: string;
+  codeB: string;
   colorA: string;
   colorB: string;
 }) {
   const total = a + b;
   const aPct = total > 0 ? (a / total) * 100 : 50;
   return (
-    <div className="border border-rule p-4 card-deep">
-      <span className="eyebrow block">{label}</span>
+    <div className="card p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="eyebrow">{label}</span>
+        <span className="text-[13px] text-muted">{total} rounds</span>
+      </div>
       <div className="mt-3 flex items-baseline justify-between">
-        <span
-          className="font-mono tabular text-2xl"
-          style={{ color: a >= b ? inkOf(colorA) : undefined, fontWeight: a >= b ? 700 : 400 }}
-        >
-          {a}
+        <span className="font-display text-[28px] font-extrabold tabular">
+          {a} <span className="text-[13px] font-bold text-muted">{codeA}</span>
         </span>
-        <span className="eyebrow text-muted-soft">{total} rounds</span>
-        <span
-          className="font-mono tabular text-2xl"
-          style={{ color: b >= a ? inkOf(colorB) : undefined, fontWeight: b >= a ? 700 : 400 }}
-        >
-          {b}
+        <span className="font-display text-[28px] font-extrabold tabular">
+          <span className="text-[13px] font-bold text-muted">{codeB}</span> {b}
         </span>
       </div>
-      <div className="mt-2 flex h-[4px] w-full overflow-hidden bg-paper-deep">
+      <div className="mt-3 flex h-[6px] w-full overflow-hidden rounded-full gap-[2px]">
         <div style={{ width: `${aPct}%`, background: colorA }} />
         <div style={{ width: `${100 - aPct}%`, background: colorB }} />
       </div>
@@ -375,56 +310,11 @@ function TallyCard({
   );
 }
 
-function ResultCell({
-  dnf,
-  text,
-  pos,
-  win,
-  color,
-}: {
-  dnf: boolean;
-  text: string | null;
-  pos: number | null;
-  win: boolean;
-  color: string;
-}) {
-  let label: string;
-  if (dnf) label = "DNF";
-  else if (pos != null) label = `P${pos}`;
-  else label = text ?? "—";
-
+function ResultCell({ dnf, text, pos, win }: { dnf: boolean; text: string | null; pos: number | null; win: boolean }) {
+  const label = dnf ? "DNF" : pos != null ? `P${pos}` : (text ?? "—");
   return (
-    <td className="py-3 pr-4 text-right font-mono tabular text-sm">
-      <span
-        style={win ? { color, fontWeight: 600 } : undefined}
-        className={dnf ? "text-muted-soft" : win ? "" : "text-muted"}
-      >
-        {label}
-      </span>
-    </td>
-  );
-}
-
-function Th({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <th
-      className={`font-mono text-[10px] tracking-[0.16em] uppercase text-muted py-2 pr-4 font-medium ${className}`}
-    >
-      {children}
-    </th>
-  );
-}
-
-function Td({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
-  return (
-    <td className={`py-3 pr-4 text-sm ${mono ? "font-mono tabular" : ""}`}>
-      {children}
+    <td className="num">
+      <span className={dnf ? "text-muted-soft" : win ? "font-display font-extrabold" : "text-muted"}>{label}</span>
     </td>
   );
 }

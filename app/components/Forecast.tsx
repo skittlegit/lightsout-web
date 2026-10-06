@@ -18,7 +18,7 @@ export default function Forecast({ data }: { data: PredictionResponse }) {
   return (
     <section id="forecast" className="section-y">
       <div className="container-max">
-        <SectionTitle kicker="Model forecast" title="Race" accent="forecast" />
+        <SectionTitle kicker="Model forecast" title="Race forecast" />
         <div className="mt-6">
           <ForecastPanel data={data} />
         </div>
@@ -135,7 +135,7 @@ export function ForecastSnapshot({ data }: { data: PredictionResponse }) {
 function SnapshotStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="px-4 sm:px-5 py-3.5 border-r border-rule last:border-r-0 min-w-0">
-      <dt className="text-[12px] text-muted">{label}</dt>
+      <dt className="eyebrow">{label}</dt>
       <dd className="font-mono tabular text-[18px] font-semibold mt-0.5 truncate">{value}</dd>
     </div>
   );
@@ -230,7 +230,7 @@ function CalloutName({ name, meta }: { name: string; meta: string }) {
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="mt-auto flex items-end justify-between gap-3 pt-4 border-t border-rule">
-      <span className="text-[13px] text-muted">{label}</span>
+      <span className="eyebrow">{label}</span>
       <span className={`numeric-lg ${accent ? "text-f1-soft" : "text-ink"}`}>{value}</span>
     </div>
   );
@@ -267,21 +267,21 @@ function WeatherCallout({ weather }: { weather: RaceWeather }) {
   return (
     <Callout
       label="Conditions"
-      aside={<span className="text-[12.5px] text-muted">{WEATHER_SOURCE[weather.source]}</span>}
+      aside={<span className="chip">{WEATHER_SOURCE[weather.source]}</span>}
       color="var(--color-team-williams)"
       className="md:col-span-2 lg:col-span-1"
     >
       <div className="font-display text-[clamp(1.4rem,2.4vw,1.75rem)] font-bold leading-tight tracking-[-0.03em]">{outlook}</div>
       <div className="mt-auto grid grid-cols-2 gap-4 pt-4 border-t border-rule">
         <div>
-          <span className="text-[13px] text-muted block">Rain chance</span>
+          <span className="eyebrow block">Rain chance</span>
           <span className="numeric-lg block mt-1.5">{pctShort(rain)}</span>
           <div aria-hidden className="mt-2.5 h-[6px] rounded-full bg-paper-deeper overflow-hidden">
             <div className="h-full rounded-full bg-team-williams" style={{ width: `${Math.max(2, rain * 100)}%` }} />
           </div>
         </div>
         <div>
-          <span className="text-[13px] text-muted block">Air temp</span>
+          <span className="eyebrow block">Air temp</span>
           <span className="numeric-lg block mt-1.5">{Math.round(weather.temp_c)}°C</span>
         </div>
       </div>

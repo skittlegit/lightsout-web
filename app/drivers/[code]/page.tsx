@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
 import SectionTitle from "@/app/components/SectionTitle";
+import { BannerChip, BannerStat, TableCard } from "@/app/components/ui";
 import { getDriverStandings, getCalendar } from "@/lib/api";
 import { getDrivers, getDriverResults } from "@/lib/jolpica";
 import { driverIdFromCode, teamSlug } from "@/lib/slug";
@@ -92,8 +93,8 @@ export default async function DriverPage({
                 <Link href={`/constructors/${teamSlug(standing.team)}` as Route} className="chip !bg-white/15 !text-white hover:!bg-white/25">
                   {teamShort(standing.team)}
                 </Link>
-                {profile?.nationality && <span className="chip !bg-white/15 !text-white">{profile.nationality}</span>}
-                <span className="chip !bg-white/15 !text-white">{upperCode}</span>
+                {profile?.nationality && <BannerChip>{profile.nationality}</BannerChip>}
+                <BannerChip>{upperCode}</BannerChip>
                 <Link href={`/compare?a=${upperCode}` as Route} className="chip !bg-white !text-ink hover:!bg-white/85">
                   Compare <span aria-hidden>→</span>
                 </Link>
@@ -120,8 +121,8 @@ export default async function DriverPage({
           {seasonResults.length === 0 ? (
             <p className="mt-6 text-sm text-muted">No race results recorded yet for this driver in {cal.season}.</p>
           ) : (
-            <div className="mt-6 card overflow-x-auto">
-              <table className="data-table min-w-[640px]">
+            <div className="mt-6">
+              <TableCard minWidth={640}>
                 <thead>
                   <tr>
                     <th className="w-14">Rnd</th>
@@ -160,20 +161,11 @@ export default async function DriverPage({
                     );
                   })}
                 </tbody>
-              </table>
+              </TableCard>
             </div>
           )}
         </div>
       </section>
     </main>
-  );
-}
-
-function BannerStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-[12px] font-bold uppercase tracking-[0.06em] text-white/70">{label}</dt>
-      <dd className="font-display text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold leading-tight mt-1">{value}</dd>
-    </div>
   );
 }

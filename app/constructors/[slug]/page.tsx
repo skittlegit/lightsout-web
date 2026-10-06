@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
 import SectionTitle from "@/app/components/SectionTitle";
+import { BannerChip, BannerStat, TableCard } from "@/app/components/ui";
 import DriverName from "@/app/components/DriverName";
 import { getConstructorStandings, getDriverStandings, getCalendar } from "@/lib/api";
 import {
@@ -103,8 +104,8 @@ export default async function ConstructorPage({
               {teamShort(standing.team)}
             </h1>
             <div className="mt-5 flex items-center gap-2 flex-wrap">
-              {standing.team !== teamShort(standing.team) && <span className="chip !bg-white/15 !text-white">{standing.team}</span>}
-              {profile?.nationality && <span className="chip !bg-white/15 !text-white">{profile.nationality}</span>}
+              {standing.team !== teamShort(standing.team) && <BannerChip>{standing.team}</BannerChip>}
+              {profile?.nationality && <BannerChip>{profile.nationality}</BannerChip>}
               {profile?.url && (
                 <a href={profile.url} target="_blank" rel="noopener noreferrer" className="chip !bg-white/15 !text-white hover:!bg-white/25">
                   Wikipedia ↗
@@ -160,8 +161,8 @@ export default async function ConstructorPage({
               No race results recorded yet for this team in {calRes.season}.
             </p>
           ) : (
-            <div className="mt-6 card overflow-x-auto">
-              <table className="data-table min-w-[680px]">
+            <div className="mt-6">
+              <TableCard minWidth={680}>
                 <thead>
                   <tr>
                     <th className="w-14">Rnd</th>
@@ -193,7 +194,7 @@ export default async function ConstructorPage({
                     );
                   })}
                 </tbody>
-              </table>
+              </TableCard>
             </div>
           )}
         </div>
@@ -210,14 +211,5 @@ function CarResult({ result }: { result?: JolpicaRaceResult }) {
       <span className={`pos-badge ${pos === 1 ? "pos-badge--lead" : ""}`}>P{result.position}</span>
       <span className="text-[14px]">{result.Driver.code ?? result.Driver.familyName}</span>
     </span>
-  );
-}
-
-function BannerStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-[12px] font-bold uppercase tracking-[0.06em] text-white/70">{label}</dt>
-      <dd className="font-display text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold leading-tight mt-1">{value}</dd>
-    </div>
   );
 }

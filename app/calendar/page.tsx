@@ -40,8 +40,7 @@ export default async function CalendarPage() {
     <main className="flex-1 w-full">
       <PageHeader
         kicker={`${cal.season} season`}
-        title="Race"
-        accent="calendar"
+        title="Race calendar"
         description={
           <>
             {cal.races.length} rounds · {done} complete

@@ -84,7 +84,8 @@
   --color-rule-strong: #43434e;
   color: var(--color-ink);
   background: var(--color-carbon);
-  border-radius: var(--radius-panel);
+  /* Same signature corner as .card and .team-card */
+  border-radius: 0 var(--radius-panel) 0 0;
 }
 
 /* ============================================================
@@ -202,10 +203,8 @@ body {
   line-height: 1.02;
   text-wrap: balance;
 }
-.headline em {
-  font-style: normal;
-  color: var(--color-f1);
-}
+/* Headings are single-colour; <em> only carries emphasis, not a second colour. */
+.headline em { font-style: normal; color: inherit; }
 
 /* Fluid display sizes */
 .h-hero       { font-size: clamp(2.25rem, 5.2vw, 4.25rem); }

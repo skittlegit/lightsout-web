@@ -1,0 +1,41 @@
+import type { ReactNode } from "react";
+
+/** Label + big value used inside coloured banners (team cards, race banner). */
+export function BannerStat({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[12px] font-bold uppercase tracking-[0.06em] text-white/70">{label}</dt>
+      <dd className="font-display text-[clamp(1.3rem,2.4vw,1.8rem)] font-extrabold leading-tight mt-1">{value}</dd>
+    </div>
+  );
+}
+
+/** Banner chip on coloured/dark backgrounds. */
+export function BannerChip({ children }: { children: ReactNode }) {
+  return <span className="chip !bg-white/15 !text-white">{children}</span>;
+}
+
+/** A data table inside a corner-bordered card, scrolling sideways on phones. */
+export function TableCard({ minWidth = 560, children }: { minWidth?: number; children: ReactNode }) {
+  return (
+    <div className="card overflow-x-auto">
+      <table className="data-table" style={{ minWidth }}>
+        {children}
+      </table>
+    </div>
+  );
+}
+
+/** One cell of a `.stat-strip`: uppercase label, value, optional note. */
+export function StripStat({ label, value, note, color }: { label: string; value: ReactNode; note?: ReactNode; color?: string }) {
+  return (
+    <div>
+      <span className="eyebrow flex items-center gap-2">
+        {color && <span aria-hidden className="team-pip !h-3 !w-[3px]" style={{ background: color }} />}
+        {label}
+      </span>
+      <span className="font-display text-[clamp(1.1rem,2vw,1.4rem)] font-bold leading-tight truncate">{value}</span>
+      {note && <span className="text-[13px] text-muted truncate">{note}</span>}
+    </div>
+  );
+}

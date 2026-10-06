@@ -11,7 +11,7 @@ export default function NotFound() {
         <div className="container-max">
           <span className="kicker">Off track · 404</span>
           <h1 className="headline h-detail mt-4">
-            Lost the <em>racing line</em>
+            Lost the racing line
           </h1>
           <p className="mt-6 text-sm text-muted max-w-md leading-relaxed">
             That driver, team, or round isn&apos;t on this season&apos;s entry
