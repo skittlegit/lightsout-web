@@ -88,13 +88,13 @@ export default async function RacePage({
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-8 p-6 sm:p-8 md:p-10">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`chip ${race.is_next ? "chip-red" : "!bg-white/15 !text-white"}`}>{status}</span>
+                  <span className={`chip ${race.is_next ? "chip-red" : ""}`}>{status}</span>
                   <BannerChip>Round {race.round} of {cal.races.length}</BannerChip>
                   {race.has_sprint && <BannerChip>Sprint weekend</BannerChip>}
                 </div>
                 <h1 className="headline h-detail mt-6">
                   {head}
-                  {tail && <span className="text-muted"> {tail}</span>}
+                  {tail && <> <em>{tail}</em></>}
                 </h1>
                 <dl className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-5">
                   <BannerStat label="Circuit" value={<span className="text-[clamp(1rem,1.6vw,1.15rem)]">{race.circuit}</span>} />
@@ -109,7 +109,7 @@ export default async function RacePage({
                   />
                 </dl>
                 {!race.is_completed && (
-                  <div className="mt-8 [&_.btn-ghost]:!border-white [&_.btn-ghost]:!text-white">
+                  <div className="mt-8">
                     <IcsButton race={race} label="Add to calendar" />
                   </div>
                 )}
@@ -152,7 +152,7 @@ export default async function RacePage({
         <section className="section-y">
           <div className="container-max">
             <div className="card p-7">
-              <h2 className="font-display text-xl font-bold">Forecast not available yet</h2>
+              <h2 className="font-display text-xl">Forecast not available yet</h2>
               <p className="mt-2 text-muted">Predictions appear for upcoming rounds once the model has run.</p>
             </div>
           </div>

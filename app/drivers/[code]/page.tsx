@@ -75,27 +75,27 @@ export default async function DriverPage({
           <div className="team-card p-6 sm:p-8 md:p-10" style={{ "--team": color } as CSSProperties}>
             <span
               aria-hidden
-              className="absolute right-4 -bottom-8 font-display font-extrabold leading-none text-[clamp(9rem,22vw,16rem)] select-none"
+              className="absolute right-4 -bottom-8 font-display leading-none text-[clamp(9rem,22vw,16rem)] select-none"
               style={{ color: "color-mix(in srgb, var(--team) 70%, white)", opacity: 0.28 }}
             >
               {profile?.permanentNumber ?? ""}
             </span>
 
             <div className="relative">
-              <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-white/75">
+              <span className="eyebrow">
                 P{standing.position} in the {cal.season} championship
               </span>
-              <h1 className="mt-3 font-display font-extrabold leading-[0.95] tracking-[-0.02em]">
+              <h1 className="mt-3 font-display leading-[0.95]">
                 <span className="block text-[clamp(1.4rem,3vw,2.2rem)] text-white/85">{given}</span>
                 <span className="block uppercase text-[clamp(2.6rem,7vw,5rem)]">{family}</span>
               </h1>
               <div className="mt-5 flex items-center gap-2 flex-wrap">
-                <Link href={`/constructors/${teamSlug(standing.team)}` as Route} className="chip !bg-white/15 !text-white hover:!bg-white/25">
+                <Link href={`/constructors/${teamSlug(standing.team)}` as Route} className="chip hover:!border-[#faf7f2]">
                   {teamShort(standing.team)}
                 </Link>
                 {profile?.nationality && <BannerChip>{profile.nationality}</BannerChip>}
                 <BannerChip>{upperCode}</BannerChip>
-                <Link href={`/compare?a=${upperCode}` as Route} className="chip !bg-white !text-ink hover:!bg-white/85">
+                <Link href={`/compare?a=${upperCode}` as Route} className="chip !bg-[#faf7f2] !border-[#faf7f2] !text-[#141414] hover:!bg-white">
                   Compare <span aria-hidden>→</span>
                 </Link>
               </div>
@@ -142,7 +142,7 @@ export default async function DriverPage({
                     const pos = Number(result.position);
                     return (
                       <tr key={round}>
-                        <td className="font-display font-bold text-muted">{String(round).padStart(2, "0")}</td>
+                        <td className="font-display text-muted">{String(round).padStart(2, "0")}</td>
                         <td>
                           <Link href={`/races/${round}` as Route} className="font-semibold hover:text-f1 transition-colors">
                             {race.raceName}

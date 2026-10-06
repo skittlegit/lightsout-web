@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 /* ============================================================
-   LightsOut — single theme, modelled on Formula 1's own palette:
-   F1 red navigation, carbon-black feature panels, warm off-white
-   page, white cards with the signature top-right corner border.
+   LightsOut — editorial theme
+   Cream paper, serif headlines with italic red emphasis, monospaced
+   small-caps labels, hairline rules, near-square corners. Red is an
+   accent, not a surface. Team colours carry the data.
    Tailwind v4 CSS-first config. No tailwind.config.ts.
 
    Token names are semantic: `paper` is the page, `paper-deep` a card,
@@ -12,26 +13,26 @@
 
 @theme {
   /* Surfaces & ink */
-  --color-paper: #f7f4f1;        /* F1 warm off-white */
-  --color-paper-deep: #ffffff;   /* cards */
-  --color-paper-deeper: #eeeae5; /* tracks, insets, hovers */
-  --color-ink: #15151e;          /* F1 carbon black */
-  --color-ink-soft: #38383f;
-  --color-muted: #64646c;        /* AA on page + card */
-  --color-muted-soft: #949498;
-  --color-rule: #e4dfd9;
-  --color-rule-strong: #cfc9c1;
-  --color-carbon: #15151e;
+  --color-paper: #faf7f2;        /* page */
+  --color-paper-deep: #fffdf9;   /* cards — a touch lighter than the page */
+  --color-paper-deeper: #f1ece3; /* tracks, insets, hovers */
+  --color-ink: #141414;
+  --color-ink-soft: #2b2a28;
+  --color-muted: #6a655d;        /* AA on page + card */
+  --color-muted-soft: #9b958b;
+  --color-rule: #e3dccf;
+  --color-rule-strong: #cbc2b2;
+  --color-carbon: #151412;
 
   /* F1 red */
   --color-f1: #e10600;
   --color-f1-deep: #b30500;
-  --color-f1-soft: #ff3a2f;
+  --color-f1-soft: #ff4a3d;
 
   /* Timing-screen colours, used sparingly for data states */
-  --color-timing-purple: #a855f7;
-  --color-timing-green: #16a34a;
-  --color-timing-yellow: #eab308;
+  --color-timing-purple: #9b51e0;
+  --color-timing-green: #1f9d55;
+  --color-timing-yellow: #d4a017;
 
   /* Team accents */
   --color-team-mercedes: #27f4d2;
@@ -47,46 +48,46 @@
   --color-team-cadillac: #c9b47b;
 
   /* Fonts (variables defined in layout.tsx via next/font) */
-  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-titillium), ui-sans-serif, system-ui, sans-serif;
-  /* Numbers use the display face with tabular figures, like F1 timing graphics. */
-  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
 
   /* Motion */
   --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-fast: 150ms;
-  --dur-mid: 220ms;
+  --dur-fast: 160ms;
+  --dur-mid: 240ms;
 
   /* Layout */
-  --container-max: 1280px;
-  --gutter-x: clamp(1rem, 3.5vw, 2rem);
-  --section-y: clamp(2.5rem, 5vw, 4rem);
-  --nav-h: 64px;
-  --radius-card: 12px;
-  --radius-panel: 16px;
+  --container-max: 1240px;
+  --gutter-x: clamp(1.25rem, 3.5vw, 2.5rem);
+  --section-y: clamp(3rem, 6vw, 5rem);
+  --nav-h: 68px;
+  --radius-card: 3px;
+  --radius-panel: 4px;
 }
 
 :root { color-scheme: light; }
 
-/* Carbon feature surface (next-race hero, predicted winner, track card).
-   Re-pins the neutral ramp so token utilities inside (bg-paper-deeper,
-   text-ink, text-muted, border-rule) read correctly on black. */
+/* Dark editorial surface (race banners, home hero, predicted winner, team
+   cards' base). Re-pins the neutral ramp so token utilities inside
+   (bg-paper-deeper, text-ink, text-muted, border-rule) read on dark. */
 .panel-carbon {
-  --color-paper: #15151e;
-  --color-paper-deep: #1f1f28;
-  --color-paper-deeper: #2a2a34;
-  --color-ink: #ffffff;
-  --color-ink-soft: #d0d0d6;
-  --color-muted: #a3a3ad;
-  --color-muted-soft: #6d6d78;
-  --color-rule: #30303a;
-  --color-rule-strong: #43434e;
+  --color-paper: #151412;
+  --color-paper-deep: #1d1b18;
+  --color-paper-deeper: #282521;
+  --color-ink: #faf7f2;
+  --color-ink-soft: #ddd7cc;
+  --color-muted: #a8a196;
+  --color-muted-soft: #6f695f;
+  --color-rule: #2f2c27;
+  --color-rule-strong: #403c35;
   color: var(--color-ink);
   background: var(--color-carbon);
-  /* Same signature corner as .card and .team-card */
-  border-radius: 0 var(--radius-panel) 0 0;
+  border-radius: var(--radius-panel);
 }
+/* Full-width band (home hero): edge to edge, no corner. */
+.panel-carbon.panel-flat { border-radius: 0; }
 
 /* ============================================================
    Base
@@ -110,8 +111,8 @@ body {
 
 body {
   font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 15.5px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -123,7 +124,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-f1);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
 .skip-link {
@@ -131,12 +131,13 @@ body {
   left: 50%;
   top: -100px;
   transform: translateX(-50%);
-  background: var(--color-carbon);
-  color: #fff;
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   z-index: 200;
   transition: top var(--dur-fast) var(--ease-out-soft);
 }
@@ -152,42 +153,40 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
-/* Wide, heavy display face — stands in for Formula1 Display. */
+/* Serif display: headlines, names, big numbers. Regular weight is the
+   elegant default; italics carry emphasis. */
 .font-display {
   font-family: var(--font-display);
-  font-stretch: 112%;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .eyebrow,
 .eyebrow-ink,
 .eyebrow-red {
-  font-size: 12px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.3;
 }
 .eyebrow      { color: var(--color-muted); }
 .eyebrow-ink  { color: var(--color-ink); }
 .eyebrow-red  { color: var(--color-f1); }
 
-/* Small label above titles: a red bar + uppercase text. */
+/* Small label above titles: monospaced, red, tracked out. */
 .kicker {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-muted);
-}
-.kicker::before {
-  content: "";
-  width: 14px;
-  height: 3px;
-  background: var(--color-f1);
+  color: var(--color-f1);
 }
 
 .rule-thin   { border-top: 1px solid var(--color-rule); }
@@ -197,26 +196,27 @@ body {
 
 .headline {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 112%;
-  letter-spacing: -0.02em;
-  line-height: 1.02;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 0.98;
   text-wrap: balance;
 }
-/* Headings are single-colour; <em> only carries emphasis, not a second colour. */
-.headline em { font-style: normal; color: inherit; }
+.headline em {
+  font-style: italic;
+  color: var(--color-f1);
+}
 
 /* Fluid display sizes */
-.h-hero       { font-size: clamp(2.25rem, 5.2vw, 4.25rem); }
-.h-section    { font-size: clamp(1.5rem, 2.8vw, 2.2rem); }
-.h-subsection { font-size: clamp(1.2rem, 2vw, 1.55rem); }
-.h-detail     { font-size: clamp(2rem, 4.6vw, 3.4rem); }
+.h-hero       { font-size: clamp(2.75rem, 7vw, 5.75rem); }
+.h-section    { font-size: clamp(1.9rem, 3.6vw, 2.8rem); }
+.h-subsection { font-size: clamp(1.4rem, 2.4vw, 1.8rem); }
+.h-detail     { font-size: clamp(2.4rem, 5.6vw, 4.25rem); }
 
-.numeric-xl { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: clamp(2.25rem, 6vw, 3.25rem); line-height: 1; font-weight: 800; }
-.numeric-lg { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; font-weight: 800; }
+.numeric-xl { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 3.5rem); line-height: 1; }
+.numeric-lg { font-family: var(--font-display); font-size: 30px; line-height: 1; }
 
-/* F1-style name: given name regular, surname bold uppercase. */
-.surname { font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; }
+/* Driver names: given name regular, surname in small capitals. */
+.surname { font-weight: 600; font-variant: all-small-caps; letter-spacing: 0.04em; font-size: 1.06em; }
 
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -236,80 +236,86 @@ summary::-webkit-details-marker { display: none; }
 }
 .section-y { padding-block: var(--section-y); }
 
-/* Sticky F1-red navigation bar */
+/* Sticky paper nav with a hairline */
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--color-f1);
-  color: #fff;
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  backdrop-filter: saturate(1.2) blur(10px);
+  -webkit-backdrop-filter: saturate(1.2) blur(10px);
+  border-bottom: 1px solid var(--color-rule);
 }
 .nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
-  height: var(--nav-h);
-  padding: 0 14px;
-  font-size: 15px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.86);
+  height: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
   white-space: nowrap;
-  transition: color var(--dur-fast) var(--ease-out-soft),
-              background-color var(--dur-fast) var(--ease-out-soft);
+  transition: color var(--dur-fast) var(--ease-out-soft);
 }
-.nav-link:hover { color: #fff; background: rgba(0, 0, 0, 0.12); }
-.nav-link[aria-current="page"] { color: #fff; }
-.nav-link[aria-current="page"]::after {
+.nav-link:hover,
+.nav-link[aria-current="page"] { color: var(--color-ink); }
+.nav-link::after {
   content: "";
   position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 0;
-  height: 4px;
-  background: #fff;
-  border-radius: 4px 4px 0 0;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-f1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-mid) var(--ease-out-soft);
 }
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
 
 /* ============================================================
    Components
    ============================================================ */
 
-/* Card with Formula 1's top-right corner border. */
+/* Card: warm white, hairline border, near-square corners, no shadow. */
 .card {
   background: var(--color-paper-deep);
-  border-radius: 0 var(--radius-card) 0 0;
-  border-top: 2px solid var(--color-ink);
-  border-right: 2px solid var(--color-ink);
-  box-shadow: 0 1px 0 var(--color-rule);
-  transition: border-color var(--dur-fast) var(--ease-out-soft);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  transition: border-color var(--dur-fast) var(--ease-out-soft),
+              transform var(--dur-mid) var(--ease-out-soft);
 }
-a.card:hover, .card-link:hover { border-color: var(--color-f1); }
+a.card:hover, .card-link:hover { border-color: var(--color-ink); }
 .card-deep { background: var(--color-paper-deep); }
 
 .row-hover { transition: background-color var(--dur-fast) var(--ease-out-soft); }
-.row-hover:hover { background: var(--color-paper); }
+.row-hover:hover { background: color-mix(in srgb, var(--color-paper-deeper) 55%, transparent); }
 
 /* Data tables (standings, results) */
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th {
   text-align: left;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
-  padding: 12px 12px;
-  border-bottom: 1px solid var(--color-rule);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-ink);
   white-space: nowrap;
 }
 .data-table td {
-  padding: 12px;
+  padding: 13px 14px;
   border-bottom: 1px solid var(--color-rule);
   vertical-align: middle;
 }
 .data-table tbody tr:last-child td { border-bottom: 0; }
 .data-table tbody tr { transition: background-color var(--dur-fast) var(--ease-out-soft); }
-.data-table tbody tr:hover { background: var(--color-paper); }
+.data-table tbody tr:hover { background: color-mix(in srgb, var(--color-paper-deeper) 55%, transparent); }
 .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Horizontal data scroller (HScroll.tsx) — thin themed scrollbar that only
@@ -344,31 +350,38 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
 .headline-link { text-decoration: none; transition: color var(--dur-fast) var(--ease-out-soft); }
 .headline-link:hover { color: var(--color-f1); }
 
+/* Chip: monospaced tag with a hairline border */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 6px;
-  background: var(--color-paper-deeper);
-  font-size: 12.5px;
-  font-weight: 700;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--color-ink-soft);
   white-space: nowrap;
 }
-.chip-red { background: var(--color-f1); color: #fff; }
+.chip-red { border-color: var(--color-f1); background: var(--color-f1); color: #fff; }
 
-/* Buttons */
+/* Buttons: near-square, monospaced labels */
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   height: 44px;
   padding: 0 20px;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 700;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   white-space: nowrap;
   transition: background-color var(--dur-fast) var(--ease-out-soft),
               border-color var(--dur-fast) var(--ease-out-soft),
@@ -376,29 +389,32 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
 }
 .btn-primary { background: var(--color-f1); color: #fff; }
 .btn-primary:hover { background: var(--color-f1-deep); }
-.btn-ghost { border: 2px solid var(--color-ink); color: var(--color-ink); }
+.btn-ghost { border: 1px solid var(--color-ink); color: var(--color-ink); background: transparent; }
 .btn-ghost:hover { background: var(--color-ink); color: var(--color-paper); }
 
-/* "View all →" text link at the end of a card or section */
+/* "View all →" text link */
 .more-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14.5px;
-  font-weight: 700;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--color-ink);
-  transition: color var(--dur-fast) var(--ease-out-soft);
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--color-rule-strong);
+  transition: color var(--dur-fast) var(--ease-out-soft), border-color var(--dur-fast) var(--ease-out-soft);
 }
-.more-link:hover { color: var(--color-f1); }
+.more-link:hover { color: var(--color-f1); border-color: var(--color-f1); }
 
 /* stat-strip: applied alongside `grid grid-cols-N` for responsive count. */
 .stat-strip {
   display: grid;
   gap: 1px;
   background: var(--color-rule);
-  border-top: 2px solid var(--color-ink);
-  border-right: 2px solid var(--color-ink);
-  border-radius: 0 var(--radius-card) 0 0;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 .stat-strip > * {
@@ -410,40 +426,55 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
   min-width: 0;
 }
 @media (min-width: 768px) {
-  .stat-strip > * { padding: 18px 22px; }
+  .stat-strip > * { padding: 20px 22px; }
 }
 
-/* Position badge (standings, odds board, calendar list) */
+/* Position marker (standings, odds board, calendar list) */
 .pos-badge {
   display: inline-grid;
   place-items: center;
-  min-width: 28px;
-  height: 26px;
+  min-width: 26px;
+  height: 24px;
   padding: 0 4px;
-  border-radius: 6px;
-  font-family: var(--font-display);
+  border-radius: 2px;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 14px;
-  font-weight: 800;
-  background: transparent;
-  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted);
   flex: none;
 }
 .pos-badge--lead { background: var(--color-f1); color: #fff; }
 
 /* Team colour pip */
-.team-pip { width: 4px; height: 22px; border-radius: 999px; flex: none; }
+.team-pip { width: 3px; height: 22px; flex: none; }
 
-/* Countdown segments (Hero) */
-.timing-seg {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  padding: 10px 6px 8px;
-  border-radius: 8px;
-  background: var(--color-paper-deeper);
+/* Team card: dark editorial surface, team colour as a top rule and a soft
+   glow in the corner — the colour accents the card instead of flooding it. */
+.team-card {
+  /* Same dark-surface tokens as .panel-carbon so labels inside stay legible. */
+  --color-ink: #faf7f2;
+  --color-ink-soft: #ddd7cc;
+  --color-muted: #b3aca0;
+  --color-muted-soft: #7a7469;
+  --color-rule: #34302a;
+  --color-paper-deeper: #2a2723;
+  position: relative;
+  overflow: hidden;
+  color: #faf7f2;
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--team) 32%, transparent) 0%, transparent 60%),
+    var(--color-carbon);
+  transition: transform var(--dur-mid) var(--ease-out-soft);
+}
+.team-card:hover { transform: translateY(-2px); }
+.team-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--team);
 }
 
 /* ============================================================
@@ -463,7 +494,7 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
 .skeleton {
   background: var(--color-paper-deeper);
   animation: skeleton-pulse 1.6s ease-in-out infinite;
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 /* Hero track outline (TrackOutline): the lap line traces itself in once. */
@@ -487,28 +518,3 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
   .hover-lift:hover { transform: none !important; }
   .track-draw { animation: none !important; stroke-dashoffset: 0; }
 }
-
-/* Team-colour card (driver + team index pages): a dark team-tinted gradient,
-   so light team colours (Mercedes, Haas, Cadillac) still carry white text. */
-.team-card {
-  position: relative;
-  overflow: hidden;
-  color: #fff;
-  border-radius: 0 var(--radius-card) 0 0;
-  background:
-    linear-gradient(140deg,
-      color-mix(in srgb, var(--team) 58%, #15151e) 0%,
-      color-mix(in srgb, var(--team) 22%, #15151e) 100%);
-  transition: transform var(--dur-fast) var(--ease-out-soft);
-}
-.team-card:hover { transform: translateY(-3px); }
-.team-card::after {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: var(--team);
-}
-
-/* Full-width carbon band (home hero): no corner, edge to edge. */
-.panel-carbon.panel-flat { border-radius: 0; }

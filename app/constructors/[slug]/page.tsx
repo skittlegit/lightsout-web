@@ -97,17 +97,17 @@ export default async function ConstructorPage({
       <section className="pt-6">
         <div className="container-max">
           <div className="team-card p-6 sm:p-8 md:p-10" style={{ "--team": color } as CSSProperties}>
-            <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-white/75">
+            <span className="eyebrow">
               P{standing.position} in the constructors&apos; championship
             </span>
-            <h1 className="mt-3 font-display font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-[clamp(2.6rem,7vw,5rem)]">
+            <h1 className="mt-3 font-display leading-[0.95] text-[clamp(2.6rem,7vw,5rem)]">
               {teamShort(standing.team)}
             </h1>
             <div className="mt-5 flex items-center gap-2 flex-wrap">
               {standing.team !== teamShort(standing.team) && <BannerChip>{standing.team}</BannerChip>}
               {profile?.nationality && <BannerChip>{profile.nationality}</BannerChip>}
               {profile?.url && (
-                <a href={profile.url} target="_blank" rel="noopener noreferrer" className="chip !bg-white/15 !text-white hover:!bg-white/25">
+                <a href={profile.url} target="_blank" rel="noopener noreferrer" className="chip hover:!border-[#faf7f2]">
                   Wikipedia ↗
                 </a>
               )}
@@ -143,7 +143,7 @@ export default async function ConstructorPage({
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="font-display text-[20px] font-extrabold tabular">{s ? s.points : "—"}</div>
+                  <div className="font-display text-[20px] tabular">{s ? s.points : "—"}</div>
                   <div className="text-[12px] text-muted">{s ? `P${s.position}` : "no standing"}</div>
                 </div>
               </Link>
@@ -180,7 +180,7 @@ export default async function ConstructorPage({
                     const combined = (Number(a?.points ?? 0) || 0) + (Number(b?.points ?? 0) || 0);
                     return (
                       <tr key={round}>
-                        <td className="font-display font-bold text-muted">{String(round).padStart(2, "0")}</td>
+                        <td className="font-display text-muted">{String(round).padStart(2, "0")}</td>
                         <td>
                           <Link href={`/races/${round}` as Route} className="font-semibold hover:text-f1 transition-colors">
                             {race.raceName}

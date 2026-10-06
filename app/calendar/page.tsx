@@ -56,9 +56,9 @@ export default async function CalendarPage() {
         }
         aside={
           <div className="w-full sm:w-64">
-            <div className="flex justify-between text-[13px] text-muted mb-2">
+            <div className="flex justify-between eyebrow mb-2">
               <span>Season progress</span>
-              <span className="font-mono">{Math.round((done / Math.max(1, cal.races.length)) * 100)}%</span>
+              <span>{Math.round((done / Math.max(1, cal.races.length)) * 100)}%</span>
             </div>
             <div className="h-[6px] rounded-full bg-paper-deeper overflow-hidden">
               <div className="h-full rounded-full bg-f1" style={{ width: `${(done / Math.max(1, cal.races.length)) * 100}%` }} />
@@ -70,7 +70,7 @@ export default async function CalendarPage() {
       <div className="container-max flex flex-col gap-8">
         {months.map((m) => (
           <section key={m.label} aria-labelledby={`month-${m.label}`}>
-            <h2 id={`month-${m.label}`} className="text-[13px] font-medium text-muted mb-3">{m.label}</h2>
+            <h2 id={`month-${m.label}`} className="font-display italic text-[24px] mb-3">{m.label}</h2>
             <ol className="card overflow-hidden">
               {m.races.map((race) => (
                 <RaceRow key={race.round} race={race} podium={podiums.get(race.round) ?? []} />
@@ -95,7 +95,7 @@ function RaceRow({ race, podium }: { race: Race; podium: JolpicaRaceResult[] }) 
         className="row-hover flex-1 min-w-0 grid grid-cols-[3rem_minmax(0,1fr)] sm:grid-cols-[3.25rem_minmax(0,1fr)_minmax(0,15rem)] items-center gap-x-4 gap-y-1 px-4 sm:px-5 py-3.5"
       >
         <div className="text-center leading-none">
-          <div className="font-display text-[22px] font-bold">{DAY.format(date)}</div>
+          <div className="font-display text-[22px]">{DAY.format(date)}</div>
           <div className="text-[11.5px] text-muted mt-1">{WEEKDAY.format(date)}</div>
         </div>
 

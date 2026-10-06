@@ -6,15 +6,15 @@ import type { ReactNode } from "react";
 export function BannerStat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[12px] font-bold uppercase tracking-[0.06em] text-white/70">{label}</dt>
-      <dd className="font-display text-[clamp(1.3rem,2.4vw,1.8rem)] font-extrabold leading-tight mt-1">{value}</dd>
+      <dt className="eyebrow">{label}</dt>
+      <dd className="font-display text-[clamp(1.3rem,2.4vw,1.8rem)] leading-tight mt-1">{value}</dd>
     </div>
   );
 }
 
 /** Banner chip on coloured/dark backgrounds. */
 export function BannerChip({ children }: { children: ReactNode }) {
-  return <span className="chip !bg-white/15 !text-white">{children}</span>;
+  return <span className="chip">{children}</span>;
 }
 
 /** A data table inside a corner-bordered card, scrolling sideways on phones. */
@@ -36,7 +36,7 @@ export function StripStat({ label, value, note, color }: { label: string; value:
         {color && <span aria-hidden className="team-pip !h-3 !w-[3px]" style={{ background: color }} />}
         {label}
       </span>
-      <span className="font-display text-[clamp(1.1rem,2vw,1.4rem)] font-bold leading-tight truncate">{value}</span>
+      <span className="font-display text-[clamp(1.1rem,2vw,1.4rem)] leading-tight truncate">{value}</span>
       {note && <span className="text-[13px] text-muted truncate">{note}</span>}
     </div>
   );
@@ -54,7 +54,7 @@ export function CardHead({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 px-4 sm:px-5 h-14 border-b border-rule">
-      <h3 className="font-display text-[16px] font-bold">{title}</h3>
+      <h3 className="font-display text-[16px]">{title}</h3>
       {action ? (
         <Link href={action.href as Route} className="more-link !text-[13.5px]">
           {action.label} <span aria-hidden>→</span>

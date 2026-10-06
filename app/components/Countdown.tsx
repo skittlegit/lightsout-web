@@ -53,7 +53,7 @@ export default function Countdown({ targetISO }: Props) {
     return (
       <div role="timer" aria-label={srLabel} className="flex items-center gap-3">
         <span className="pulse-dot inline-block w-[10px] h-[10px] rounded-full bg-f1" />
-        <span className="font-display text-2xl font-extrabold">Race in progress</span>
+        <span className="font-display text-2xl">Race in progress</span>
       </div>
     );
   }
@@ -71,10 +71,10 @@ export default function Countdown({ targetISO }: Props) {
 function Segment({ value, label, live }: { value: number; label: string; live?: boolean }) {
   return (
     <div aria-hidden className="flex flex-col">
-      <span className={`font-display font-extrabold tabular leading-none text-[clamp(2.4rem,6vw,4rem)] ${live ? "text-f1-soft" : "text-white"}`}>
+      <span className={`font-display tabular leading-none text-[clamp(2.4rem,6vw,4rem)] ${live ? "text-f1-soft" : "text-white"}`}>
         {pad2(value)}
       </span>
-      <span className="mt-2 text-[12px] font-bold uppercase tracking-[0.08em] text-white/60">{label}</span>
+      <span className="mt-2 eyebrow">{label}</span>
     </div>
   );
 }

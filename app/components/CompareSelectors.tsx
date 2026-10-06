@@ -36,7 +36,7 @@ export default function CompareSelectors({ options, a, b }: Props) {
         options={options}
         onChange={(code) => go({ a: code })}
       />
-      <span className="font-display font-semibold text-muted text-lg sm:text-xl select-none">
+      <span className="font-display text-muted text-lg sm:text-xl select-none">
         vs
       </span>
       <Picker
@@ -75,7 +75,7 @@ function Picker({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-label={label}
-          className={`w-full appearance-none bg-paper-deep border-2 border-ink rounded-tr-[12px] hover:border-f1 transition-colors font-display font-bold text-base sm:text-lg h-12 pl-4 pr-10 truncate cursor-pointer ${
+          className={`w-full appearance-none bg-paper-deep border border-rule-strong rounded-[var(--radius-card)] hover:border-ink transition-colors font-display text-base sm:text-lg h-12 pl-4 pr-10 truncate cursor-pointer ${
             align === "right" ? "text-right pr-4 pl-10" : ""
           }`}
         >

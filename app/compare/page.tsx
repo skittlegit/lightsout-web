@@ -167,21 +167,21 @@ export default async function ComparePage({
           {/* Season stats */}
           <div className="mt-4 card overflow-hidden">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 h-12 border-b border-rule">
-              <span className="font-display font-extrabold text-right">{codeA}</span>
+              <span className="font-display text-right">{codeA}</span>
               <span className="eyebrow text-center min-w-[120px]">Season</span>
-              <span className="font-display font-extrabold">{codeB}</span>
+              <span className="font-display">{codeB}</span>
             </div>
             {rows.map((r) => (
               <div key={r.label} className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-3 border-b border-rule last:border-b-0 row-hover">
                 <span
-                  className={`text-right tabular text-[16px] ${r.better === "a" ? "font-display font-extrabold" : "text-muted"}`}
+                  className={`text-right tabular text-[16px] ${r.better === "a" ? "font-display" : "text-muted"}`}
                   style={r.better === "a" ? { color: inkOf(colorA) } : undefined}
                 >
                   {r.aStr}
                 </span>
                 <span className="eyebrow text-center whitespace-nowrap min-w-[120px]">{r.label}</span>
                 <span
-                  className={`tabular text-[16px] ${r.better === "b" ? "font-display font-extrabold" : "text-muted"}`}
+                  className={`tabular text-[16px] ${r.better === "b" ? "font-display" : "text-muted"}`}
                   style={r.better === "b" ? { color: inkOf(colorB) } : undefined}
                 >
                   {r.bStr}
@@ -216,7 +216,7 @@ export default async function ComparePage({
                 <tbody>
                   {h2h.rows.map((row) => (
                     <tr key={row.round}>
-                      <td className="font-display font-bold text-muted">{String(row.round).padStart(2, "0")}</td>
+                      <td className="font-display text-muted">{String(row.round).padStart(2, "0")}</td>
                       <td>
                         <Link href={`/races/${row.round}` as Route} className="font-semibold hover:text-f1 transition-colors">
                           {row.raceName}
@@ -226,7 +226,7 @@ export default async function ComparePage({
                       <ResultCell dnf={row.bDnf} text={row.bText} pos={row.bPos} win={row.winner === "b"} />
                       <td className="num">
                         {row.winner ? (
-                          <span className="inline-flex items-center gap-2 font-display font-bold">
+                          <span className="inline-flex items-center gap-2 font-display">
                             <span aria-hidden className="team-pip !h-4" style={{ background: row.winner === "a" ? colorA : colorB }} />
                             {row.winner === "a" ? codeA : codeB}
                           </span>
@@ -255,10 +255,10 @@ function DriverHead({ standing, color }: { standing: DriverStanding; color: stri
       style={{ "--team": color } as CSSProperties}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="font-display text-[26px] font-extrabold leading-none">P{standing.position}</span>
+        <span className="font-display text-[26px] leading-none">P{standing.position}</span>
         <span className="text-right">
-          <span className="block font-display text-[22px] font-extrabold leading-none">{standing.points}</span>
-          <span className="block text-[11px] font-semibold uppercase tracking-[0.06em] text-white/70 mt-1">Pts</span>
+          <span className="block font-display text-[22px] leading-none">{standing.points}</span>
+          <span className="block eyebrow mt-1">Pts</span>
         </span>
       </div>
       <div className="mt-auto min-w-0">
@@ -295,10 +295,10 @@ function TallyCard({
         <span className="text-[13px] text-muted">{total} rounds</span>
       </div>
       <div className="mt-3 flex items-baseline justify-between">
-        <span className="font-display text-[28px] font-extrabold tabular">
+        <span className="font-display text-[28px] tabular">
           {a} <span className="text-[13px] font-bold text-muted">{codeA}</span>
         </span>
-        <span className="font-display text-[28px] font-extrabold tabular">
+        <span className="font-display text-[28px] tabular">
           <span className="text-[13px] font-bold text-muted">{codeB}</span> {b}
         </span>
       </div>
@@ -314,7 +314,7 @@ function ResultCell({ dnf, text, pos, win }: { dnf: boolean; text: string | null
   const label = dnf ? "DNF" : pos != null ? `P${pos}` : (text ?? "—");
   return (
     <td className="num">
-      <span className={dnf ? "text-muted-soft" : win ? "font-display font-extrabold" : "text-muted"}>{label}</span>
+      <span className={dnf ? "text-muted-soft" : win ? "font-display" : "text-muted"}>{label}</span>
     </td>
   );
 }

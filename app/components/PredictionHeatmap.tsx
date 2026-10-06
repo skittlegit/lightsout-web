@@ -9,7 +9,7 @@ interface Props {
 /* Sticky driver column: an opaque background plus a hairline on its scroll
    edge so probability cells slide beneath it cleanly. */
 const stickyCell = {
-  background: "var(--color-paper)",
+  background: "var(--color-paper-deep)",
   boxShadow: "inset -1px 0 0 var(--color-rule)",
 } as const;
 
@@ -34,14 +34,14 @@ export default function PredictionHeatmap({ drivers }: Props) {
       noFadeLeft
     >
       <table
-        className="border-separate border-spacing-0 min-w-[860px] w-full text-[10px]"
+        className="border-separate border-spacing-[2px] min-w-[860px] w-full text-[11px]"
         aria-label="Predicted finishing-position distribution per driver"
       >
         <thead>
           <tr>
             <th
               scope="col"
-              className="sticky left-0 z-[1] text-left pr-3 pb-2 align-bottom"
+              className="sticky left-0 z-[1] text-left pr-3 pb-2 align-bottom w-[150px]"
               style={stickyCell}
             >
               <span className="eyebrow">Driver</span>
@@ -67,12 +67,8 @@ export default function PredictionHeatmap({ drivers }: Props) {
                 style={stickyCell}
               >
                 <div className="flex items-baseline gap-2">
-                  <span className="font-mono tabular text-[10px] text-muted w-5">
-                    {String(Math.round(d.expected_position)).padStart(2, "0")}
-                  </span>
-                  <span className="font-display text-[14px]">
-                    {d.driver_name}
-                  </span>
+                  <span className="font-display text-[13px]">{d.driver_code}</span>
+                  <span className="text-[12.5px] text-muted">{d.driver_name.split(" ").at(-1)}</span>
                 </div>
               </th>
               {d.position_distribution.map((p, i) => {
@@ -80,13 +76,12 @@ export default function PredictionHeatmap({ drivers }: Props) {
                 return (
                   <td
                     key={i}
-                    className="text-center font-mono tabular align-middle"
+                    className="text-center tabular align-middle rounded-[4px] font-semibold"
                     style={{
                       background: heatmapColor(p),
                       color: heatmapTextColor(p),
-                      width: 28,
-                      height: 26,
-                      borderRight: "1px solid var(--color-rule)",
+                      width: 30,
+                      height: 28,
                     }}
                     title={`${d.driver_name} · P${i + 1} · ${(p * 100).toFixed(1)}%`}
                   >

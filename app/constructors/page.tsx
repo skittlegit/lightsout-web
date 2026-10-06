@@ -36,13 +36,13 @@ export default async function TeamsPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="font-display text-[15px] font-extrabold text-white/70">P{t.position}</span>
-                  <div className="font-display text-[26px] font-extrabold leading-tight truncate">{teamShort(t.team)}</div>
+                  <span className="font-display text-[15px] text-white/70">P{t.position}</span>
+                  <div className="font-display text-[26px] leading-tight truncate">{teamShort(t.team)}</div>
                   {t.team !== teamShort(t.team) && <div className="text-[13px] text-white/70 truncate">{t.team}</div>}
                 </div>
                 <span className="text-right shrink-0">
-                  <span className="block font-display text-[26px] font-extrabold leading-none">{t.points}</span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.06em] text-white/70 mt-1">Pts</span>
+                  <span className="block font-display text-[26px] leading-none">{t.points}</span>
+                  <span className="block eyebrow mt-1">Pts</span>
                 </span>
               </div>
 
@@ -54,7 +54,7 @@ export default async function TeamsPage() {
                 {lineup.map((d) => (
                   <li key={d.driver_code} className="flex items-center justify-between gap-3 text-[15px]">
                     <DriverName name={d.driver_name} className="truncate" />
-                    <span className="font-display font-bold text-white/80 tabular">{d.points}</span>
+                    <span className="font-display text-white/80 tabular">{d.points}</span>
                   </li>
                 ))}
               </ul>

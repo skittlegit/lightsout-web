@@ -183,17 +183,19 @@ export function countryCode(country: string): string {
 /* ------------------------------------------------------------------ */
 
 function heatmapT(p: number): number {
-  return Math.pow(Math.max(0, Math.min(1, p)), 0.45);
+  return Math.pow(Math.max(0, Math.min(1, p)), 0.6);
 }
 
+/** Cell fill: transparent below 2% so the long tail doesn't muddy the grid. */
 export function heatmapColor(p: number): string {
-  const t = heatmapT(p);
-  return `color-mix(in srgb, var(--color-f1-deep) ${(t * 100).toFixed(1)}%, var(--color-paper))`;
+  if (p < 0.02) return "transparent";
+  const t = Math.min(1, heatmapT(p) * 1.25);
+  return `color-mix(in srgb, var(--color-f1) ${(t * 100).toFixed(1)}%, var(--color-paper-deep))`;
 }
 
 export function heatmapTextColor(p: number): string {
   // Light text once the cell is red-dominant; otherwise the theme's ink.
-  return heatmapT(p) >= 0.6 ? "#FAF7F2" : "var(--color-ink)";
+  return heatmapT(p) * 1.25 >= 0.55 ? "#ffffff" : "var(--color-ink)";
 }
 
 /* ------------------------------------------------------------------ */

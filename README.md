@@ -5,10 +5,10 @@ progression, race results, driver and team pages, driver head-to-heads, and
 Monte Carlo race forecasts.
 
 Built with **Next.js 16 (App Router, Turbopack)** and **Tailwind CSS v4**
-(CSS-first config, no `tailwind.config`). One theme modelled on Formula 1's own
-palette: F1-red navigation, carbon-black feature panels, a warm off-white page,
-and white cards with the top-right corner border. Archivo (wide) for headings,
-Titillium Web for text. Design tokens live in `app/globals.css`.
+(CSS-first config, no `tailwind.config`). One editorial theme: cream paper,
+Fraunces serif headlines with italic red emphasis, DM Sans text, JetBrains Mono
+labels, hairline rules and dark panels for race banners and team cards. Design
+tokens live in `app/globals.css`.
 
 ## Data sources
 

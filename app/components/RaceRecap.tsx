@@ -40,12 +40,12 @@ function PodiumCard({ r, rank }: { r: JolpicaRaceResult; rank: number }) {
       style={{ "--team": teamColor(r.Constructor.name) } as CSSProperties}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="font-display text-[34px] font-extrabold leading-none">P{rank}</span>
-        <span className="font-display font-bold text-[15px] text-white/85 tabular">{gap}</span>
+        <span className="font-display text-[34px] leading-none">P{rank}</span>
+        <span className="font-display text-[15px] text-white/85 tabular">{gap}</span>
       </div>
       <div className="mt-auto">
         <div className="text-[15px] text-white/85 leading-tight">{r.Driver.givenName}</div>
-        <div className="font-display text-[22px] font-extrabold uppercase leading-tight">{r.Driver.familyName}</div>
+        <div className="font-display text-[22px] leading-tight">{r.Driver.familyName}</div>
         <div className="mt-1 text-[13px] text-white/75">{teamShort(r.Constructor.name)}</div>
       </div>
     </Link>

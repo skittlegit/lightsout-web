@@ -1,26 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Titillium_Web } from "next/font/google";
-import { Suspense } from "react";
+import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import CommandPaletteServer from "./components/CommandPaletteServer";
 import SiteNav from "./components/SiteNav";
 import Footer from "./components/Footer";
 import { SEASON } from "@/lib/api";
 
-// Wide display face for headings: the wdth axis gives the Formula1 Display feel.
-const archivo = Archivo({
-  variable: "--font-archivo",
+// Editorial serif for headlines and big numbers.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
-  axes: ["wdth"],
+  axes: ["opsz", "SOFT", "WONK"],
+  style: ["normal", "italic"],
 });
 
-// Body face — the typeface formula1.com used for years.
-const titillium = Titillium_Web({
-  variable: "--font-titillium",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "600", "700"],
+});
+
+// Small-caps labels and timing data.
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -39,8 +43,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Matches the red navigation bar.
-  themeColor: "#e10600",
+  // Matches --color-paper.
+  themeColor: "#faf7f2",
 };
 
 export default function RootLayout({
@@ -52,7 +56,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${archivo.variable} ${titillium.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <a href="#content" className="skip-link">Skip to content</a>
@@ -61,9 +65,6 @@ export default function RootLayout({
           {children}
         </div>
         <Footer />
-        <Suspense fallback={null}>
-          <CommandPaletteServer />
-        </Suspense>
       </body>
     </html>
   );

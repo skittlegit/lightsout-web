@@ -32,27 +32,27 @@ export default function DriverCard({
       {/* Car number, large and tinted, behind the content */}
       <span
         aria-hidden
-        className={`absolute -right-1 -bottom-4 font-display font-extrabold leading-none select-none ${lg ? "text-[180px]" : "text-[118px]"}`}
+        className={`absolute -right-1 -bottom-4 font-display leading-none select-none ${lg ? "text-[180px]" : "text-[118px]"}`}
         style={{ color: "color-mix(in srgb, var(--team) 70%, white)", opacity: 0.2 }}
       >
         {profile?.permanentNumber ?? ""}
       </span>
 
       <div className="relative flex items-start justify-between gap-3">
-        <span className={`font-display font-extrabold leading-none ${lg ? "text-[40px]" : "text-[26px]"}`}>
+        <span className={`font-display leading-none ${lg ? "text-[40px]" : "text-[26px]"}`}>
           {standing.position}
         </span>
         <span className="text-right">
-          <span className={`block font-display font-extrabold leading-none ${lg ? "text-[28px]" : "text-[18px]"}`}>
+          <span className={`block font-display leading-none ${lg ? "text-[28px]" : "text-[18px]"}`}>
             {standing.points}
           </span>
-          <span className="block text-[11px] font-semibold uppercase tracking-[0.06em] text-white/70 mt-1">Pts</span>
+          <span className="block eyebrow mt-1">Pts</span>
         </span>
       </div>
 
       <div className="relative mt-auto pt-10">
         <div className={`text-white/85 leading-tight ${lg ? "text-[18px]" : "text-[15px]"}`}>{given}</div>
-        <div className={`font-display font-extrabold uppercase leading-tight tracking-[-0.01em] ${lg ? "text-[clamp(1.9rem,3.5vw,2.6rem)]" : "text-[24px]"}`}>
+        <div className={`font-display leading-tight ${lg ? "text-[clamp(1.9rem,3.5vw,2.6rem)]" : "text-[24px]"}`}>
           {family}
         </div>
         <div className="mt-2 text-[13px] text-white/75">

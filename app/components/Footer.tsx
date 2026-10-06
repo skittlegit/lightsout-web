@@ -5,10 +5,10 @@ import { NAV_LINKS } from "@/lib/nav";
 /** Site-wide footer, rendered once by the root layout. */
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-rule">
+    <footer className="mt-24 panel-carbon panel-flat">
       <div className="container-max py-10 grid gap-8 md:grid-cols-[1.5fr_1fr_1fr]">
         <div className="flex flex-col gap-3">
-          <Logo tone="ink" />
+          <Logo tone="paper" />
           <p className="text-sm text-muted max-w-sm leading-relaxed">
             Calendar, standings, results and Monte Carlo race forecasts for the
             Formula 1 season.
