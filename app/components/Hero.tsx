@@ -10,8 +10,10 @@ interface Props {
 }
 
 function targetISO(race: Race): string {
-  // Backend supplies date only; default to 13:00 UTC on race day.
-  return `${race.race_date}T13:00:00Z`;
+  // Jolpica start times are UTC ("12:00:00Z"); fall back to 13:00 UTC when a
+  // snapshot predates race_time. Night races start hours away from 13:00.
+  const time = race.race_time?.match(/^\d{2}:\d{2}(:\d{2})?/)?.[0] ?? "13:00:00";
+  return `${race.race_date}T${time}Z`;
 }
 
 export default function Hero({ race, totalRounds }: Props) {

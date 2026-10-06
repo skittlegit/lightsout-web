@@ -39,7 +39,7 @@ export default async function DriverPage({
   const upperCode = code.toUpperCase();
   const jolpicaId = driverIdFromCode(upperCode);
 
-  const [standings, allDrivers, cal, seasonResults] = await Promise.all([
+  const [standings, allDrivers, cal, mappedResults] = await Promise.all([
     getDriverStandings(),
     getDrivers(),
     getCalendar(),
@@ -52,6 +52,9 @@ export default async function DriverPage({
   const profile = jolpicaId
     ? allDrivers.find((d) => d.driverId === jolpicaId)
     : allDrivers.find((d) => d.code?.toUpperCase() === upperCode);
+  // Drivers missing from the static code map (e.g. mid-season substitutes)
+  // still get their results via the ID from Jolpica's season driver list.
+  const seasonResults = jolpicaId || !profile ? mappedResults : await getDriverResults(profile.driverId);
 
   const racesByRound = new Map<number, Race>();
   for (const r of cal.races) racesByRound.set(r.round, r);

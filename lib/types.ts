@@ -47,6 +47,8 @@ export interface Race {
   circuit: string;
   country: string;
   race_date: string; // ISO date "YYYY-MM-DD"
+  /** UTC start time, e.g. "13:00:00Z"; absent in older snapshots. */
+  race_time?: string | null;
   is_next: boolean;
   is_completed: boolean;
   has_sprint?: boolean;

@@ -66,12 +66,11 @@ function ForecastBody({
   isPostQuali: boolean;
 }) {
   const pole = mode.predicted_pole;
-  const winner =
-    [...mode.drivers].sort((a, b) => a.expected_position - b.expected_position)[0] ?? null;
-
-  const top5 = [...mode.drivers]
-    .sort((a, b) => b.win_probability - a.win_probability)
-    .slice(0, 5);
+  // "Predicted winner" is the most likely winner. Lowest expected position can
+  // belong to a consistent top-4 runner with a single-digit win chance.
+  const byWin = [...mode.drivers].sort((a, b) => b.win_probability - a.win_probability);
+  const winner = byWin[0] ?? null;
+  const top5 = byWin.slice(0, 5);
   const barLeader = top5[0]?.win_probability ?? 1;
 
   const updatedRel = relativeTimeUpper(mode.generated_at);

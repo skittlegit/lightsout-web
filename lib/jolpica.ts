@@ -115,7 +115,7 @@ export async function getSeasonCalendar(): Promise<CalendarResponse | null> {
   return { season: Number(SEASON), races: data.RaceTable.Races.map((race) => ({
     season: Number(race.season), round: Number(race.round), race_name: race.raceName,
     circuit: race.Circuit.circuitName, country: race.Circuit.Location.country,
-    race_date: race.date, is_completed: false, is_next: false, has_sprint: "Sprint" in race,
+    race_date: race.date, race_time: race.time ?? null, is_completed: false, is_next: false, has_sprint: "Sprint" in race,
   })) };
 }
 

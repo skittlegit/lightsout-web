@@ -7,7 +7,7 @@ import CompareSelectors, {
   type CompareOption,
 } from "@/app/components/CompareSelectors";
 import { getDriverStandings } from "@/lib/api";
-import { getDriverResults } from "@/lib/jolpica";
+import { getDriverResults, getDrivers } from "@/lib/jolpica";
 import { driverIdFromCode } from "@/lib/slug";
 import { abbreviateName, teamColor, teamShort } from "@/lib/format";
 import { seasonStats, headToHead } from "@/lib/compare";
@@ -97,8 +97,14 @@ export default async function ComparePage({
     );
   }
 
-  const idA = driverIdFromCode(codeA);
-  const idB = driverIdFromCode(codeB);
+  // Static map first; fall back to Jolpica's season driver list for codes it
+  // doesn't cover (e.g. mid-season substitutes).
+  const needsLookup = !driverIdFromCode(codeA) || !driverIdFromCode(codeB);
+  const seasonDrivers = needsLookup ? await getDrivers() : [];
+  const idFor = (code: string) =>
+    driverIdFromCode(code) ?? seasonDrivers.find((d) => d.code?.toUpperCase() === code)?.driverId ?? null;
+  const idA = idFor(codeA);
+  const idB = idFor(codeB);
   const [rA, rB] = await Promise.all([
     idA ? getDriverResults(idA) : Promise.resolve([]),
     idB ? getDriverResults(idB) : Promise.resolve([]),

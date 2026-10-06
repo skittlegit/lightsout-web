@@ -5,8 +5,12 @@
 
 import type { JolpicaRaceResult } from "./jolpica";
 
-function isClassified(status: string): boolean {
-  return status === "Finished" || /^\+\d+ Lap/.test(status);
+/**
+ * Jolpica "classified" statuses: a clean finish or laps-down. Older seasons
+ * report laps-down as "+1 Lap"; 2024 onward reports them as "Lapped".
+ */
+export function isClassified(status: string): boolean {
+  return status === "Finished" || status === "Lapped" || /^\+\d+ Lap/.test(status);
 }
 
 export interface RaceRecap {
