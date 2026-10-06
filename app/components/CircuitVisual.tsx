@@ -105,24 +105,19 @@ export default function CircuitVisual({ circuit, variant = "card" }: Props) {
 
   return (
     <div
-      className={`relative bg-ink text-paper overflow-hidden border border-ink ${
+      className={`relative panel-carbon overflow-hidden ${
         tall ? "min-h-[300px]" : ""
       }`}
     >
-      <div className="absolute inset-0 chevron-bg-soft pointer-events-none" aria-hidden />
-      <div className="absolute inset-0 scanline pointer-events-none" aria-hidden />
-      <span aria-hidden className="absolute top-0 left-0 right-0 h-[2px] bg-f1" />
-
+      
       <div className="relative p-6 md:p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-f1-soft">
-              ◢ Telemetry · Track Card
-            </span>
-            <div className="mt-2 font-display italic text-[clamp(1.4rem,3.2vw,2rem)] leading-tight text-paper">
+            <span className="kicker">Track card</span>
+            <div className="mt-2 font-display font-bold text-[clamp(1.25rem,2.8vw,1.75rem)] leading-tight text-ink">
               {circuit.circuitName}
             </div>
-            <div className="mt-1 font-mono text-[11px] tracking-[0.16em] uppercase text-paper/55">
+            <div className="mt-1 font-mono text-[11px] tracking-[0.16em] uppercase text-muted">
               {circuit.Location.locality} · {circuit.Location.country}
             </div>
           </div>
@@ -257,18 +252,18 @@ export default function CircuitVisual({ circuit, variant = "card" }: Props) {
           />
         </div>
 
-        <p className="mt-5 text-[11px] leading-relaxed text-paper/55">
+        <p className="mt-5 text-[11px] leading-relaxed text-muted">
           {isReal
             ? "Track outline traced from OpenStreetMap survey data."
             : "Generic placeholder — true outline pending."}{" "}
           {meta.lapRecord && (
-            <span className="text-paper/75">Lap record · {meta.lapRecord}. </span>
+            <span className="text-ink-soft">Lap record · {meta.lapRecord}. </span>
           )}
           <a
             href={circuit.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-paper/30 hover:decoration-f1 hover:text-f1 transition-colors"
+            className="underline decoration-rule-strong hover:decoration-f1 hover:text-f1 transition-colors"
           >
             Reference ↗
           </a>
@@ -281,15 +276,15 @@ export default function CircuitVisual({ circuit, variant = "card" }: Props) {
 function DataCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[9px] tracking-[0.2em] uppercase text-paper/40">{label}</span>
-      <span className="text-paper">{value}</span>
+      <span className="text-[9px] tracking-[0.2em] uppercase text-muted-soft">{label}</span>
+      <span className="text-ink">{value}</span>
     </div>
   );
 }
 
 /**
- * Bare track outline for dark surfaces (the homepage hero): halo, tarmac and
- * a lap line that draws itself in once. Renders nothing for circuits without
+ * Bare track outline for dark surfaces (the homepage hero): tarmac plus a
+ * lap line that draws itself in once. Renders nothing for circuits without
  * a traced outline, so the hero never shows the generic placeholder.
  */
 export function TrackOutline({
@@ -305,15 +300,14 @@ export function TrackOutline({
   if (!meta) return null;
   return (
     <svg viewBox="0 0 200 100" className={className} role="img" aria-label={`${label} layout`}>
-      <path d={meta.d} fill="none" stroke="rgba(225,6,0,0.22)" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round" />
-      <path d={meta.d} fill="none" stroke="rgba(250,247,242,0.12)" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
+            <path d={meta.d} fill="none" stroke="rgba(242,244,247,0.1)" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" />
       <path
         d={meta.d}
         pathLength={100}
         className="track-draw"
         fill="none"
-        stroke="#faf7f2"
-        strokeWidth="1.1"
+        stroke="#f2f4f7"
+        strokeWidth="1.4"
         strokeLinejoin="round"
         strokeLinecap="round"
       />

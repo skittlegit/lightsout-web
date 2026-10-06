@@ -1,22 +1,11 @@
 import { Suspense } from "react";
-import Masthead from "./components/Masthead";
 import Hero from "./components/Hero";
-import SeasonCalendar from "./components/SeasonCalendar";
 import DriversTable from "./components/DriversTable";
 import ConstructorsTable from "./components/ConstructorsTable";
-import PaddockIntelView from "./components/PaddockIntel";
-import Forecast from "./components/Forecast";
-import Footer from "./components/Footer";
-import SectionAnchors from "./components/SectionAnchors";
-import SmoothScroll from "./components/SmoothScroll";
-import Reveal from "./components/Reveal";
-import TickerSection from "./components/TickerSection";
-import {
-  HeroSkeleton,
-  CalendarSkeleton,
-  ColumnSkeleton,
-  ForecastSkeleton,
-} from "./components/Skeletons";
+import { ForecastSnapshot } from "./components/Forecast";
+import { LastRaceCard, TitleFightCard, UpcomingRaces } from "./components/HomeCards";
+import SectionTitle from "./components/SectionTitle";
+import { HeroSkeleton, ColumnSkeleton } from "./components/Skeletons";
 import {
   getCalendar,
   getConstructorStandings,
@@ -28,57 +17,60 @@ import {
 import { getCircuit, getRaceResults } from "@/lib/jolpica";
 
 // Allow the forecast's server render up to 60s: the backend's /predictions/next
-// can take several seconds cold, and the default serverless cap would abort it
-// (falling back to the mock). Vercel Hobby permits up to 60s.
+// can take several seconds cold, and the default serverless cap would abort it.
+// Vercel Hobby permits up to 60s.
 export const maxDuration = 60;
 export const revalidate = 600;
 
+/** Overview: next race, the three things that changed, standings, what's next. */
 export default function Home() {
   return (
-    <>
-      <a href="#hero" className="skip-link">Skip to content</a>
-      <SmoothScroll />
-      <SectionAnchors />
-
-      {/* Top race-radio ticker */}
-      <Suspense fallback={<div className="h-[36px] bg-ink" aria-hidden />}>
-        <TickerSection />
+    <main className="flex-1 w-full">
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroSection />
       </Suspense>
 
-      <main id="hero" className="flex-1 w-full">
-        <Reveal>
-          <Masthead />
-        </Reveal>
-
-        {/* Next Race */}
-        <Reveal delay={60}>
-          <Suspense fallback={<HeroSkeleton />}>
-            <HeroSection />
+      <section className="pt-5">
+        <div className="container-max grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <Suspense fallback={<ColumnSkeleton rows={6} />}>
+            <ForecastCard />
           </Suspense>
-        </Reveal>
-
-        {/* Calendar */}
-        <Reveal delay={120}>
-          <Suspense fallback={<CalendarSkeleton />}>
-            <CalendarSection />
+          <Suspense fallback={<ColumnSkeleton rows={5} />}>
+            <LastRaceSection />
           </Suspense>
-        </Reveal>
-
-        {/* Drivers / Constructors / Last Race — three-column block */}
-        <Reveal delay={180}>
-          <ThreeColumnBlock />
-        </Reveal>
-
-        {/* Forecast */}
-        <Reveal delay={220}>
-          <Suspense fallback={<ForecastSkeleton />}>
-            <ForecastSection />
+          <Suspense fallback={<ColumnSkeleton rows={4} />}>
+            <TitleFightSection />
           </Suspense>
-        </Reveal>
+        </div>
+      </section>
 
-        <Footer />
-      </main>
-    </>
+      <section className="section-y">
+        <div className="container-max">
+          <Suspense fallback={<SectionTitle kicker="Standings" title="Championship" />}>
+            <StandingsTitle />
+          </Suspense>
+          <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
+            <Suspense fallback={<ColumnSkeleton rows={10} />}>
+              <DriversColumn />
+            </Suspense>
+            <Suspense fallback={<ColumnSkeleton rows={11} />}>
+              <ConstructorsColumn />
+            </Suspense>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-4">
+        <div className="container-max">
+          <SectionTitle kicker="Calendar" title="Coming up" action={{ href: "/calendar", label: "Full calendar" }} />
+          <div className="mt-6">
+            <Suspense fallback={<ColumnSkeleton rows={2} />}>
+              <UpcomingSection />
+            </Suspense>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -94,56 +86,47 @@ async function HeroSection() {
   return <Hero race={next} totalRounds={cal.races.length} circuitId={circuit?.circuitId} />;
 }
 
-async function CalendarSection() {
+async function ForecastCard() {
+  return <ForecastSnapshot data={await getNextPrediction()} />;
+}
+
+async function LastRaceSection() {
   const cal = await getCalendar();
-  return <SeasonCalendar races={cal.races} season={cal.season} />;
-}
-
-function ThreeColumnBlock() {
-  return (
-    <section className="section-y">
-      <div className="container-max grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
-        <div id="drivers">
-          <Suspense fallback={<ColumnSkeleton rows={10} />}>
-            <DriversColumn />
-          </Suspense>
-        </div>
-        <div id="constructors">
-          <Suspense fallback={<ColumnSkeleton rows={11} />}>
-            <ConstructorsColumn />
-          </Suspense>
-        </div>
-        <div id="paddock" className="md:col-span-2 lg:col-span-1">
-          <Suspense fallback={<ColumnSkeleton rows={5} />}>
-            <PaddockColumn />
-          </Suspense>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-async function DriversColumn() {
-  const drivers = await getDriverStandings();
-  return <DriversTable drivers={drivers} />;
-}
-
-async function ConstructorsColumn() {
-  const teams = await getConstructorStandings();
-  return <ConstructorsTable teams={teams} />;
-}
-
-async function PaddockColumn() {
-  const [cal, drivers] = await Promise.all([getCalendar(), getDriverStandings()]);
   const lastRace = pickLastCompleted(cal.races);
   const results = lastRace ? await getRaceResults(lastRace.round) : null;
   const podium = [...(results?.Results ?? [])]
     .sort((a, b) => Number(a.position) - Number(b.position))
     .slice(0, 3);
-  return <PaddockIntelView lastRace={lastRace} drivers={drivers} podium={podium} />;
+  return <LastRaceCard race={lastRace} podium={podium} />;
 }
 
-async function ForecastSection() {
-  const data = await getNextPrediction();
-  return <Forecast data={data} />;
+async function TitleFightSection() {
+  return <TitleFightCard drivers={await getDriverStandings()} />;
+}
+
+async function StandingsTitle() {
+  const cal = await getCalendar();
+  const done = cal.races.filter((r) => r.is_completed).length;
+  return (
+    <SectionTitle
+      kicker={`After round ${done} of ${cal.races.length}`}
+      title="Championship"
+      meta={`${cal.races.length - done} rounds to go`}
+    />
+  );
+}
+
+async function DriversColumn() {
+  return <DriversTable drivers={await getDriverStandings()} />;
+}
+
+async function ConstructorsColumn() {
+  return <ConstructorsTable teams={await getConstructorStandings()} />;
+}
+
+async function UpcomingSection() {
+  const cal = await getCalendar();
+  const upcoming = cal.races.filter((r) => !r.is_completed).slice(0, 4);
+  if (!upcoming.length) return <p className="text-sm text-muted">The season is complete.</p>;
+  return <UpcomingRaces races={upcoming} />;
 }

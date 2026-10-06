@@ -22,12 +22,13 @@ interface Props {
 }
 
 const SECTIONS: PaletteItem[] = [
-  { title: "Up Next", subtitle: "Next race · countdown", haystack: "next race up next hero", href: "/#next", group: "Sections" },
-  { title: "Calendar", subtitle: "Full season schedule", haystack: "calendar season schedule rounds", href: "/#calendar", group: "Sections" },
-  { title: "Drivers' Championship", subtitle: "Standings", haystack: "drivers championship standings", href: "/#drivers", group: "Sections" },
-  { title: "Constructors' Cup", subtitle: "Standings", haystack: "constructors cup standings teams", href: "/#constructors", group: "Sections" },
-  { title: "Last Race", subtitle: "Most recent completed", haystack: "last race paddock recap", href: "/#paddock", group: "Sections" },
-  { title: "Forecast", subtitle: "Predictions for next round", haystack: "forecast predictions model", href: "/#forecast", group: "Sections" },
+  { title: "Home", subtitle: "Next race and overview", haystack: "home next race up next overview", href: "/", group: "Sections" },
+  { title: "Calendar", subtitle: "Full season schedule", haystack: "calendar season schedule rounds races", href: "/calendar", group: "Sections" },
+  { title: "Standings", subtitle: "Drivers, teams and points progression", haystack: "standings championship drivers constructors cup points", href: "/standings", group: "Sections" },
+  { title: "Drivers", subtitle: "Every driver on the grid", haystack: "drivers grid", href: "/drivers", group: "Sections" },
+  { title: "Teams", subtitle: "Every constructor", haystack: "teams constructors", href: "/constructors", group: "Sections" },
+  { title: "Forecast", subtitle: "Predictions for the next round", haystack: "forecast predictions model odds", href: "/forecast", group: "Sections" },
+  { title: "Compare", subtitle: "Driver head to head", haystack: "compare head to head versus", href: "/compare", group: "Sections" },
 ];
 
 export default function CommandPalette({ items }: Props) {
@@ -178,10 +179,10 @@ export default function CommandPalette({ items }: Props) {
       <button
         aria-label="Close palette"
         onClick={close}
-        className="absolute inset-0 bg-ink/60 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
       {/* panel */}
-      <div className="relative w-full max-w-[640px] bg-paper border border-rule shadow-2xl">
+      <div className="relative w-full max-w-[640px] bg-paper-deep border border-rule-strong rounded-[var(--radius-card)] overflow-hidden shadow-2xl">
         <div className="flex items-center gap-3 border-b border-rule px-4 py-3">
           <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
             Search
@@ -192,16 +193,15 @@ export default function CommandPalette({ items }: Props) {
             onChange={(e) => onQueryChange(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Drivers, constructors, rounds, sections…"
-            className="flex-1 bg-transparent outline-none text-[16px] font-display placeholder:text-muted/70"
+            className="flex-1 bg-transparent outline-none text-[16px] placeholder:text-muted/70"
           />
-          <kbd className="font-mono text-[10px] tracking-[0.16em] text-muted px-1.5 py-0.5 border border-rule">
+          <kbd className="font-mono text-[10px] tracking-[0.16em] text-muted px-1.5 py-0.5 border border-rule rounded-md">
             ESC
           </kbd>
         </div>
 
         <div
           ref={listRef}
-          data-lenis-prevent
           className="max-h-[60vh] overflow-y-auto"
         >
           {grouped.length === 0 && (

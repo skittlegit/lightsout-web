@@ -36,7 +36,7 @@ export default function CompareSelectors({ options, a, b }: Props) {
         options={options}
         onChange={(code) => go({ a: code })}
       />
-      <span className="font-display italic text-muted text-lg sm:text-xl select-none">
+      <span className="font-display font-semibold text-muted text-lg sm:text-xl select-none">
         vs
       </span>
       <Picker
@@ -68,15 +68,15 @@ function Picker({
   align?: "left" | "right";
 }) {
   return (
-    <label className={`flex flex-col gap-1.5 ${align === "right" ? "items-end" : ""}`}>
+    <label className={`flex flex-col gap-1.5 min-w-0 ${align === "right" ? "items-end" : ""}`}>
       <span className="eyebrow">{label}</span>
-      <div className="relative">
+      <div className="relative w-full sm:w-[320px]">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-label={label}
-          className={`appearance-none bg-paper border border-rule hover:border-ink focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2 transition-colors font-display text-base sm:text-lg py-2 pl-3 pr-9 max-w-[42vw] sm:max-w-none truncate cursor-pointer ${
-            align === "right" ? "text-right pr-3 pl-9" : ""
+          className={`w-full appearance-none bg-paper-deep border-2 border-ink rounded-tr-[12px] hover:border-f1 transition-colors font-display font-bold text-base sm:text-lg h-12 pl-4 pr-10 truncate cursor-pointer ${
+            align === "right" ? "text-right pr-4 pl-10" : ""
           }`}
         >
           {options.map((o) => (
@@ -88,7 +88,7 @@ function Picker({
         <span
           aria-hidden
           className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted ${
-            align === "right" ? "left-3" : "right-3"
+            align === "right" ? "left-4" : "right-4"
           }`}
         >
           <svg width="11" height="11" viewBox="0 0 12 12" fill="none">

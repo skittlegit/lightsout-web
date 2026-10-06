@@ -5,176 +5,172 @@ import type {
   PredictionResponse,
   RaceWeather,
 } from "@/lib/types";
-import { pct, pctShort, raceStartISO, relativeTimeUpper, teamColor, teamShort } from "@/lib/format";
-import LocalStartTime from "./LocalStartTime";
+import { pct, pctShort, relativeTimeUpper, teamColor, teamShort } from "@/lib/format";
 import PredictionHeatmap from "./PredictionHeatmap";
-
-interface Props {
-  data: PredictionResponse;
-}
+import SectionTitle from "./SectionTitle";
+import { CardHead } from "./DriversTable";
+import DriverName from "./DriverName";
 
 const BOARD_SIZE = 10;
 
-export default function Forecast({ data }: Props) {
-  const isUnavailable = data.status === "model_unavailable";
-  const mode: ModePrediction | null = data.post_quali ?? data.pre_quali;
-
+/** Race-page section: title + the full forecast panel. */
+export default function Forecast({ data }: { data: PredictionResponse }) {
   return (
     <section id="forecast" className="section-y">
       <div className="container-max">
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <div>
-            <span className="eyebrow-red block mb-2">§ 04</span>
-            <h3 className="headline h-section">
-              Race <em>Forecast</em>
-            </h3>
-          </div>
-          <div className="sm:text-right flex flex-col items-start sm:items-end gap-1.5">
-            <span className="eyebrow">
-              {data.race_name} · Round {String(data.round).padStart(2, "0")}
-            </span>
-            {data.race_time && data.race_date && (
-              <span className="eyebrow-ink">
-                Lights out · <LocalStartTime iso={raceStartISO(data.race_date, data.race_time)} />
-              </span>
-            )}
-          </div>
+        <SectionTitle kicker="Model forecast" title="Race" accent="forecast" />
+        <div className="mt-6">
+          <ForecastPanel data={data} />
         </div>
-        <div className="rule-thin mt-6" />
-
-        {isUnavailable || !mode ? (
-          <EmptyState message={data.message ?? null} />
-        ) : (
-          <ForecastBody mode={mode} weather={data.weather ?? null} isPostQuali={!!data.post_quali} />
-        )}
       </div>
     </section>
   );
 }
 
-function EmptyState({ message }: { message: string | null }) {
-  return (
-    <div className="mt-10 card card-deep p-7 md:p-12">
-      <span className="eyebrow-red block">Forecast Unavailable</span>
-      <p className="mt-3 font-display italic text-[clamp(1.25rem,3vw,1.7rem)] text-ink-soft max-w-2xl leading-snug">
-        The forecast is temporarily unavailable. Please check back shortly.
-      </p>
-      {message && (
-        <p className="mt-3 text-sm text-muted max-w-xl">{message}</p>
-      )}
-      <p className="mt-3 text-sm text-muted max-w-xl">
-        Forecasts refresh as new race and qualifying data becomes available.
-      </p>
-    </div>
-  );
+/** Best available mode: post-quali once qualifying has run, else pre-race. */
+function activeMode(data: PredictionResponse): ModePrediction | null {
+  return data.status === "model_unavailable" ? null : (data.post_quali ?? data.pre_quali);
 }
 
-function ForecastBody({
-  mode,
-  weather,
-  isPostQuali,
-}: {
-  mode: ModePrediction;
-  weather: RaceWeather | null;
-  isPostQuali: boolean;
-}) {
-  const pole = mode.predicted_pole;
-  // "Predicted winner" is the most likely winner. Lowest expected position can
-  // belong to a consistent top-4 runner with a single-digit win chance.
-  const byWin = [...mode.drivers].sort((a, b) => b.win_probability - a.win_probability);
-  const winner = byWin[0] ?? null;
-  const board = byWin.slice(0, BOARD_SIZE);
-  const winScale = board[0]?.win_probability || 1;
+/** Most likely winner — not the lowest expected position, which can belong
+ * to a consistent top-4 runner with a single-digit win chance. */
+function byWinChance(mode: ModePrediction): DriverPrediction[] {
+  return [...mode.drivers].sort((a, b) => b.win_probability - a.win_probability);
+}
 
-  const updatedRel = relativeTimeUpper(mode.generated_at);
-  const stageLabel = isPostQuali ? "POST-QUALI" : "PRE-RACE";
+/** Full forecast: headline cards, odds board, distribution matrix. */
+export function ForecastPanel({ data }: { data: PredictionResponse }) {
+  const mode = activeMode(data);
+  if (!mode) return <EmptyState message={data.message ?? null} />;
+
+  const ranked = byWinChance(mode);
+  const winner = ranked[0] ?? null;
+  const board = ranked.slice(0, BOARD_SIZE);
+  const winScale = board[0]?.win_probability || 1;
   const simsK = `${Math.round(mode.n_simulations / 1000)}K`;
+  const weather = data.weather ?? null;
 
   return (
-    <>
-      <div className={`mt-9 md:mt-10 grid grid-cols-1 gap-5 ${weather ? "lg:grid-cols-3 md:grid-cols-2" : "md:grid-cols-2"}`}>
-        {winner && (
-          <Callout
-            eyebrow="Predicted Winner"
-            name={winner.driver_name}
-            meta={`${teamShort(winner.team)} · ${winner.driver_code}`}
-            color={teamColor(winner.team)}
-            statLabel="Win probability"
-            stat={pctShort(winner.win_probability)}
-            accent
-          />
-        )}
-        {pole && <PoleCallout pole={pole} />}
+    <div className="flex flex-col gap-5">
+      <div className={`grid grid-cols-1 gap-5 ${weather ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"}`}>
+        {winner && <WinnerCallout winner={winner} />}
+        {mode.predicted_pole && <PoleCallout pole={mode.predicted_pole} />}
         {weather && <WeatherCallout weather={weather} />}
       </div>
 
-      <div className="mt-12">
-        <div className="flex items-baseline justify-between gap-2 flex-wrap">
-          <span className="eyebrow-ink">Odds Board · Top {board.length} by Win Chance</span>
-          <span className="eyebrow">{simsK} Simulated Races</span>
-        </div>
-
-        <div className="mt-4 hidden md:grid grid-cols-[2rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_3.5rem] gap-4 pb-2 border-b border-ink">
+      <div className="card overflow-hidden">
+        <CardHead title="Odds board" meta={`Top ${board.length} by win chance`} />
+        <div className="hidden md:grid grid-cols-[28px_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_3.5rem] gap-4 px-5 py-2.5 border-b border-rule">
           <span className="eyebrow">#</span>
           <span className="eyebrow">Driver</span>
           <span className="eyebrow">Win</span>
           <span className="eyebrow">Podium</span>
           <span className="eyebrow">Points</span>
-          <span className="eyebrow text-right">Exp</span>
+          <span className="eyebrow text-right">Avg pos</span>
         </div>
         <ol className="flex flex-col">
           {board.map((d, i) => (
             <OddsRow key={d.driver_code} d={d} rank={i + 1} winScale={winScale} />
           ))}
         </ol>
+
+        <details className="group border-t border-rule">
+          <summary className="cursor-pointer list-none flex items-center justify-between px-5 h-12 select-none row-hover">
+            <span className="text-[14px] font-medium">
+              Every driver, every position · {mode.drivers.length} × {mode.drivers[0]?.position_distribution.length ?? 0}
+            </span>
+            <span className="text-[13px] text-muted group-open:hidden">Show</span>
+            <span className="text-[13px] text-muted hidden group-open:inline">Hide</span>
+          </summary>
+          <div className="px-5 pb-6 pt-2">
+            <PredictionHeatmap drivers={mode.drivers} />
+            <p className="mt-4 text-[12px] text-muted max-w-2xl leading-relaxed">
+              Each cell is the chance (%) of that finishing position. Cells under 5% are blank.
+            </p>
+          </div>
+        </details>
       </div>
 
-      <details className="mt-10 group">
-        <summary className="cursor-pointer list-none flex items-center justify-between border-y border-ink py-3 select-none">
-          <span className="eyebrow-ink">Full Distribution Matrix · {mode.drivers.length} × {mode.drivers[0]?.position_distribution.length ?? 0}</span>
-          <span className="eyebrow group-open:hidden">Expand +</span>
-          <span className="eyebrow hidden group-open:inline">Collapse −</span>
-        </summary>
-        <div className="pt-6">
-          <PredictionHeatmap drivers={mode.drivers} />
-          <p className="mt-4 text-[11px] text-muted max-w-2xl leading-relaxed">
-            Cell value = round(P × 100). Cells below 5% are blank; colour scale
-            is gamma-corrected so sub-threshold tails still register.
-          </p>
-        </div>
-      </details>
-
-      <div className="mt-10 flex flex-wrap gap-x-5 gap-y-1">
-        <span className="eyebrow">{stageLabel}</span>
-        <span className="eyebrow">· {simsK} SIMS</span>
-        <span className="eyebrow">· MODEL {mode.model_version.toUpperCase()}</span>
-        <span className="eyebrow">· UPDATED {updatedRel}</span>
+      <div className="flex flex-wrap gap-2">
+        <span className="chip">{data.post_quali ? "After qualifying" : "Before qualifying"}</span>
+        <span className="chip">{simsK} simulated races</span>
+        <span className="chip">Model {mode.model_version}</span>
+        <span className="chip">Updated {relativeTimeUpper(mode.generated_at).toLowerCase()}</span>
       </div>
-    </>
+    </div>
+  );
+}
+
+/** Home-page card: favourite, pole, conditions, and the top five. */
+export function ForecastSnapshot({ data }: { data: PredictionResponse }) {
+  const mode = activeMode(data);
+  return (
+    <div className="card overflow-hidden flex flex-col h-full">
+      <CardHead title="Race forecast" action={{ href: "/forecast", label: "Full forecast" }} />
+      {!mode ? (
+        <p className="px-5 py-6 text-sm text-muted">{data.message ?? "The forecast is temporarily unavailable."}</p>
+      ) : (
+        <>
+          <dl className="grid grid-cols-3 border-b border-rule">
+            <SnapshotStat label="Favourite" value={byWinChance(mode)[0]?.driver_code ?? "—"} />
+            <SnapshotStat label="Pole pick" value={mode.predicted_pole?.driver_code ?? "—"} />
+            <SnapshotStat label="Rain" value={data.weather ? pctShort(data.weather.rain_probability) : "—"} />
+          </dl>
+          <ol className="flex flex-col py-1">
+            {byWinChance(mode).slice(0, 5).map((d, i) => (
+              <li key={d.driver_code} className="grid grid-cols-[28px_4px_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-5 py-2">
+                <span className={`pos-badge ${i === 0 ? "pos-badge--lead" : ""}`}>{i + 1}</span>
+                <span aria-hidden className="team-pip" style={{ background: teamColor(d.team) }} />
+                <DriverName name={d.driver_name} className="truncate text-[15px]" />
+                <span className="font-mono tabular text-[14px] font-semibold">{pct(d.win_probability)}</span>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+    </div>
+  );
+}
+
+function SnapshotStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="px-4 sm:px-5 py-3.5 border-r border-rule last:border-r-0 min-w-0">
+      <dt className="text-[12px] text-muted">{label}</dt>
+      <dd className="font-mono tabular text-[18px] font-semibold mt-0.5 truncate">{value}</dd>
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string | null }) {
+  return (
+    <div className="card p-7 md:p-10">
+      <h3 className="font-display text-xl font-semibold">Forecast temporarily unavailable</h3>
+      <p className="mt-2 text-sm text-muted max-w-xl">
+        {message ?? "Please check back shortly."} Forecasts refresh as new race and qualifying data arrives.
+      </p>
+    </div>
   );
 }
 
 function OddsRow({ d, rank, winScale }: { d: DriverPrediction; rank: number; winScale: number }) {
   const color = teamColor(d.team);
   return (
-    <li className="row-hover relative grid grid-cols-[2rem_minmax(0,1fr)_auto] md:grid-cols-[2rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_3.5rem] gap-x-4 gap-y-2 items-center py-3 border-b border-rule last:border-b-0">
-      <span aria-hidden className="absolute left-0 top-3 bottom-3 w-[3px]" style={{ background: color }} />
-      <span className="font-mono tabular text-[12px] text-muted pl-3">
-        {String(rank).padStart(2, "0")}
-      </span>
-      <div className="min-w-0">
-        <div className="font-display text-[18px] leading-tight truncate">{d.driver_name}</div>
-        <div className="eyebrow mt-0.5 truncate">{teamShort(d.team)} · {d.driver_code}</div>
+    <li className="row-hover grid grid-cols-[28px_minmax(0,1fr)_auto] md:grid-cols-[28px_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_3.5rem] gap-x-4 items-center px-4 sm:px-5 py-2.5 border-b border-rule last:border-b-0">
+      <span className={`pos-badge ${rank === 1 ? "pos-badge--lead" : ""}`}>{rank}</span>
+      <div className="min-w-0 flex items-center gap-3">
+        <span aria-hidden className="team-pip" style={{ background: color }} />
+        <div className="min-w-0">
+          <DriverName name={d.driver_name} className="block text-[15px] leading-tight truncate" />
+          <div className="text-[12.5px] text-muted truncate">{teamShort(d.team)}</div>
+        </div>
       </div>
       {/* Mobile: headline win % only; the meters need the wide grid. */}
-      <span className="md:hidden font-mono tabular text-[15px]">{pct(d.win_probability)}</span>
+      <span className="md:hidden font-mono tabular text-[14.5px] font-semibold">{pct(d.win_probability)}</span>
       <div className="hidden md:contents">
         <Meter value={d.win_probability} scale={winScale} color={color} strong />
         <Meter value={d.podium_probability} scale={1} color={color} />
         <Meter value={d.points_probability} scale={1} color={color} />
-        <span className="font-mono tabular text-[13px] text-right text-muted">
-          P{d.expected_position.toFixed(1)}
-        </span>
+        <span className="font-mono tabular text-[13px] text-right text-muted">{d.expected_position.toFixed(1)}</span>
       </div>
     </li>
   );
@@ -185,71 +181,77 @@ function Meter({ value, scale, color, strong }: { value: number; scale: number; 
   const width = Math.max(1.5, Math.min(1, value / scale) * 100);
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <div className="h-[6px] flex-1 bg-paper-deep overflow-hidden">
-        <div
-          className="h-full"
-          style={{ width: `${width}%`, background: color, opacity: strong ? 1 : 0.55 }}
-        />
+      <div className="h-[6px] flex-1 rounded-full bg-paper-deeper overflow-hidden">
+        <div className="h-full rounded-full" style={{ width: `${width}%`, background: color, opacity: strong ? 1 : 0.5 }} />
       </div>
-      <span className={`font-mono tabular text-[12px] w-[3.25rem] text-right ${strong ? "text-ink" : "text-muted"}`}>
+      <span className={`font-mono tabular text-[12.5px] w-[3.25rem] text-right ${strong ? "text-ink font-semibold" : "text-muted"}`}>
         {pct(value)}
       </span>
     </div>
   );
 }
 
-// .eyebrow's colour is unlayered CSS, so a text-* utility can't override it.
-const INVERT_MUTED = { color: "color-mix(in srgb, var(--color-paper) 62%, transparent)" } as const;
-
 function Callout({
-  eyebrow,
-  name,
-  meta,
+  label,
+  aside,
   color,
-  statLabel,
-  stat,
-  accent,
+  carbon,
+  className = "",
+  children,
 }: {
-  eyebrow: string;
-  name: string;
-  meta: string;
-  color: string;
-  statLabel: string;
-  stat: string;
-  accent?: boolean;
+  label: string;
+  aside?: React.ReactNode;
+  color?: string;
+  carbon?: boolean;
+  className?: string;
+  children: React.ReactNode;
 }) {
   return (
-    // The accent variant skips .card: its unlayered paper background would
-    // override the bg-ink utility and leave light text on a light card.
-    <div className={`hover-lift p-6 md:p-8 flex flex-col gap-4 relative overflow-hidden ${accent ? "surface-invert bg-ink text-paper border border-ink" : "card card-deep"}`}>
-      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: color }} />
-      {accent && <div aria-hidden className="absolute inset-0 chevron-bg-soft pointer-events-none" />}
-      <span className="eyebrow-red relative">{eyebrow}</span>
-      <div className="relative">
-        <div className={`font-display text-[clamp(2rem,4.5vw,3rem)] leading-[0.95] ${accent ? "text-paper" : ""}`}>
-          {name}
-        </div>
-        <div className="eyebrow mt-2" style={accent ? INVERT_MUTED : undefined}>{meta}</div>
+    <div className={`${carbon ? "panel-carbon" : "card"} relative overflow-hidden p-6 flex flex-col gap-4 min-h-[200px] ${className}`}>
+      {color && <span aria-hidden className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-full" style={{ background: color }} />}
+      <div className="flex items-center justify-between gap-3">
+        <span className="kicker">{label}</span>
+        {aside}
       </div>
-      <div className="relative flex items-baseline justify-between mt-auto pt-2">
-        <span className="eyebrow" style={accent ? INVERT_MUTED : undefined}>{statLabel}</span>
-        <span className="numeric-lg text-f1">{stat}</span>
-      </div>
+      {children}
     </div>
+  );
+}
+
+function CalloutName({ name, meta }: { name: string; meta: string }) {
+  return (
+    <div>
+      <div className="font-display text-[clamp(1.5rem,2.6vw,1.9rem)] font-bold leading-tight tracking-[-0.03em]">{name}</div>
+      <div className="text-[13px] text-muted mt-1">{meta}</div>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="mt-auto flex items-end justify-between gap-3 pt-4 border-t border-rule">
+      <span className="text-[13px] text-muted">{label}</span>
+      <span className={`numeric-lg ${accent ? "text-f1-soft" : "text-ink"}`}>{value}</span>
+    </div>
+  );
+}
+
+function WinnerCallout({ winner }: { winner: DriverPrediction }) {
+  return (
+    <Callout label="Predicted winner" color={teamColor(winner.team)} carbon>
+      <CalloutName name={winner.driver_name} meta={`${teamShort(winner.team)} · ${winner.driver_code}`} />
+      <Stat label="Win probability" value={pctShort(winner.win_probability)} accent />
+    </Callout>
   );
 }
 
 function PoleCallout({ pole }: { pole: PredictedPole }) {
   return (
-    <Callout
-      eyebrow="Predicted Pole"
-      name={pole.driver_name}
-      meta={`${teamShort(pole.team)} · ${pole.driver_code}`}
-      color={teamColor(pole.team)}
-      // The API's "confidence" is the pole-probability margin over P2.
-      statLabel="Edge over P2"
-      stat={`+${pctShort(pole.confidence)}`}
-    />
+    <Callout label="Predicted pole" color={teamColor(pole.team)}>
+      <CalloutName name={pole.driver_name} meta={`${teamShort(pole.team)} · ${pole.driver_code}`} />
+      {/* The API's "confidence" is the pole-probability margin over P2. */}
+      <Stat label="Edge over P2" value={`+${pctShort(pole.confidence)}`} />
+    </Callout>
   );
 }
 
@@ -263,40 +265,26 @@ function WeatherCallout({ weather }: { weather: RaceWeather }) {
   const rain = weather.rain_probability;
   const outlook = rain >= 0.6 ? "Wet race likely" : rain >= 0.3 ? "Mixed conditions" : "Dry race expected";
   return (
-    <div className="card card-deep hover-lift p-6 md:p-8 flex flex-col gap-4 relative md:col-span-2 lg:col-span-1">
-      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[3px] bg-team-williams" />
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="eyebrow-red">Race Conditions</span>
-        <span className="eyebrow">{WEATHER_SOURCE[weather.source]}</span>
-      </div>
-      <div className="font-display italic text-[clamp(1.6rem,3.5vw,2.25rem)] leading-[1]">{outlook}</div>
-      <div className="grid grid-cols-2 gap-4 mt-auto pt-2">
+    <Callout
+      label="Conditions"
+      aside={<span className="text-[12.5px] text-muted">{WEATHER_SOURCE[weather.source]}</span>}
+      color="var(--color-team-williams)"
+      className="md:col-span-2 lg:col-span-1"
+    >
+      <div className="font-display text-[clamp(1.4rem,2.4vw,1.75rem)] font-bold leading-tight tracking-[-0.03em]">{outlook}</div>
+      <div className="mt-auto grid grid-cols-2 gap-4 pt-4 border-t border-rule">
         <div>
-          <span className="eyebrow block">Rain chance</span>
-          <span className="numeric-lg">{pctShort(rain)}</span>
-          <RainGauge value={rain} />
+          <span className="text-[13px] text-muted block">Rain chance</span>
+          <span className="numeric-lg block mt-1.5">{pctShort(rain)}</span>
+          <div aria-hidden className="mt-2.5 h-[6px] rounded-full bg-paper-deeper overflow-hidden">
+            <div className="h-full rounded-full bg-team-williams" style={{ width: `${Math.max(2, rain * 100)}%` }} />
+          </div>
         </div>
         <div>
-          <span className="eyebrow block">Air temp</span>
-          <span className="numeric-lg">{Math.round(weather.temp_c)}°<span className="text-muted text-[18px]">C</span></span>
+          <span className="text-[13px] text-muted block">Air temp</span>
+          <span className="numeric-lg block mt-1.5">{Math.round(weather.temp_c)}°C</span>
         </div>
       </div>
-    </div>
-  );
-}
-
-/** Ten-segment gauge — reads like a rain radar strip. */
-function RainGauge({ value }: { value: number }) {
-  const lit = Math.round(value * 10);
-  return (
-    <div aria-hidden className="mt-2 flex gap-[3px]">
-      {Array.from({ length: 10 }, (_, i) => (
-        <span
-          key={i}
-          className="h-[6px] flex-1"
-          style={{ background: i < lit ? "var(--color-team-williams)" : "var(--color-paper-deeper)" }}
-        />
-      ))}
-    </div>
+    </Callout>
   );
 }

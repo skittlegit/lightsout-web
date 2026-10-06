@@ -25,12 +25,16 @@ export default function PaletteTrigger() {
       type="button"
       onClick={open}
       aria-label="Open search"
-      className="inline-flex items-center gap-2 px-2 py-1 border border-rule hover:border-ink transition-colors focus-visible:outline-2 focus-visible:outline-f1 focus-visible:outline-offset-2"
+      className="inline-flex items-center gap-2.5 h-10 pl-3.5 pr-2 rounded-full bg-black/15 text-white hover:bg-black/25 transition-colors"
     >
-      <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+        <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10.5 10.5 14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+      <span className="hidden sm:inline text-[14px] font-semibold">
         Search
       </span>
-      <kbd className="font-mono text-[10px] tracking-[0.16em] text-ink/80">
+      <kbd className="hidden sm:inline font-mono text-[11px] text-white bg-white/20 rounded-md px-1.5 py-0.5">
         {isMac ? "⌘" : "Ctrl"}K
       </kbd>
     </button>

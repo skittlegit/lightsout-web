@@ -1,29 +1,37 @@
 @import "tailwindcss";
 
-/* Class-based dark mode: `dark:` utilities activate under `.dark` on <html>. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ============================================================
-   LightsOut — editorial almanac theme (Phase 2 polish)
+   LightsOut — single theme, modelled on Formula 1's own palette:
+   F1 red navigation, carbon-black feature panels, warm off-white
+   page, white cards with the signature top-right corner border.
    Tailwind v4 CSS-first config. No tailwind.config.ts.
+
+   Token names are semantic: `paper` is the page, `paper-deep` a card,
+   `ink` the text colour.
    ============================================================ */
 
 @theme {
   /* Surfaces & ink */
-  --color-paper: #faf7f2;
-  --color-paper-deep: #f2eee6;
-  --color-paper-deeper: #ebe6db;
-  --color-ink: #0e0e0e;
-  --color-ink-soft: #1f1f1f;
-  --color-muted: #5e5b55;        /* darker for AA on paper */
-  --color-muted-soft: #8a857c;
-  --color-rule: #d9d2c5;
-  --color-rule-strong: #b8b0a0;
+  --color-paper: #f7f4f1;        /* F1 warm off-white */
+  --color-paper-deep: #ffffff;   /* cards */
+  --color-paper-deeper: #eeeae5; /* tracks, insets, hovers */
+  --color-ink: #15151e;          /* F1 carbon black */
+  --color-ink-soft: #38383f;
+  --color-muted: #64646c;        /* AA on page + card */
+  --color-muted-soft: #949498;
+  --color-rule: #e4dfd9;
+  --color-rule-strong: #cfc9c1;
+  --color-carbon: #15151e;
 
   /* F1 red */
   --color-f1: #e10600;
-  --color-f1-deep: #c20500;
-  --color-f1-soft: #ff2a1f;
+  --color-f1-deep: #b30500;
+  --color-f1-soft: #ff3a2f;
+
+  /* Timing-screen colours, used sparingly for data states */
+  --color-timing-purple: #a855f7;
+  --color-timing-green: #16a34a;
+  --color-timing-yellow: #eab308;
 
   /* Team accents */
   --color-team-mercedes: #27f4d2;
@@ -32,65 +40,51 @@
   --color-team-mclaren: #ff8000;
   --color-team-aston: #229971;
   --color-team-alpine: #0093cc;
-  --color-team-williams: #64c4ff;
+  --color-team-williams: #1868db;
   --color-team-racingbulls: #6692ff;
   --color-team-sauber: #52e252;
   --color-team-haas: #b6babd;
-  --color-team-cadillac: #ffd700;
+  --color-team-cadillac: #c9b47b;
 
   /* Fonts (variables defined in layout.tsx via next/font) */
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-titillium), ui-sans-serif, system-ui, sans-serif;
+  /* Numbers use the display face with tabular figures, like F1 timing graphics. */
+  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* Motion */
   --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-fast: 160ms;
-  --dur-mid: 240ms;
-  --dur-slow: 480ms;
+  --dur-fast: 150ms;
+  --dur-mid: 220ms;
 
   /* Layout */
-  --container-max: 1320px;
-  --gutter-x: clamp(1.25rem, 3.5vw, 2.5rem);
-  --section-y: clamp(3rem, 7vw, 5rem);
+  --container-max: 1280px;
+  --gutter-x: clamp(1rem, 3.5vw, 2rem);
+  --section-y: clamp(2.5rem, 5vw, 4rem);
+  --nav-h: 64px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
 }
-
-/* ============================================================
-   Theme — light (default) / dark ("night race")
-   The neutral ramp is inverted under `.dark`; every `bg-paper`,
-   `text-ink`, `border-rule`, etc. follows automatically. F1 reds and
-   team accents are intentionally shared across both themes.
-   ============================================================ */
 
 :root { color-scheme: light; }
 
-:root.dark {
-  color-scheme: dark;
-  --color-paper: #0c0d0f;        /* page base — clean neutral near-black */
-  --color-paper-deep: #15161a;   /* cards / panels — clearly above base */
-  --color-paper-deeper: #1e2026; /* highest surface */
-  --color-ink: #f3f2ef;          /* primary text — near-white */
-  --color-ink-soft: #c9c8c5;
-  --color-muted: #a2a1a6;        /* secondary text — cool grey, AA on base */
-  --color-muted-soft: #6f6e74;
-  --color-rule: #2d2f35;         /* hairlines — visible so the grid still reads */
-  --color-rule-strong: #474a53;
-}
-
-/* Panels that stay a dark "cockpit" surface in BOTH themes (hero, ticker).
-   Re-pin the neutral ramp locally to its light-theme values so the
-   `bg-ink` / `text-paper` treatment inside them never flips. */
-.surface-invert {
-  --color-paper: #faf7f2;
-  --color-paper-deep: #f2eee6;
-  --color-paper-deeper: #ebe6db;
-  --color-ink: #0e0e0e;
-  --color-ink-soft: #1f1f1f;
-  --color-muted: #5e5b55;
-  --color-muted-soft: #8a857c;
-  --color-rule: #d9d2c5;
-  --color-rule-strong: #b8b0a0;
+/* Carbon feature surface (next-race hero, predicted winner, track card).
+   Re-pins the neutral ramp so token utilities inside (bg-paper-deeper,
+   text-ink, text-muted, border-rule) read correctly on black. */
+.panel-carbon {
+  --color-paper: #15151e;
+  --color-paper-deep: #1f1f28;
+  --color-paper-deeper: #2a2a34;
+  --color-ink: #ffffff;
+  --color-ink-soft: #d0d0d6;
+  --color-muted: #a3a3ad;
+  --color-muted-soft: #6d6d78;
+  --color-rule: #30303a;
+  --color-rule-strong: #43434e;
+  color: var(--color-ink);
+  background: var(--color-carbon);
+  border-radius: var(--radius-panel);
 }
 
 /* ============================================================
@@ -103,7 +97,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 64px;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -115,94 +109,85 @@ body {
 
 body {
   font-family: var(--font-sans);
-  font-size: 15.5px;
-  line-height: 1.55;
-  font-feature-settings: "ss01", "kern";
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-@media (min-width: 1024px) {
-  body { font-size: 16px; }
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 18% 8%, rgba(14, 14, 14, 0.028) 0%, transparent 55%),
-    radial-gradient(ellipse at 82% 88%, rgba(193, 5, 0, 0.018) 0%, transparent 60%),
-    radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.16) 100%);
-  mix-blend-mode: multiply;
-}
-
-/* On dark, a faint top-left light + bottom-right red glow instead of multiply. */
-:root.dark body::before {
-  background:
-    radial-gradient(ellipse at 18% 8%, rgba(255, 255, 255, 0.035) 0%, transparent 55%),
-    radial-gradient(ellipse at 82% 88%, rgba(255, 42, 31, 0.06) 0%, transparent 60%);
-  mix-blend-mode: screen;
-}
-
-main,
-header,
-footer,
-section { position: relative; z-index: 1; }
-
-::selection { background: var(--color-f1); color: var(--color-paper); }
+::selection { background: var(--color-f1); color: #fff; }
 
 :focus-visible {
   outline: 2px solid var(--color-f1);
   outline-offset: 3px;
-  border-radius: 1px;
+  border-radius: 4px;
 }
 
 .skip-link {
-  position: absolute;
+  position: fixed;
   left: 50%;
   top: -100px;
   transform: translateX(-50%);
-  background: var(--color-ink);
-  color: var(--color-paper);
+  background: var(--color-carbon);
+  color: #fff;
   padding: 8px 14px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  z-index: 100;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 200;
   transition: top var(--dur-fast) var(--ease-out-soft);
 }
 .skip-link:focus { top: 12px; }
 
 /* ============================================================
-   Typography utilities
+   Typography
    ============================================================ */
 
-.tabular {
+.tabular,
+.font-mono {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
 
-.font-display { font-family: var(--font-display); }
+/* Wide, heavy display face — stands in for Formula1 Display. */
+.font-display {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  letter-spacing: -0.01em;
+}
 
 .eyebrow,
 .eyebrow-ink,
 .eyebrow-red {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
+  font-size: 12px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-weight: 500;
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 1.3;
 }
 .eyebrow      { color: var(--color-muted); }
 .eyebrow-ink  { color: var(--color-ink); }
-.eyebrow-red  { color: var(--color-f1); font-weight: 600; }
+.eyebrow-red  { color: var(--color-f1); }
+
+/* Small label above titles: a red bar + uppercase text. */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.kicker::before {
+  content: "";
+  width: 14px;
+  height: 3px;
+  background: var(--color-f1);
+}
 
 .rule-thin   { border-top: 1px solid var(--color-rule); }
 .rule-red    { border-top: 2px solid var(--color-f1); }
@@ -211,26 +196,28 @@ section { position: relative; z-index: 1; }
 
 .headline {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  line-height: 0.95;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
   text-wrap: balance;
 }
 .headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-f1);
-  font-weight: 400;
 }
 
 /* Fluid display sizes */
-.h-mark       { font-size: clamp(3.5rem, 16vw, 13rem);  letter-spacing: -0.04em; }
-.h-hero       { font-size: clamp(2.75rem, 11vw, 8rem); }
-.h-section    { font-size: clamp(2.25rem, 7.5vw, 4.75rem); }
-.h-subsection { font-size: clamp(1.5rem, 4vw, 2.5rem); }
-.h-detail     { font-size: clamp(2.25rem, 8vw, 5rem); }
+.h-hero       { font-size: clamp(2.25rem, 5.2vw, 4.25rem); }
+.h-section    { font-size: clamp(1.5rem, 2.8vw, 2.2rem); }
+.h-subsection { font-size: clamp(1.2rem, 2vw, 1.55rem); }
+.h-detail     { font-size: clamp(2rem, 4.6vw, 3.4rem); }
 
-.numeric-xl { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(2.5rem, 7vw, 3.5rem); line-height: 1; }
-.numeric-lg { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; }
+.numeric-xl { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: clamp(2.25rem, 6vw, 3.25rem); line-height: 1; font-weight: 800; }
+.numeric-lg { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; font-weight: 800; }
+
+/* F1-style name: given name regular, surname bold uppercase. */
+.surname { font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; }
 
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -239,7 +226,7 @@ section { position: relative; z-index: 1; }
 summary::-webkit-details-marker { display: none; }
 
 /* ============================================================
-   Components / utilities
+   Layout
    ============================================================ */
 
 .container-max {
@@ -250,17 +237,81 @@ summary::-webkit-details-marker { display: none; }
 }
 .section-y { padding-block: var(--section-y); }
 
-.card {
-  background: var(--color-paper);
-  border: 1px solid var(--color-rule);
-  transition: border-color var(--dur-fast) var(--ease-out-soft),
-              transform var(--dur-fast) var(--ease-out-soft);
+/* Sticky F1-red navigation bar */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-f1);
+  color: #fff;
 }
-.card:hover { border-color: var(--color-ink); }
-.card-deep { background: color-mix(in srgb, var(--color-paper-deep) 60%, var(--color-paper)); }
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: var(--nav-h);
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out-soft),
+              background-color var(--dur-fast) var(--ease-out-soft);
+}
+.nav-link:hover { color: #fff; background: rgba(0, 0, 0, 0.12); }
+.nav-link[aria-current="page"] { color: #fff; }
+.nav-link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 4px;
+  background: #fff;
+  border-radius: 4px 4px 0 0;
+}
+
+/* ============================================================
+   Components
+   ============================================================ */
+
+/* Card with Formula 1's top-right corner border. */
+.card {
+  background: var(--color-paper-deep);
+  border-radius: 0 var(--radius-card) 0 0;
+  border-top: 2px solid var(--color-ink);
+  border-right: 2px solid var(--color-ink);
+  box-shadow: 0 1px 0 var(--color-rule);
+  transition: border-color var(--dur-fast) var(--ease-out-soft);
+}
+a.card:hover, .card-link:hover { border-color: var(--color-f1); }
+.card-deep { background: var(--color-paper-deep); }
 
 .row-hover { transition: background-color var(--dur-fast) var(--ease-out-soft); }
-.row-hover:hover { background: color-mix(in srgb, var(--color-paper-deep) 50%, transparent); }
+.row-hover:hover { background: var(--color-paper); }
+
+/* Data tables (standings, results) */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--color-rule);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-rule);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table tbody tr { transition: background-color var(--dur-fast) var(--ease-out-soft); }
+.data-table tbody tr:hover { background: var(--color-paper); }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Horizontal data scroller (HScroll.tsx) — thin themed scrollbar that only
    appears when content actually overflows, plus dynamic edge-fade hints. */
@@ -273,8 +324,6 @@ summary::-webkit-details-marker { display: none; }
 .hscroll::-webkit-scrollbar-track { background: transparent; }
 .hscroll::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 3px; }
 
-/* Edge fades toggled from JS: visible only on a side with more content, so
-   nothing is veiled once you've scrolled all the way there. */
 .hscroll-fade {
   position: absolute;
   top: 0;
@@ -284,71 +333,8 @@ summary::-webkit-details-marker { display: none; }
   z-index: 2;
   transition: opacity var(--dur-mid) var(--ease-out-soft);
 }
-.hscroll-fade--l { left: 0;  background: linear-gradient(90deg, var(--color-paper), transparent); }
-.hscroll-fade--r { right: 0; background: linear-gradient(-90deg, var(--color-paper), transparent); }
-
-/* Snap assists touch flicks. Snap targets are the cards themselves
-   (`.snap-start`), so every round is a valid resting point. */
-.scroll-snap-x {
-  scroll-snap-type: x proximity;
-  scroll-padding-left: var(--gutter-x);
-  overscroll-behavior-x: contain;
-}
-/* On mouse/trackpad the wheel + drag handlers pan by assigning scrollLeft,
-   and each assignment re-snaps — the strip judders and the far end can
-   become unreachable. Fine pointers pan free; touch keeps the snap. */
-@media (pointer: fine) {
-  .scroll-snap-x { scroll-snap-type: none; }
-}
-
-/* Section rail (SectionAnchors.tsx): dots at rest, label chip on hover/focus. */
-.rail-link {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 22px;
-  width: 22px;
-  color: var(--color-muted-soft);
-  transition: color var(--dur-fast) var(--ease-out-soft);
-}
-.rail-link:hover,
-.rail-link:focus-visible,
-.rail-link[data-active] { color: var(--color-ink); }
-.rail-link--accent { color: var(--color-f1); }
-.rail-dot {
-  width: 6px;
-  height: 6px;
-  margin-left: 3px;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.55;
-  transition: transform var(--dur-fast) var(--ease-out-soft),
-              opacity var(--dur-fast) var(--ease-out-soft),
-              width var(--dur-mid) var(--ease-out-soft);
-}
-.rail-link[data-active] .rail-dot { width: 14px; opacity: 1; background: var(--color-f1); }
-.rail-link:hover .rail-dot { opacity: 1; transform: scale(1.2); }
-.rail-dot--diamond { border-radius: 1px; transform: rotate(45deg); opacity: 1; }
-.rail-link:hover .rail-dot--diamond { transform: rotate(45deg) scale(1.2); }
-.rail-label {
-  position: absolute;
-  left: 26px;
-  white-space: nowrap;
-  padding: 3px 8px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  background: var(--color-paper);
-  border: 1px solid var(--color-rule);
-  opacity: 0;
-  transform: translateX(-4px);
-  pointer-events: none;
-  transition: opacity var(--dur-fast) var(--ease-out-soft),
-              transform var(--dur-fast) var(--ease-out-soft);
-}
-.rail-link:hover .rail-label,
-.rail-link:focus-visible .rail-label { opacity: 1; transform: translateX(0); }
+.hscroll-fade--l { left: 0;  background: linear-gradient(90deg, var(--color-paper-deep), transparent); }
+.hscroll-fade--r { right: 0; background: linear-gradient(-90deg, var(--color-paper-deep), transparent); }
 
 .hover-lift {
   transition: transform var(--dur-fast) var(--ease-out-soft),
@@ -356,198 +342,109 @@ summary::-webkit-details-marker { display: none; }
 }
 .hover-lift:hover { transform: translateY(-2px); }
 
-.headline-link {
-  display: inline-block;
-  position: relative;
-  text-decoration: none;
-}
-.headline-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0.05em;
-  width: 100%;
-  height: 2px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform var(--dur-mid) var(--ease-out-soft);
-}
-.headline-link:hover::after { transform: scaleX(1); }
+.headline-link { text-decoration: none; transition: color var(--dur-fast) var(--ease-out-soft); }
+.headline-link:hover { color: var(--color-f1); }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border: 1px solid var(--color-rule);
-  background: var(--color-paper);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-ink);
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: var(--color-paper-deeper);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
   white-space: nowrap;
 }
-.chip-dark {
-  border-color: rgba(250, 247, 242, 0.2);
-  background: transparent;
-  color: var(--color-paper);
-}
+.chip-red { background: var(--color-f1); color: #fff; }
 
-/* stat-strip: applied alongside `grid grid-cols-N` for responsive count.
-   Hairline divider is achieved via 1px gap with rule-color bg. */
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out-soft),
+              border-color var(--dur-fast) var(--ease-out-soft),
+              color var(--dur-fast) var(--ease-out-soft);
+}
+.btn-primary { background: var(--color-f1); color: #fff; }
+.btn-primary:hover { background: var(--color-f1-deep); }
+.btn-ghost { border: 2px solid var(--color-ink); color: var(--color-ink); }
+.btn-ghost:hover { background: var(--color-ink); color: var(--color-paper); }
+
+/* "View all →" text link at the end of a card or section */
+.more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-ink);
+  transition: color var(--dur-fast) var(--ease-out-soft);
+}
+.more-link:hover { color: var(--color-f1); }
+
+/* stat-strip: applied alongside `grid grid-cols-N` for responsive count. */
 .stat-strip {
   display: grid;
   gap: 1px;
   background: var(--color-rule);
-  border: 1px solid var(--color-rule);
+  border-top: 2px solid var(--color-ink);
+  border-right: 2px solid var(--color-ink);
+  border-radius: 0 var(--radius-card) 0 0;
+  overflow: hidden;
 }
 .stat-strip > * {
-  background: var(--color-paper);
+  background: var(--color-paper-deep);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 @media (min-width: 768px) {
-  .stat-strip > * { padding: 20px 22px; }
+  .stat-strip > * { padding: 18px 22px; }
 }
 
-/* ============================================================
-   Race aesthetic — checker, chevron, scanline, ticker, shift lights
-   ============================================================ */
-
-/* Checker — used as S/F line and accent strips */
-.checker-strip {
-  --c1: var(--color-ink);
-  --c2: var(--color-paper);
-  background-image:
-    linear-gradient(45deg, var(--c1) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--c1) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--c1) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--c1) 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
-  background-color: var(--c2);
+/* Position badge (standings, odds board, calendar list) */
+.pos-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 26px;
+  padding: 0 4px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 800;
+  background: transparent;
+  color: var(--color-ink);
+  flex: none;
 }
-.checker-strip-sm { background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0; }
+.pos-badge--lead { background: var(--color-f1); color: #fff; }
 
-/* Chevron pattern — diagonal racing stripes */
-.chevron-bg {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0,
-    transparent 14px,
-    color-mix(in srgb, var(--color-f1) 14%, transparent) 14px,
-    color-mix(in srgb, var(--color-f1) 14%, transparent) 16px
-  );
-}
-.chevron-bg-soft {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0,
-    transparent 18px,
-    rgba(255, 255, 255, 0.04) 18px,
-    rgba(255, 255, 255, 0.04) 20px
-  );
-}
+/* Team colour pip */
+.team-pip { width: 4px; height: 22px; border-radius: 999px; flex: none; }
 
-/* Scanlines — telemetry HUD vibe */
-.scanline {
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0,
-    transparent 3px,
-    rgba(255, 255, 255, 0.025) 3px,
-    rgba(255, 255, 255, 0.025) 4px
-  );
-}
-
-/* Italic + slight forward skew — "speed" treatment for marquee numbers */
-.skew-fwd { transform: skewX(-7deg); transform-origin: bottom left; }
-
-/* ============================================================
-   Ticker (marquee)
-   ============================================================ */
-
-.ticker {
-  position: relative;
-  overflow: hidden;
-  background: var(--color-ink);
-  color: var(--color-paper);
-  border-block: 1px solid var(--color-ink);
-}
-.ticker__track {
+/* Countdown segments (Hero) */
+.timing-seg {
   display: flex;
-  width: max-content;
-  animation: ticker-scroll 48s linear infinite;
-  will-change: transform;
-}
-.ticker__group {
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  flex-shrink: 0;
-  padding-block: 10px;
-}
-.ticker__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding-inline: 28px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--color-paper);
-}
-.ticker__item--accent { color: var(--color-f1-soft); }
-.ticker__sep {
-  width: 6px; height: 6px; background: var(--color-f1);
-  flex: none; transform: rotate(45deg);
-}
-.ticker__edge {
-  position: absolute; top: 0; bottom: 0; width: 60px; pointer-events: none; z-index: 2;
-}
-.ticker__edge--l { left: 0;  background: linear-gradient(90deg, var(--color-ink) 0, transparent 100%); }
-.ticker__edge--r { right: 0; background: linear-gradient(-90deg, var(--color-ink) 0, transparent 100%); }
-.ticker:hover .ticker__track { animation-play-state: paused; }
-
-@keyframes ticker-scroll {
-  from { transform: translate3d(0,0,0); }
-  to   { transform: translate3d(-50%,0,0); }
-}
-
-/* ============================================================
-   Shift lights — 5-light start sequence
-   ============================================================ */
-
-.shift-lights {
-  display: inline-flex;
-  gap: 6px;
-  padding: 6px 8px;
-  background: #050505;
-  border: 1px solid #1a1a1a;
-  border-radius: 2px;
-}
-.shift-lights__dot {
-  width: 12px; height: 12px; border-radius: 999px;
-  background: #2a0707;
-  box-shadow: inset 0 0 0 1px #0a0a0a;
-  animation: shift-on 4.4s steps(1, end) infinite;
-}
-.shift-lights__dot:nth-child(1) { animation-delay: 0.0s; }
-.shift-lights__dot:nth-child(2) { animation-delay: 0.5s; }
-.shift-lights__dot:nth-child(3) { animation-delay: 1.0s; }
-.shift-lights__dot:nth-child(4) { animation-delay: 1.5s; }
-.shift-lights__dot:nth-child(5) { animation-delay: 2.0s; }
-
-@keyframes shift-on {
-  0%, 9%   { background: #2a0707; box-shadow: inset 0 0 0 1px #0a0a0a; }
-  10%, 65% { background: var(--color-f1-soft); box-shadow: 0 0 8px rgba(255,42,31,0.7), inset 0 0 0 1px #ff8a82; }
-  66%, 100% { background: #2a0707; box-shadow: inset 0 0 0 1px #0a0a0a; }
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 6px 8px;
+  border-radius: 8px;
+  background: var(--color-paper-deeper);
 }
 
 /* ============================================================
@@ -560,25 +457,23 @@ summary::-webkit-details-marker { display: none; }
 }
 .pulse-dot { animation: pulse-dot 1.6s var(--ease-editorial) infinite; }
 
-@keyframes colon-pulse {
-  0%, 55%   { opacity: 0.92; }
-  75%, 100% { opacity: 0.4; }
-}
-.colon-pulse { animation: colon-pulse 1.6s var(--ease-out-soft) infinite; }
-
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 0.85; }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
 }
 .skeleton {
-  background: var(--color-paper-deep);
+  background: var(--color-paper-deeper);
   animation: skeleton-pulse 1.6s ease-in-out infinite;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
-/* ============================================================
-   Reduced motion
-   ============================================================ */
+/* Hero track outline (TrackOutline): the lap line traces itself in once. */
+.track-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: track-draw 2.2s var(--ease-editorial) 0.2s forwards;
+}
+@keyframes track-draw { to { stroke-dashoffset: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -589,20 +484,29 @@ summary::-webkit-details-marker { display: none; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .pulse-dot, .colon-pulse, .skeleton { animation: none !important; }
-  .ticker__track { animation: none !important; }
-  .shift-lights__dot { animation: none !important; background: #2a0707 !important; }
+  .pulse-dot, .skeleton { animation: none !important; }
   .hover-lift:hover { transform: none !important; }
-  .headline-link::after { transition: none !important; }
+  .track-draw { animation: none !important; stroke-dashoffset: 0; }
 }
 
-/* Hero track outline (TrackOutline): the lap line traces itself in once. */
-.track-draw {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: track-draw 2.4s var(--ease-editorial) 0.3s forwards;
+/* Team-colour card (driver + team index pages): a dark team-tinted gradient,
+   so light team colours (Mercedes, Haas, Cadillac) still carry white text. */
+.team-card {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  border-radius: 0 var(--radius-card) 0 0;
+  background:
+    linear-gradient(140deg,
+      color-mix(in srgb, var(--team) 58%, #15151e) 0%,
+      color-mix(in srgb, var(--team) 22%, #15151e) 100%);
+  transition: transform var(--dur-fast) var(--ease-out-soft);
 }
-@keyframes track-draw { to { stroke-dashoffset: 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .track-draw { animation: none; stroke-dashoffset: 0; }
+.team-card:hover { transform: translateY(-3px); }
+.team-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--team);
 }

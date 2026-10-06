@@ -86,6 +86,7 @@ export interface JolpicaRace {
   date: string;
   time?: string;
   Results?: JolpicaRaceResult[];
+  SprintResults?: JolpicaRaceResult[];
   QualifyingResults?: JolpicaQualifyingResult[];
 }
 
@@ -107,6 +108,44 @@ async function jget<T>(path: string, revalidate: number): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Every page of a season-wide race endpoint, merged by round. Jolpica caps
+ * `limit` at 100 rows and splits a race's results across pages, so rows for
+ * the same round are concatenated. Returns null if any page fails, so callers
+ * never chart a partial season as if it were complete.
+ */
+async function seasonRaces(
+  path: "results" | "sprint",
+  key: "Results" | "SprintResults",
+  season: string,
+): Promise<JolpicaRace[] | null> {
+  const byRound = new Map<string, JolpicaRace>();
+  for (let offset = 0; offset < 2000; offset += 100) {
+    const data = await jget<{ total: string; RaceTable: RaceTable }>(
+      `/${season}/${path}.json?limit=100&offset=${offset}`,
+      3_600,
+    );
+    if (!data) return null;
+    for (const race of data.RaceTable.Races) {
+      const prev = byRound.get(race.round);
+      if (prev) prev[key] = [...(prev[key] ?? []), ...(race[key] ?? [])];
+      else byRound.set(race.round, { ...race, [key]: [...(race[key] ?? [])] });
+    }
+    if (offset + 100 >= Number(data.total)) break;
+  }
+  return [...byRound.values()].sort((a, b) => Number(a.round) - Number(b.round));
+}
+
+/** Grand Prix classifications for every completed round of the season. */
+export async function getSeasonResults(season = SEASON): Promise<JolpicaRace[] | null> {
+  return seasonRaces("results", "Results", season);
+}
+
+/** Sprint classifications (sprint weekends only). */
+export async function getSeasonSprints(season = SEASON): Promise<JolpicaRace[] | null> {
+  return seasonRaces("sprint", "SprintResults", season);
 }
 
 export async function getSeasonCalendar(): Promise<CalendarResponse | null> {

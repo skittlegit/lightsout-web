@@ -70,14 +70,6 @@ export function formatRaceFullDate(iso: string): string {
   }).format(d);
 }
 
-export function timeGreeting(now: Date = new Date()): string {
-  const h = now.getHours();
-  if (h >= 0 && h < 5) return "Late Lap";
-  if (h < 12) return "Good Morning";
-  if (h < 18) return "Good Afternoon";
-  return "Good Evening";
-}
-
 /** "Andrea Kimi Antonelli" -> "K. Antonelli", "Max Verstappen" -> "M. Verstappen" */
 export function abbreviateName(full: string): string {
   const parts = full.trim().split(/\s+/);
@@ -219,4 +211,12 @@ export function relativeTimeUpper(iso: string, now: Date = new Date()): string {
   if (hr < 24) return `${hr} HR${hr === 1 ? "" : "S"} AGO`;
   const day = Math.floor(hr / 24);
   return `${day} DAY${day === 1 ? "" : "S"} AGO`;
+}
+
+/**
+ * A team colour darkened enough to use as text on the light page — raw
+ * Mercedes cyan or Haas grey on off-white fails contrast.
+ */
+export function inkOf(color: string): string {
+  return `color-mix(in srgb, ${color} 60%, #15151e)`;
 }

@@ -35,3 +35,18 @@ test("lapped finishers show laps down instead of a stray seconds gap", async () 
   assert.equal(finishGap(row(64, "Lapped"), 68), "+4 Laps");
   assert.equal(finishGap(row(38, "Retired"), 68), "Retired");
 });
+
+test("points progression sums race + sprint and carries totals through missed rounds", async () => {
+  const { pointsProgression, podiumsByRound } = await import("../lib/season.ts");
+  const res = (code, pos, pts) => ({ position: String(pos), points: String(pts), Driver: { code, givenName: code, familyName: code }, Constructor: { name: "T" } });
+  const races = [
+    { round: "1", Results: [res("AAA", 1, 25), res("BBB", 2, 18)] },
+    { round: "2", Results: [res("BBB", 1, 25)] },
+  ];
+  const sprints = [{ round: "2", SprintResults: [res("AAA", 1, 8)] }];
+  const { rounds, series } = pointsProgression(races, sprints);
+  assert.deepEqual(rounds, [1, 2]);
+  assert.deepEqual(series.find((s) => s.code === "BBB").points, [18, 43]);
+  assert.deepEqual(series.find((s) => s.code === "AAA").points, [25, 33]);
+  assert.equal(podiumsByRound(races).get(2)[0].Driver.code, "BBB");
+});

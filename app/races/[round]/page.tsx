@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
-import Footer from "@/app/components/Footer";
 import CircuitVisual from "@/app/components/CircuitVisual";
 import Forecast from "@/app/components/Forecast";
 import HScroll from "@/app/components/HScroll";
@@ -11,6 +10,7 @@ import {
   countryCode,
   formatRaceFullDate,
   splitRaceName,
+  inkOf,
   teamColor,
   teamShort,
 } from "@/lib/format";
@@ -82,7 +82,7 @@ export default async function RacePage({
     <main className="flex-1 w-full">
       <BackBar
         crumb="Calendar"
-        crumbHref="/#calendar"
+        crumbHref="/calendar"
         label={`Round ${String(roundN).padStart(2, "0")}`}
       />
 
@@ -154,7 +154,7 @@ export default async function RacePage({
           <div className="container-max">
             <div className="card card-deep p-7 md:p-10">
               <span className="eyebrow-red block">Forecast</span>
-              <p className="mt-3 font-display italic text-[clamp(1.15rem,2.5vw,1.5rem)] text-ink-soft max-w-xl">
+              <p className="mt-3 font-display font-semibold text-[clamp(1.15rem,2.5vw,1.5rem)] text-ink-soft max-w-xl">
                 Prediction not yet generated for this round.
               </p>
             </div>
@@ -162,7 +162,6 @@ export default async function RacePage({
         </section>
       )}
 
-      <Footer />
     </main>
   );
 }
@@ -257,12 +256,12 @@ function PodiumStep({
           className="group block min-w-0"
         >
           <span
-            className="font-mono tabular text-[10px] tracking-[0.16em] block"
-            style={{ color }}
+            className="font-mono tabular text-[11px] font-bold tracking-[0.1em] block"
+            style={{ color: inkOf(color) }}
           >
             {code || teamShort(r.Constructor.name)}
           </span>
-          <span className="font-display italic text-[clamp(0.95rem,2.4vw,1.3rem)] leading-tight block truncate group-hover:text-f1 transition-colors">
+          <span className="font-display font-semibold text-[clamp(0.95rem,2.4vw,1.3rem)] leading-tight block truncate group-hover:text-f1 transition-colors">
             {r.Driver.familyName}
           </span>
           <span className="eyebrow block truncate mt-0.5">
@@ -384,7 +383,7 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
                         href={code ? `/drivers/${code.toLowerCase()}` : "#"}
                         className="hover:text-f1 transition-colors"
                       >
-                        <span className="font-display italic">
+                        <span className="font-display font-semibold">
                           {r.Driver.givenName} {r.Driver.familyName}
                         </span>
                       </Link>
@@ -467,7 +466,7 @@ function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
                         href={code ? `/drivers/${code.toLowerCase()}` : "#"}
                         className="hover:text-f1 transition-colors"
                       >
-                        <span className="font-display italic">
+                        <span className="font-display font-semibold">
                           {r.Driver.givenName} {r.Driver.familyName}
                         </span>
                       </Link>

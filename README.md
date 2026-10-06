@@ -1,11 +1,14 @@
 # LightsOut — F1 Season Hub
 
-Editorial-style Formula 1 web app: season calendar, championship standings,
-race results, driver head-to-heads, and Monte Carlo race forecasts.
+Formula 1 web app: season calendar, championship standings and points
+progression, race results, driver and team pages, driver head-to-heads, and
+Monte Carlo race forecasts.
 
-Built with **Next.js 16 (App Router, Turbopack)**, **Tailwind CSS v4**
-(CSS-first config, no `tailwind.config`), **Framer Motion**, and **Lenis**
-smooth scrolling. Light/dark theme with a class-based toggle.
+Built with **Next.js 16 (App Router, Turbopack)** and **Tailwind CSS v4**
+(CSS-first config, no `tailwind.config`). One theme modelled on Formula 1's own
+palette: F1-red navigation, carbon-black feature panels, a warm off-white page,
+and white cards with the top-right corner border. Archivo (wide) for headings,
+Titillium Web for text. Design tokens live in `app/globals.css`.
 
 ## Data sources
 
@@ -60,10 +63,14 @@ npm run typecheck  # tsc --noEmit
 
 ```text
 app/
-  page.tsx               # homepage — hero, calendar, standings, forecast
+  page.tsx               # home — next race, forecast snapshot, last race, standings, coming up
+  calendar/              # full season, grouped by month, winners + local start times
+  standings/             # drivers + teams tables, points progression chart
+  drivers/               # driver grid (team-colour cards)
+  forecast/              # full forecast: odds board, conditions, position matrix
   races/[round]/         # race detail: results, qualifying, recap, forecast
   drivers/[code]/        # driver profile + season form
-  constructors/[slug]/   # constructor profile, lineup, race log
+  constructors/          # team grid; [slug]/ team profile, lineup, race log
   compare/               # driver head-to-head (?a=VER&b=NOR)
   api/                   # JSON proxies of the backend (calendar, standings, predictions)
   components/            # server + client components
@@ -71,6 +78,8 @@ lib/
   api.ts                 # lightsout-api data layer (ISR + mock fallback)
   jolpica.ts             # Jolpica/Ergast wrapper
   compare.ts, recap.ts   # pure derivation helpers
+  season.ts              # points progression + per-round podiums
+  nav.ts                 # top-level sections (nav + footer)
   format.ts, slug.ts     # display + identifier mapping
   ics.ts                 # add-to-calendar (.ics) generation
 ```

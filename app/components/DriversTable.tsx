@@ -1,95 +1,71 @@
 import type { DriverStanding } from "@/lib/types";
-import { abbreviateName, teamColor, teamShort } from "@/lib/format";
+import { teamColor, teamShort } from "@/lib/format";
 import Link from "next/link";
+import type { Route } from "next";
+import type { ReactNode } from "react";
+import DriverName from "./DriverName";
 
 interface Props {
   drivers: DriverStanding[];
+  limit?: number;
 }
 
-export default function DriversTable({ drivers }: Props) {
-  const top = drivers.slice(0, 10);
+/** Compact drivers' standings: position, team colour, name, gap, points. */
+export default function DriversTable({ drivers, limit = 10 }: Props) {
+  const top = drivers.slice(0, limit);
   const leader = top[0]?.points ?? 0;
 
   return (
-    <div className="flex flex-col">
-      <SectionHead num="01" headHTML="Drivers'" tail="Championship" />
-      <ul className="mt-5 flex flex-col">
+    <div className="card overflow-hidden flex flex-col h-full">
+      <CardHead title="Drivers" action={{ href: "/standings", label: "Full standings" }} />
+      <ol className="flex flex-col">
         {top.map((d) => {
-          const ratio = leader > 0 ? d.points / leader : 0;
-          const color = teamColor(d.team);
+          const lead = d.position === 1;
           return (
-            <li
-              key={d.driver_code}
-              className="row-hover relative grid grid-cols-[1.75rem_minmax(0,1fr)_auto] gap-3 items-center py-3 border-b border-rule last:border-b-0 group"
-            >
-              {/* Team-color leading edge — thickens on hover */}
-              <span
-                aria-hidden
-                className="absolute left-0 top-3 bottom-3 w-[3px] group-hover:w-[4px] transition-[width] duration-150"
-                style={{ background: color }}
-              />
-              <span className="font-mono tabular text-[12px] text-muted pl-3">
-                {String(d.position).padStart(2, "0")}
-              </span>
-
+            <li key={d.driver_code} className="border-b border-rule last:border-b-0">
               <Link
                 href={`/drivers/${d.driver_code.toLowerCase()}`}
-                className="min-w-0"
+                className="row-hover grid grid-cols-[28px_4px_minmax(0,1fr)_auto_3.5rem] items-center gap-3 px-4 sm:px-5 py-2.5"
               >
-                <div className="font-display text-[19px] leading-tight truncate group-hover:text-f1 transition-colors">
-                  {abbreviateName(d.driver_name)}
-                </div>
-                <div className="eyebrow mt-0.5 truncate">
-                  {teamShort(d.team)} · {d.driver_code}
-                </div>
-              </Link>
-
-              <div className="flex flex-col items-end gap-1.5 min-w-[88px]">
-                <span className="font-mono tabular text-[15px]">
-                  {d.points}
-                  <span className="eyebrow ml-1">PTS</span>
+                <span className={`pos-badge ${lead ? "pos-badge--lead" : ""}`}>{d.position}</span>
+                <span aria-hidden className="team-pip" style={{ background: teamColor(d.team) }} />
+                <span className="min-w-0">
+                  <DriverName name={d.driver_name} className="block truncate text-[15px]" />
+                  <span className="block text-[12.5px] text-muted truncate">{teamShort(d.team)}</span>
                 </span>
-                <div className="w-[88px] h-[3px] bg-paper-deep">
-                  <div
-                    className="h-full transition-[width] duration-500"
-                    style={{
-                      width: `${Math.max(2, ratio * 100)}%`,
-                      background: color,
-                    }}
-                  />
-                </div>
-              </div>
+                <span className="font-mono tabular text-[12px] text-muted text-right">
+                  {lead ? "Leader" : `−${leader - d.points}`}
+                </span>
+                <span className="font-mono tabular text-[14.5px] font-semibold text-right">{d.points}</span>
+              </Link>
             </li>
           );
         })}
-      </ul>
-
-      <Link
-        href="/compare"
-        className="mt-4 inline-flex items-center gap-2 self-start font-mono text-[10px] tracking-[0.18em] uppercase text-muted hover:text-f1 transition-colors border-b border-rule hover:border-f1 pb-1"
-      >
-        Compare drivers <span aria-hidden>⤳</span>
-      </Link>
+      </ol>
     </div>
   );
 }
 
-export function SectionHead({
-  num,
-  headHTML,
-  tail,
+/** Card header used by the home-page cards: title + optional link onward. */
+export function CardHead({
+  title,
+  meta,
+  action,
 }: {
-  num: string;
-  headHTML: string;
-  tail: string;
+  title: string;
+  meta?: ReactNode;
+  action?: { href: string; label: string };
 }) {
   return (
-    <div>
-      <span className="eyebrow-red block">§ {num}</span>
-      <h3 className="headline h-subsection mt-2">
-        {headHTML} <em>{tail}</em>
-      </h3>
-      <div className="rule-thin mt-4" />
+    <div className="flex items-center justify-between gap-3 px-4 sm:px-5 h-14 border-b border-rule">
+      <h3 className="font-display text-[16px] font-semibold">{title}</h3>
+      {action ? (
+        <Link href={action.href as Route} className="more-link !text-[13px]">
+          {action.label} <span aria-hidden>→</span>
+        </Link>
+      ) : meta ? (
+        <span className="text-[13px] text-muted">{meta}</span>
+      ) : null}
     </div>
   );
 }

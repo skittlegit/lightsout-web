@@ -1,27 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Archivo, Titillium_Web } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import CommandPaletteServer from "./components/CommandPaletteServer";
+import SiteNav from "./components/SiteNav";
+import Footer from "./components/Footer";
 import { SEASON } from "@/lib/api";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Wide display face for headings: the wdth axis gives the Formula1 Display feel.
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
   display: "swap",
-  axes: ["opsz", "SOFT", "WONK"],
+  axes: ["wdth"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+// Body face — the typeface formula1.com used for years.
+const titillium = Titillium_Web({
+  variable: "--font-titillium",
   subsets: ["latin"],
   display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -40,14 +39,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Matches --color-paper; the dark theme is a user toggle (class-based), not
-  // OS-derived, so a single light chrome color is the honest default.
-  themeColor: "#faf7f2",
+  // Matches the red navigation bar.
+  themeColor: "#e10600",
 };
-
-// Runs before first paint. The site is light by default and ignores OS
-// preference — it only goes dark if the user has explicitly toggled it.
-const themeScript = `(function(){try{if(localStorage.getItem('lo:theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -58,14 +52,15 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
-      className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${archivo.variable} ${titillium.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col">
-        {children}
+        <a href="#content" className="skip-link">Skip to content</a>
+        <SiteNav />
+        <div id="content" className="flex-1 flex flex-col">
+          {children}
+        </div>
+        <Footer />
         <Suspense fallback={null}>
           <CommandPaletteServer />
         </Suspense>

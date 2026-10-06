@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import BackBar from "@/app/components/BackBar";
-import Footer from "@/app/components/Footer";
 import HScroll from "@/app/components/HScroll";
 import CompareSelectors, {
   type CompareOption,
@@ -9,7 +8,7 @@ import CompareSelectors, {
 import { getDriverStandings } from "@/lib/api";
 import { getDriverResults, getDrivers } from "@/lib/jolpica";
 import { driverIdFromCode } from "@/lib/slug";
-import { abbreviateName, teamColor, teamShort } from "@/lib/format";
+import { abbreviateName, inkOf, teamColor, teamShort } from "@/lib/format";
 import { seasonStats, headToHead } from "@/lib/compare";
 import type { DriverStanding } from "@/lib/types";
 
@@ -86,13 +85,12 @@ export default async function ComparePage({
   if (!sA || !sB) {
     return (
       <main className="flex-1 w-full">
-        <BackBar crumb="Drivers" crumbHref="/#drivers" label="Head to Head" />
+        <BackBar crumb="Drivers" crumbHref="/drivers" label="Head to Head" />
         <section className="section-y">
           <div className="container-max">
             <p className="text-muted">Standings are unavailable right now.</p>
           </div>
         </section>
-        <Footer />
       </main>
     );
   }
@@ -142,7 +140,7 @@ export default async function ComparePage({
 
   return (
     <main className="flex-1 w-full">
-      <BackBar crumb="Drivers" crumbHref="/#drivers" label="Head to Head" />
+      <BackBar crumb="Drivers" crumbHref="/drivers" label="Head to Head" />
 
       <section className="section-y">
         <div className="container-max">
@@ -195,7 +193,7 @@ export default async function ComparePage({
                   className={`font-mono tabular text-right text-[15px] sm:text-base ${
                     r.better === "a" ? "font-semibold" : "text-muted"
                   }`}
-                  style={r.better === "a" ? { color: colorA } : undefined}
+                  style={r.better === "a" ? { color: inkOf(colorA) } : undefined}
                 >
                   {r.aStr}
                 </span>
@@ -206,7 +204,7 @@ export default async function ComparePage({
                   className={`font-mono tabular text-left text-[15px] sm:text-base ${
                     r.better === "b" ? "font-semibold" : "text-muted"
                   }`}
-                  style={r.better === "b" ? { color: colorB } : undefined}
+                  style={r.better === "b" ? { color: inkOf(colorB) } : undefined}
                 >
                   {r.bStr}
                 </span>
@@ -252,7 +250,7 @@ export default async function ComparePage({
                       <Td>
                         <Link
                           href={`/races/${row.round}`}
-                          className="font-display italic hover:text-f1 transition-colors"
+                          className="font-display font-semibold hover:text-f1 transition-colors"
                         >
                           {row.raceName}
                         </Link>
@@ -300,7 +298,6 @@ export default async function ComparePage({
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }
@@ -322,12 +319,12 @@ function DriverHead({
     >
       <span aria-hidden className="block w-full h-[5px]" style={{ background: color }} />
       <span
-        className="font-mono tabular text-[12px] tracking-[0.18em]"
-        style={{ color }}
+        className="font-mono tabular text-[12px] font-bold tracking-[0.1em]"
+        style={{ color: inkOf(color) }}
       >
         {standing.driver_code}
       </span>
-      <span className="font-display italic text-[clamp(1.4rem,4.5vw,2.4rem)] leading-[1.05] truncate max-w-full group-hover:text-f1 transition-colors">
+      <span className="font-display font-semibold text-[clamp(1.4rem,4.5vw,2.4rem)] leading-[1.05] truncate max-w-full group-hover:text-f1 transition-colors">
         {standing.driver_name}
       </span>
       <span className="eyebrow truncate max-w-full">
@@ -358,14 +355,14 @@ function TallyCard({
       <div className="mt-3 flex items-baseline justify-between">
         <span
           className="font-mono tabular text-2xl"
-          style={{ color: a >= b ? colorA : undefined, fontWeight: a >= b ? 600 : 400 }}
+          style={{ color: a >= b ? inkOf(colorA) : undefined, fontWeight: a >= b ? 700 : 400 }}
         >
           {a}
         </span>
         <span className="eyebrow text-muted-soft">{total} rounds</span>
         <span
           className="font-mono tabular text-2xl"
-          style={{ color: b >= a ? colorB : undefined, fontWeight: b >= a ? 600 : 400 }}
+          style={{ color: b >= a ? inkOf(colorB) : undefined, fontWeight: b >= a ? 700 : 400 }}
         >
           {b}
         </span>
