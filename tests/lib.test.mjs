@@ -18,3 +18,11 @@ test("recap does not count lapped cars as DNFs and lets them be biggest mover", 
   assert.equal(recap.classified, 2);
   assert.equal(recap.biggestMover.result.Driver.familyName, "D2");
 });
+
+test("ics is a timed UTC event when the race start is known, all-day otherwise", async () => {
+  const { buildRaceIcs } = await import("../lib/ics.ts");
+  const race = { season: 2026, round: 17, race_name: "Singapore Grand Prix", circuit: "Marina Bay", country: "Singapore", race_date: "2026-10-11" };
+  const timed = buildRaceIcs({ ...race, race_time: "12:00:00Z" });
+  assert.match(timed, /DTSTART:20261011T120000Z\r\nDTEND:20261011T140000Z/);
+  assert.match(buildRaceIcs(race), /DTSTART;VALUE=DATE:20261011\r\nDTEND;VALUE=DATE:20261012/);
+});
