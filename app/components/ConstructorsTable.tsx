@@ -1,22 +1,24 @@
 import type { ConstructorStanding } from "@/lib/types";
 import { teamColor, teamShort } from "@/lib/format";
 import { teamSlug } from "@/lib/slug";
-import { CardHead } from "./DriversTable";
+import { CardHead } from "./ui";
 import Link from "next/link";
 
 interface Props {
   teams: ConstructorStanding[];
+  /** Show only the top N teams. */
+  limit?: number;
 }
 
 /** Constructors' standings with points bars scaled to the leader. */
-export default function ConstructorsTable({ teams }: Props) {
+export default function ConstructorsTable({ teams, limit }: Props) {
   const leader = teams[0]?.points ?? 0;
 
   return (
     <div className="card overflow-hidden flex flex-col h-full">
       <CardHead title="Teams" action={{ href: "/constructors", label: "All teams" }} />
       <ol className="flex flex-col px-4 sm:px-5 py-2">
-        {teams.map((t) => {
+        {teams.slice(0, limit ?? teams.length).map((t) => {
           const ratio = leader > 0 ? t.points / leader : 0;
           const color = teamColor(t.team);
           return (

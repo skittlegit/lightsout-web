@@ -28,7 +28,7 @@ function diff(target: number): Parts {
   return { d, h, m, s, past };
 }
 
-/** Countdown in four segments, seconds ticking in red. */
+/** Large countdown digits for dark surfaces; seconds tick in red. */
 export default function Countdown({ targetISO }: Props) {
   const target = new Date(targetISO).getTime();
   const [parts, setParts] = useState<Parts | null>(null);
@@ -53,28 +53,28 @@ export default function Countdown({ targetISO }: Props) {
     return (
       <div role="timer" aria-label={srLabel} className="flex items-center gap-3">
         <span className="pulse-dot inline-block w-[10px] h-[10px] rounded-full bg-f1" />
-        <span className="font-display text-xl font-semibold">Race in progress</span>
+        <span className="font-display text-2xl font-extrabold">Race in progress</span>
       </div>
     );
   }
 
   return (
-    <div role="timer" aria-label={srLabel} className="grid grid-cols-4 gap-2 w-full md:max-w-[440px]">
+    <div role="timer" aria-label={srLabel} className="flex items-start gap-5 sm:gap-8">
       <Segment value={p.d} label="Days" />
       <Segment value={p.h} label="Hrs" />
-      <Segment value={p.m} label="Min" />
-      <Segment value={p.s} label="Sec" live />
+      <Segment value={p.m} label="Mins" />
+      <Segment value={p.s} label="Secs" live />
     </div>
   );
 }
 
 function Segment({ value, label, live }: { value: number; label: string; live?: boolean }) {
   return (
-    <div className="timing-seg" aria-hidden>
-      <span className={`font-mono tabular font-semibold leading-none text-[clamp(1.5rem,4.5vw,2rem)] ${live ? "text-f1-soft" : "text-ink"}`}>
+    <div aria-hidden className="flex flex-col">
+      <span className={`font-display font-extrabold tabular leading-none text-[clamp(2.4rem,6vw,4rem)] ${live ? "text-f1-soft" : "text-white"}`}>
         {pad2(value)}
       </span>
-      <span className="eyebrow">{label}</span>
+      <span className="mt-2 text-[12px] font-bold uppercase tracking-[0.08em] text-white/60">{label}</span>
     </div>
   );
 }

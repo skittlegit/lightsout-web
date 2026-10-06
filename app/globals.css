@@ -509,3 +509,6 @@ a.card:hover, .card-link:hover { border-color: var(--color-f1); }
   height: 3px;
   background: var(--team);
 }
+
+/* Full-width carbon band (home hero): no corner, edge to edge. */
+.panel-carbon.panel-flat { border-radius: 0; }

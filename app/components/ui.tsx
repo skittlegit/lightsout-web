@@ -1,3 +1,5 @@
+import Link from "next/link";
+import type { Route } from "next";
 import type { ReactNode } from "react";
 
 /** Label + big value used inside coloured banners (team cards, race banner). */
@@ -36,6 +38,30 @@ export function StripStat({ label, value, note, color }: { label: string; value:
       </span>
       <span className="font-display text-[clamp(1.1rem,2vw,1.4rem)] font-bold leading-tight truncate">{value}</span>
       {note && <span className="text-[13px] text-muted truncate">{note}</span>}
+    </div>
+  );
+}
+
+/** Card header: title + optional meta text or a link onward. */
+export function CardHead({
+  title,
+  meta,
+  action,
+}: {
+  title: string;
+  meta?: ReactNode;
+  action?: { href: string; label: string };
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 sm:px-5 h-14 border-b border-rule">
+      <h3 className="font-display text-[16px] font-bold">{title}</h3>
+      {action ? (
+        <Link href={action.href as Route} className="more-link !text-[13.5px]">
+          {action.label} <span aria-hidden>→</span>
+        </Link>
+      ) : meta ? (
+        <span className="text-[13px] text-muted">{meta}</span>
+      ) : null}
     </div>
   );
 }

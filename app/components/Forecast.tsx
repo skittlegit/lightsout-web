@@ -8,7 +8,7 @@ import type {
 import { pct, pctShort, relativeTimeUpper, teamColor, teamShort } from "@/lib/format";
 import PredictionHeatmap from "./PredictionHeatmap";
 import SectionTitle from "./SectionTitle";
-import { CardHead } from "./DriversTable";
+import { CardHead } from "./ui";
 import DriverName from "./DriverName";
 
 const BOARD_SIZE = 10;
@@ -101,42 +101,50 @@ export function ForecastPanel({ data }: { data: PredictionResponse }) {
   );
 }
 
-/** Home-page card: favourite, pole, conditions, and the top five. */
-export function ForecastSnapshot({ data }: { data: PredictionResponse }) {
+/** Home-page spotlight: the three favourites, pole pick and conditions. */
+export function ForecastSpotlight({ data }: { data: PredictionResponse }) {
   const mode = activeMode(data);
+  if (!mode) return <EmptyState message={data.message ?? null} />;
+  const favourites = byWinChance(mode).slice(0, 3);
+  const scale = favourites[0]?.win_probability || 1;
+  const pole = mode.predicted_pole;
+  const weather = data.weather ?? null;
+
   return (
-    <div className="card overflow-hidden flex flex-col h-full">
-      <CardHead title="Race forecast" action={{ href: "/forecast", label: "Full forecast" }} />
-      {!mode ? (
-        <p className="px-5 py-6 text-sm text-muted">{data.message ?? "The forecast is temporarily unavailable."}</p>
-      ) : (
-        <>
-          <dl className="grid grid-cols-3 border-b border-rule">
-            <SnapshotStat label="Favourite" value={byWinChance(mode)[0]?.driver_code ?? "—"} />
-            <SnapshotStat label="Pole pick" value={mode.predicted_pole?.driver_code ?? "—"} />
-            <SnapshotStat label="Rain" value={data.weather ? pctShort(data.weather.rain_probability) : "—"} />
-          </dl>
-          <ol className="flex flex-col py-1">
-            {byWinChance(mode).slice(0, 5).map((d, i) => (
-              <li key={d.driver_code} className="grid grid-cols-[28px_4px_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-5 py-2">
-                <span className={`pos-badge ${i === 0 ? "pos-badge--lead" : ""}`}>{i + 1}</span>
-                <span aria-hidden className="team-pip" style={{ background: teamColor(d.team) }} />
-                <DriverName name={d.driver_name} className="truncate text-[15px]" />
-                <span className="font-mono tabular text-[14px] font-semibold">{pct(d.win_probability)}</span>
-              </li>
-            ))}
-          </ol>
-        </>
-      )}
+    <div className="card overflow-hidden grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <ol className="flex flex-col">
+        {favourites.map((d, i) => (
+          <li key={d.driver_code} className="flex items-center gap-4 px-5 sm:px-6 py-5 border-b border-rule last:border-b-0">
+            <span className={`pos-badge ${i === 0 ? "pos-badge--lead" : ""}`}>{i + 1}</span>
+            <span aria-hidden className="team-pip !h-10" style={{ background: teamColor(d.team) }} />
+            <div className="min-w-0 flex-1">
+              <DriverName name={d.driver_name} className="block text-[17px] truncate" />
+              <div className="mt-2 h-[6px] rounded-full bg-paper-deeper overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${Math.max(2, (d.win_probability / scale) * 100)}%`, background: teamColor(d.team) }} />
+              </div>
+            </div>
+            <div className="text-right shrink-0">
+              <div className="font-display text-[28px] font-extrabold leading-none tabular">{pct(d.win_probability)}</div>
+              <div className="eyebrow mt-1">to win</div>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <dl className="grid grid-cols-3 lg:grid-cols-1 border-t lg:border-t-0 lg:border-l border-rule">
+        <SpotlightStat label="Pole pick" value={pole ? <DriverName name={pole.driver_name} /> : "—"} />
+        <SpotlightStat label="Rain chance" value={weather ? pctShort(weather.rain_probability) : "—"} />
+        <SpotlightStat label="Air temp" value={weather ? `${Math.round(weather.temp_c)}°C` : "—"} />
+      </dl>
     </div>
   );
 }
 
-function SnapshotStat({ label, value }: { label: string; value: string }) {
+function SpotlightStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="px-4 sm:px-5 py-3.5 border-r border-rule last:border-r-0 min-w-0">
+    <div className="px-5 sm:px-6 py-4 border-r lg:border-r-0 lg:border-b border-rule last:border-0 min-w-0 flex flex-col justify-center">
       <dt className="eyebrow">{label}</dt>
-      <dd className="font-mono tabular text-[18px] font-semibold mt-0.5 truncate">{value}</dd>
+      <dd className="font-display text-[18px] sm:text-[20px] font-bold mt-1 truncate">{value}</dd>
     </div>
   );
 }

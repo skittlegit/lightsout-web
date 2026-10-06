@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { PageHeader } from "@/app/components/SectionTitle";
-import { CardHead } from "@/app/components/DriversTable";
+import { CardHead } from "@/app/components/ui";
 import ProgressionChart from "@/app/components/ProgressionChart";
 import DriverName from "@/app/components/DriverName";
 import { getCalendar, getConstructorStandings, getDriverStandings } from "@/lib/api";

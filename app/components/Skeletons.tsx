@@ -5,32 +5,21 @@
 
 export function HeroSkeleton() {
   return (
-    <section className="pt-6 md:pt-8 pb-4">
-      <div className="container-max">
-        <div className="panel-carbon overflow-hidden">
-          <div className="p-6 sm:p-8 md:p-12 grid grid-cols-1 lg:grid-cols-[1.25fr_1fr] gap-8">
-            <div className="space-y-5 min-w-0">
-              <div className="flex gap-2">
-                <div className="skeleton h-6 w-24 !rounded-full" />
-                <div className="skeleton h-6 w-28 !rounded-full" />
-              </div>
-              <div className="skeleton h-16 sm:h-20 md:h-24 w-4/5" />
-              <div className="skeleton h-16 sm:h-20 md:h-24 w-3/5" />
-              <div className="grid grid-cols-3 gap-5 pt-4">
-                <div className="skeleton h-10" />
-                <div className="skeleton h-10" />
-                <div className="skeleton h-10" />
-              </div>
-            </div>
-            <div className="skeleton hidden lg:block h-56" />
+    <section className="panel-carbon panel-flat">
+      <div className="container-max grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-10 pt-10 md:pt-14 pb-10">
+        <div className="space-y-5 min-w-0">
+          <div className="flex gap-2">
+            <div className="skeleton h-6 w-24" />
+            <div className="skeleton h-6 w-28" />
           </div>
-          <div className="border-t border-rule px-6 sm:px-8 md:px-12 py-6 grid grid-cols-4 gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton h-16" />
-            ))}
-          </div>
+          <div className="skeleton h-20 md:h-28 w-4/5" />
+          <div className="skeleton h-8 w-2/5" />
+          <div className="skeleton h-12 w-3/5" />
+          <div className="skeleton h-16 w-full max-w-md" />
         </div>
+        <div className="skeleton hidden lg:block h-64" />
       </div>
+      <div className="border-t border-white/10 h-[88px]" />
     </section>
   );
 }

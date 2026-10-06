@@ -63,7 +63,7 @@ npm run typecheck  # tsc --noEmit
 
 ```text
 app/
-  page.tsx               # home — next race, forecast snapshot, last race, standings, coming up
+  page.tsx               # home — race weekend hero, leaders, forecast, last race, title race, coming up
   calendar/              # full season, grouped by month, winners + local start times
   standings/             # drivers + teams tables, points progression chart
   drivers/               # driver grid (team-colour cards)
