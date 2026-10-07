@@ -1,9 +1,10 @@
 import Link from "next/link";
 import type { Route } from "next";
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
-import Footer from "@/app/components/Footer";
-import HScroll from "@/app/components/HScroll";
+import SectionTitle from "@/app/components/SectionTitle";
+import { BannerChip, BannerStat, TableCard } from "@/app/components/ui";
 import { getDriverStandings, getCalendar } from "@/lib/api";
 import { getDrivers, getDriverResults } from "@/lib/jolpica";
 import { driverIdFromCode, teamSlug } from "@/lib/slug";
@@ -39,7 +40,7 @@ export default async function DriverPage({
   const upperCode = code.toUpperCase();
   const jolpicaId = driverIdFromCode(upperCode);
 
-  const [standings, allDrivers, cal, seasonResults] = await Promise.all([
+  const [standings, allDrivers, cal, mappedResults] = await Promise.all([
     getDriverStandings(),
     getDrivers(),
     getCalendar(),
@@ -52,119 +53,84 @@ export default async function DriverPage({
   const profile = jolpicaId
     ? allDrivers.find((d) => d.driverId === jolpicaId)
     : allDrivers.find((d) => d.code?.toUpperCase() === upperCode);
+  // Drivers missing from the static code map (e.g. mid-season substitutes)
+  // still get their results via the ID from Jolpica's season driver list.
+  const seasonResults = jolpicaId || !profile ? mappedResults : await getDriverResults(profile.driverId);
 
   const racesByRound = new Map<number, Race>();
   for (const r of cal.races) racesByRound.set(r.round, r);
 
   const color = teamColor(standing.team);
+  const finishes = seasonResults.map((r) => Number(r.Results?.[0]?.position)).filter(Number.isFinite);
+  const podiums = finishes.filter((p) => p <= 3).length;
+  const given = profile?.givenName ?? standing.driver_name.split(" ").slice(0, -1).join(" ");
+  const family = profile?.familyName ?? standing.driver_name.split(" ").at(-1);
 
   return (
     <main className="flex-1 w-full">
-      <BackBar crumb="Drivers" crumbHref="/#drivers" label={upperCode} />
+      <BackBar crumb="Drivers" crumbHref="/drivers" label={standing.driver_name} />
 
-      <section className="section-y">
+      <section className="pt-6">
         <div className="container-max">
-          <span className="eyebrow-red block">
-            P{standing.position} · Driver Profile
-          </span>
+          <div className="team-card p-6 sm:p-8 md:p-10" style={{ "--team": color } as CSSProperties}>
+            <span
+              aria-hidden
+              className="absolute right-4 -bottom-8 font-display leading-none text-[clamp(9rem,22vw,16rem)] select-none"
+              style={{ color: "color-mix(in srgb, var(--team) 70%, white)", opacity: 0.28 }}
+            >
+              {profile?.permanentNumber ?? ""}
+            </span>
 
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 lg:gap-10 items-end">
-            <div className="min-w-0">
-              <h1 className="headline h-detail">
-                {profile?.givenName ? (
-                  <>
-                    {profile.givenName}{" "}
-                    <em style={{ color, fontStyle: "italic" }}>
-                      {profile.familyName}
-                    </em>
-                  </>
-                ) : (
-                  <em style={{ color, fontStyle: "italic" }}>
-                    {standing.driver_name}
-                  </em>
-                )}
+            <div className="relative">
+              <span className="eyebrow">
+                P{standing.position} in the {cal.season} championship
+              </span>
+              <h1 className="mt-3 font-display leading-[0.95]">
+                <span className="block text-[clamp(1.4rem,3vw,2.2rem)] text-white/85">{given}</span>
+                <span className="block uppercase text-[clamp(2.6rem,7vw,5rem)]">{family}</span>
               </h1>
-              <div className="mt-5 flex items-center gap-2 sm:gap-3 flex-wrap">
-                <span className="chip" style={{ borderColor: color, color }}>
-                  {upperCode}
-                </span>
-                <Link
-                  href={`/constructors/${teamSlug(standing.team)}`}
-                  className="chip hover:border-ink transition-colors"
-                >
+              <div className="mt-5 flex items-center gap-2 flex-wrap">
+                <Link href={`/constructors/${teamSlug(standing.team)}` as Route} className="chip hover:!border-[#faf7f2]">
                   {teamShort(standing.team)}
                 </Link>
-                <Link
-                  href={`/compare?a=${upperCode}` as Route}
-                  className="chip hover:border-f1 hover:text-f1 transition-colors"
-                >
-                  Compare ⤳
+                {profile?.nationality && <BannerChip>{profile.nationality}</BannerChip>}
+                <BannerChip>{upperCode}</BannerChip>
+                <Link href={`/compare?a=${upperCode}` as Route} className="chip !bg-[#faf7f2] !border-[#faf7f2] !text-[#141414] hover:!bg-white">
+                  Compare <span aria-hidden>→</span>
                 </Link>
-                {profile?.permanentNumber && (
-                  <span className="chip text-muted">
-                    №{profile.permanentNumber}
-                  </span>
-                )}
-                {profile?.nationality && (
-                  <span className="chip text-muted">
-                    {profile.nationality}
-                  </span>
-                )}
               </div>
+
+              <dl className="mt-8 grid grid-cols-2 sm:grid-cols-5 gap-x-6 gap-y-5 max-w-3xl">
+                <BannerStat label="Points" value={String(standing.points)} />
+                <BannerStat label="Wins" value={String(standing.wins)} />
+                <BannerStat label="Podiums" value={String(podiums)} />
+                <BannerStat label="Best finish" value={finishes.length ? `P${Math.min(...finishes)}` : "—"} />
+                <BannerStat
+                  label="Born"
+                  value={profile?.dateOfBirth ? `${formatRaceDate(profile.dateOfBirth)} ${profile.dateOfBirth.slice(0, 4)}` : "—"}
+                />
+              </dl>
             </div>
-
-            <div
-              aria-hidden
-              className="w-full lg:w-[280px] h-[6px]"
-              style={{ background: color }}
-            />
-          </div>
-
-          <div className="rule-thin mt-10" />
-
-          <div className="mt-8 stat-strip grid-cols-2 md:grid-cols-4">
-            <Stat label="Position" value={`P${standing.position}`} />
-            <Stat label="Points" value={String(standing.points)} />
-            <Stat label="Wins" value={String(standing.wins)} />
-            <Stat
-              label="Born"
-              value={
-                profile?.dateOfBirth
-                  ? formatRaceDate(profile.dateOfBirth) +
-                    ", " +
-                    profile.dateOfBirth.slice(0, 4)
-                  : "\u2014"
-              }
-            />
           </div>
         </div>
       </section>
 
-      <section className="pb-16 md:pb-24">
+      <section className="section-y">
         <div className="container-max">
-          <div className="flex items-end justify-between gap-6 flex-wrap">
-            <h2 className="headline h-subsection">
-              Season <em>Form</em>
-            </h2>
-            <span className="eyebrow">{cal.season} · {seasonResults.length} rounds logged</span>
-          </div>
-          <div className="rule-thin mt-4" />
-
+          <SectionTitle kicker={`${cal.season} season`} title="Race by race" meta={`${seasonResults.length} rounds`} />
           {seasonResults.length === 0 ? (
-            <p className="mt-8 text-sm text-muted">
-              No race results recorded yet for this driver in {cal.season}.
-            </p>
+            <p className="mt-6 text-sm text-muted">No race results recorded yet for this driver in {cal.season}.</p>
           ) : (
-            <HScroll className="mt-8" bleed ariaLabel="Season results">
-              <table className="w-full border-collapse min-w-[640px]">
+            <div className="mt-6">
+              <TableCard minWidth={640}>
                 <thead>
-                  <tr className="text-left">
-                    <Th>R</Th>
-                    <Th>Race</Th>
-                    <Th>Grid</Th>
-                    <Th>Finish</Th>
-                    <Th>Pts</Th>
-                    <Th>Status</Th>
+                  <tr>
+                    <th className="w-14">Rnd</th>
+                    <th>Grand Prix</th>
+                    <th className="num">Grid</th>
+                    <th className="num">Finish</th>
+                    <th className="num">Pts</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -173,83 +139,33 @@ export default async function DriverPage({
                     if (!result) return null;
                     const round = Number(race.round);
                     const calRace = racesByRound.get(round);
+                    const pos = Number(result.position);
                     return (
-                      <tr key={round} className="row-hover border-t border-rule">
-                        <Td mono>{String(round).padStart(2, "0")}</Td>
-                        <Td>
-                          <Link
-                            href={`/races/${round}`}
-                            className="hover:text-f1 transition-colors"
-                          >
-                            <span className="font-display italic">
-                              {race.raceName}
-                            </span>
-                            {calRace && (
-                              <span className="ml-2 eyebrow text-muted">
-                                {countryCode(calRace.country)}
-                              </span>
-                            )}
+                      <tr key={round}>
+                        <td className="font-display text-muted">{String(round).padStart(2, "0")}</td>
+                        <td>
+                          <Link href={`/races/${round}` as Route} className="font-semibold hover:text-f1 transition-colors">
+                            {race.raceName}
                           </Link>
-                        </Td>
-                        <Td mono>{result.grid}</Td>
-                        <Td mono>
-                          <span
-                            style={{
-                              color:
-                                Number(result.position) <= 3 ? color : undefined,
-                              fontWeight: Number(result.position) <= 3 ? 600 : undefined,
-                            }}
-                          >
+                          {calRace && <span className="ml-2 text-[12.5px] text-muted">{countryCode(calRace.country)}</span>}
+                        </td>
+                        <td className="num">{result.grid}</td>
+                        <td className="num">
+                          <span className={`pos-badge ${pos === 1 ? "pos-badge--lead" : ""} ${pos > 3 ? "!font-semibold" : ""}`}>
                             P{result.position}
                           </span>
-                        </Td>
-                        <Td mono>{result.points}</Td>
-                        <Td>
-                          <span className="eyebrow">{result.status}</span>
-                        </Td>
+                        </td>
+                        <td className="num font-semibold">{result.points}</td>
+                        <td className="text-muted text-[14px]">{result.status}</td>
                       </tr>
                     );
                   })}
                 </tbody>
-              </table>
-            </HScroll>
+              </TableCard>
+            </div>
           )}
-
-          <p className="mt-6 text-[11px] text-muted leading-relaxed">
-            Race results sourced via the Jolpica F1 (Ergast-compatible) public
-            API. Standings come from the lightsout-api backend.
-          </p>
         </div>
       </section>
-
-      <Footer />
     </main>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <span className="eyebrow">{label}</span>
-      <span className="font-display text-[clamp(1.75rem,4vw,2.4rem)] leading-none">
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function Th({ children }: { children: React.ReactNode }) {
-  return (
-    <th className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted py-2 pr-4 font-medium">
-      {children}
-    </th>
-  );
-}
-
-function Td({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
-  return (
-    <td className={`py-3 pr-4 text-sm ${mono ? "font-mono tabular" : ""}`}>
-      {children}
-    </td>
   );
 }

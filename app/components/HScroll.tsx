@@ -90,7 +90,6 @@ export default function HScroll({
     >
       <div
         ref={ref}
-        data-lenis-prevent
         role="region"
         aria-label={ariaLabel}
         tabIndex={scrollable ? 0 : -1}

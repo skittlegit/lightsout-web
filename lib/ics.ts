@@ -3,10 +3,35 @@ import type { Race } from "./types";
 /**
  * iCalendar (.ics) generation for a single race.
  *
- * The backend only gives a race date (no session times), so each event is an
- * all-day entry on race day — honest to the data we have. Importable into
- * Google / Apple / Outlook calendars.
+ * With a known UTC start (race_time) the event is a timed two-hour block that
+ * calendars show in the viewer's own timezone; otherwise it is an all-day
+ * entry on race day. Importable into Google / Apple / Outlook calendars.
  */
+
+const RACE_DURATION_MS = 2 * 60 * 60 * 1000;
+
+/** UTC instant in iCalendar basic format, e.g. 20261011T120000Z. */
+function icsInstant(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+
+/** DTSTART/DTEND lines: timed when the start time is known, else all-day. */
+function eventTimes(race: Race): string[] {
+  const hhmm = race.race_time?.match(/^\d{2}:\d{2}/)?.[0];
+  if (hhmm) {
+    const start = new Date(`${race.race_date.slice(0, 10)}T${hhmm}:00Z`);
+    if (!Number.isNaN(start.getTime())) {
+      return [
+        `DTSTART:${icsInstant(start)}`,
+        `DTEND:${icsInstant(new Date(start.getTime() + RACE_DURATION_MS))}`,
+      ];
+    }
+  }
+  return [
+    `DTSTART;VALUE=DATE:${ymd(race.race_date)}`,
+    `DTEND;VALUE=DATE:${ymdPlusOne(race.race_date)}`,
+  ];
+}
 
 function ymd(iso: string): string {
   return iso.slice(0, 10).replace(/-/g, "");
@@ -29,8 +54,7 @@ function esc(s: string): string {
 }
 
 export function buildRaceIcs(race: Race): string {
-  const stamp =
-    new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+  const stamp = icsInstant(new Date());
   const location = esc([race.circuit, race.country].filter(Boolean).join(", "));
   const description = esc(
     `Round ${race.round} of the ${race.season} Formula 1 season.` +
@@ -46,8 +70,7 @@ export function buildRaceIcs(race: Race): string {
     "BEGIN:VEVENT",
     `UID:f1-${race.season}-r${race.round}@lightsout`,
     `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${ymd(race.race_date)}`,
-    `DTEND;VALUE=DATE:${ymdPlusOne(race.race_date)}`,
+    ...eventTimes(race),
     `SUMMARY:${esc(`🏁 ${race.race_name}`)}`,
     `LOCATION:${location}`,
     `DESCRIPTION:${description}`,

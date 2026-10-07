@@ -1,23 +1,31 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { notFound } from "next/navigation";
 import BackBar from "@/app/components/BackBar";
-import Footer from "@/app/components/Footer";
-import CircuitVisual from "@/app/components/CircuitVisual";
+import { TrackOutline, circuitMeta } from "@/app/components/Circuit";
+import DriverName from "@/app/components/DriverName";
 import Forecast from "@/app/components/Forecast";
-import HScroll from "@/app/components/HScroll";
+import IcsButton from "@/app/components/IcsButton";
+import LocalStartTime from "@/app/components/LocalStartTime";
+import SectionTitle from "@/app/components/SectionTitle";
+import { BannerChip, BannerStat, TableCard } from "@/app/components/ui";
+import RaceRecapBlock from "@/app/components/RaceRecap";
 import { getCalendar, getPrediction } from "@/lib/api";
 import { getCircuit, getRaceResults, getQualifying } from "@/lib/jolpica";
 import {
   countryCode,
   formatRaceFullDate,
+  raceStartISO,
   splitRaceName,
   teamColor,
   teamShort,
 } from "@/lib/format";
 import { teamSlug } from "@/lib/slug";
-import { raceRecap, gridDelta, type RaceRecap } from "@/lib/recap";
+import { raceRecap, gridDelta, finishGap, type RaceRecap } from "@/lib/recap";
 import type { JolpicaRaceResult, JolpicaQualifyingResult } from "@/lib/jolpica";
 
+// Upcoming rounds render the forecast, which can take several seconds cold.
+export const maxDuration = 60;
 export const revalidate = 600;
 
 interface Params {
@@ -65,271 +73,115 @@ export default async function RacePage({
 
   const raceResults = results?.Results ?? [];
   const recap = race.is_completed ? raceRecap(raceResults) : null;
-
+  const meta = circuit ? circuitMeta(circuit.circuitId) : null;
   const { head, tail } = splitRaceName(race.race_name);
-  const status = race.is_completed
-    ? "Completed"
-    : race.is_next
-      ? "Up Next"
-      : "Scheduled";
-  const statusColor = race.is_completed
-    ? "text-muted"
-    : race.is_next
-      ? "text-f1"
-      : "text-ink";
+  const status = race.is_completed ? "Completed" : race.is_next ? "Next race" : "Upcoming";
 
   return (
     <main className="flex-1 w-full">
-      <BackBar
-        crumb="Calendar"
-        crumbHref="/#calendar"
-        label={`Round ${String(roundN).padStart(2, "0")}`}
-      />
+      <BackBar crumb="Calendar" crumbHref="/calendar" label={race.race_name} />
 
-      <section className="section-y">
+      {/* Race banner: title, facts, track map */}
+      <section className="pt-6">
         <div className="container-max">
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <span className={`eyebrow-red ${statusColor}`}>
-              Round {String(roundN).padStart(2, "0")} · {status}
-            </span>
-            <span className="chip">{countryCode(race.country)}</span>
-          </div>
+          <div className="panel-carbon overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-8 p-6 sm:p-8 md:p-10">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`chip ${race.is_next ? "chip-red" : ""}`}>{status}</span>
+                  <BannerChip>Round {race.round} of {cal.races.length}</BannerChip>
+                  {race.has_sprint && <BannerChip>Sprint weekend</BannerChip>}
+                </div>
+                <h1 className="headline h-detail mt-6">
+                  {head}
+                  {tail && <> <em>{tail}</em></>}
+                </h1>
+                <dl className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-5">
+                  <BannerStat label="Circuit" value={<span className="text-[clamp(1rem,1.6vw,1.15rem)]">{race.circuit}</span>} />
+                  <BannerStat label="Country" value={<span className="text-[clamp(1rem,1.6vw,1.15rem)]">{race.country} · {countryCode(race.country)}</span>} />
+                  <BannerStat
+                    label={race.race_time ? "Lights out (your time)" : "Race day"}
+                    value={
+                      <span className="text-[clamp(1rem,1.6vw,1.15rem)]">
+                        {race.race_time ? <LocalStartTime iso={raceStartISO(race.race_date, race.race_time)} /> : formatRaceFullDate(race.race_date)}
+                      </span>
+                    }
+                  />
+                </dl>
+                {!race.is_completed && (
+                  <div className="mt-8">
+                    <IcsButton race={race} label="Add to calendar" />
+                  </div>
+                )}
+              </div>
 
-          <h1 className="headline h-detail mt-6">
-            {head}
-            {tail && (
-              <>
-                {" "}
-                <em>{tail}</em>
-              </>
-            )}
-          </h1>
-
-          <div className="mt-8 stat-strip grid-cols-2 md:grid-cols-4">
-            <Stat label="Country" value={race.country} />
-            <Stat label="Circuit" value={race.circuit} />
-            <Stat label="Race Day" value={formatRaceFullDate(race.race_date)} mono />
-            <Stat
-              label="Round"
-              value={`${String(roundN).padStart(2, "0")} of ${String(cal.races.length).padStart(2, "0")}`}
-              mono
-            />
+              {circuit && meta && (
+                <div className="flex flex-col justify-between gap-6">
+                  <TrackOutline circuitId={circuit.circuitId} label={circuit.circuitName} className="w-full h-auto max-w-[460px] mx-auto" />
+                  <dl className="grid grid-cols-3 gap-4 border-t border-rule pt-5">
+                    <BannerStat label="Length" value={meta.km ? `${meta.km.toFixed(3)} km` : "—"} />
+                    <BannerStat label="Corners" value={meta.turns ?? "—"} />
+                    <BannerStat label="DRS zones" value={meta.drs ?? "—"} />
+                  </dl>
+                  {meta.lapRecord && <p className="text-[13px] text-muted -mt-2">Lap record · {meta.lapRecord}</p>}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Race recap — podium + headline facts (completed rounds only) */}
-      {recap && <RaceRecapBlock results={raceResults} recap={recap} />}
-
-      {/* Circuit visual */}
-      {circuit && (
-        <section className="py-6">
-          <div className="container-max grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-8 items-stretch">
-            <CircuitVisual circuit={circuit} variant="wide" />
-            <div className="flex flex-col justify-end">
-              <span className="eyebrow-red block">Layout</span>
-              <h3 className="headline h-subsection mt-2">
-                Track <em>Card</em>
-              </h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted max-w-md">
-                Geographic and reference data for {circuit.circuitName}.
-                Track outline is stylised — see Wikipedia link for the
-                survey-accurate layout.
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* If completed: results + quali. If upcoming: prediction. */}
       {race.is_completed ? (
         <>
-          <ResultsBlock results={raceResults} />
-          <QualifyingBlock results={quali?.QualifyingResults ?? []} />
+          {recap && <RecapSection results={raceResults} recap={recap} />}
+          <ResultsSection results={raceResults} />
+          <QualifyingSection results={quali?.QualifyingResults ?? []} />
+          {!raceResults.length && (
+            <section className="section-y">
+              <div className="container-max">
+                <div className="card p-7">
+                  <p className="text-muted">Results for this round haven&apos;t been published yet.</p>
+                </div>
+              </div>
+            </section>
+          )}
         </>
       ) : prediction ? (
         <Forecast data={prediction} />
       ) : (
-        <section className="py-10">
+        <section className="section-y">
           <div className="container-max">
-            <div className="card card-deep p-7 md:p-10">
-              <span className="eyebrow-red block">Forecast</span>
-              <p className="mt-3 font-display italic text-[clamp(1.15rem,2.5vw,1.5rem)] text-ink-soft max-w-xl">
-                Prediction not yet generated for this round.
-              </p>
+            <div className="card p-7">
+              <h2 className="font-display text-xl">Forecast not available yet</h2>
+              <p className="mt-2 text-muted">Predictions appear for upcoming rounds once the model has run.</p>
             </div>
           </div>
         </section>
       )}
-
-      <Footer />
     </main>
   );
 }
 
 /* --------------------------- Recap --------------------------- */
 
-function RaceRecapBlock({
-  results,
-  recap,
-}: {
-  results: JolpicaRaceResult[];
-  recap: RaceRecap;
-}) {
-  const top3 = [...results]
-    .sort((a, b) => Number(a.position) - Number(b.position))
-    .slice(0, 3);
-
-  const name = (r: JolpicaRaceResult | null) =>
-    r ? r.Driver.familyName : "—";
-
+function RecapSection({ results, recap }: { results: JolpicaRaceResult[]; recap: RaceRecap }) {
   return (
-    <section className="py-8 md:py-10">
+    <section className="section-y">
       <div className="container-max">
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <h2 className="headline h-subsection">
-            On the <em>Podium</em>
-          </h2>
-          <span className="eyebrow">Top 3 · Final</span>
-        </div>
-        <div className="rule-thin mt-4" />
-
-        {/* Podium steps — P2 / P1 / P3 with P1 tallest. */}
-        <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-4 items-end max-w-[760px] mx-auto">
-          <PodiumStep r={top3[1]} rank={2} riser="h-[110px] sm:h-[140px]" />
-          <PodiumStep r={top3[0]} rank={1} riser="h-[140px] sm:h-[180px]" />
-          <PodiumStep r={top3[2]} rank={3} riser="h-[90px] sm:h-[118px]" />
-        </div>
-
-        {/* Headline facts */}
-        <div className="mt-10 stat-strip grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-          <RecapCell
-            label="Winner"
-            value={name(recap.winner)}
-            sub={recap.winner ? teamShort(recap.winner.Constructor.name) : undefined}
-            color={recap.winner ? teamColor(recap.winner.Constructor.name) : undefined}
-          />
-          <RecapCell
-            label="Pole"
-            value={name(recap.pole)}
-            sub={recap.pole ? "Started P1" : undefined}
-          />
-          <RecapCell
-            label="Fastest Lap"
-            value={name(recap.fastestLap)}
-            sub={recap.fastestLapTime ?? undefined}
-          />
-          <RecapCell
-            label="Biggest Mover"
-            value={recap.biggestMover ? recap.biggestMover.result.Driver.familyName : "—"}
-            sub={recap.biggestMover ? `+${recap.biggestMover.gained} places` : undefined}
-          />
-          <RecapCell
-            label="DNFs"
-            value={String(recap.dnfs)}
-            sub={`${recap.classified} classified`}
-          />
+        <SectionTitle kicker="Race recap" title="Podium" />
+        <div className="mt-6">
+          <RaceRecapBlock results={results} recap={recap} />
         </div>
       </div>
     </section>
   );
 }
 
-function PodiumStep({
-  r,
-  rank,
-  riser,
-}: {
-  r?: JolpicaRaceResult;
-  rank: number;
-  riser: string;
-}) {
-  if (!r) return <div aria-hidden />;
-  const color = teamColor(r.Constructor.name);
-  const code = r.Driver.code ?? "";
-  const gap = rank === 1 ? r.Time?.time ?? "" : r.Time?.time ?? r.status;
-
-  return (
-    <div className="flex flex-col">
-      <div className="mb-2 text-center min-w-0">
-        <Link
-          href={code ? `/drivers/${code.toLowerCase()}` : "#"}
-          className="group block min-w-0"
-        >
-          <span
-            className="font-mono tabular text-[10px] tracking-[0.16em] block"
-            style={{ color }}
-          >
-            {code || teamShort(r.Constructor.name)}
-          </span>
-          <span className="font-display italic text-[clamp(0.95rem,2.4vw,1.3rem)] leading-tight block truncate group-hover:text-f1 transition-colors">
-            {r.Driver.familyName}
-          </span>
-          <span className="eyebrow block truncate mt-0.5">
-            {teamShort(r.Constructor.name)}
-          </span>
-        </Link>
-      </div>
-      <div
-        className={`relative ${riser} border border-rule bg-paper-deep flex flex-col items-center pt-3`}
-      >
-        <span
-          aria-hidden
-          className="absolute top-0 left-0 right-0 h-[4px]"
-          style={{ background: color }}
-        />
-        <span className="font-display text-[clamp(1.9rem,6vw,3.25rem)] leading-none">
-          {rank}
-        </span>
-        <span className="eyebrow mt-1.5">
-          {rank === 1 ? "Winner" : `P${rank}`}
-        </span>
-        <span className="font-mono tabular text-[10px] text-muted mt-auto mb-2.5 px-1 text-center truncate max-w-full">
-          {gap}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function RecapCell({
-  label,
-  value,
-  sub,
-  color,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div>
-      <span className="eyebrow flex items-center gap-1.5">
-        {color && (
-          <span aria-hidden className="inline-block w-[8px] h-[8px]" style={{ background: color }} />
-        )}
-        {label}
-      </span>
-      <span className="font-display text-[clamp(1.05rem,2.4vw,1.45rem)] leading-tight block truncate">
-        {value}
-      </span>
-      {sub && (
-        <span className="font-mono tabular text-[10px] tracking-[0.06em] text-muted block truncate">
-          {sub}
-        </span>
-      )}
-    </div>
-  );
-}
-
 function GridDelta({ delta }: { delta: number | null }) {
-  if (delta === null || delta === 0) {
-    return <span className="text-muted-soft">—</span>;
-  }
+  if (delta === null || delta === 0) return <span className="text-muted-soft">—</span>;
   const gained = delta > 0;
   return (
-    <span className={gained ? "text-ink" : "text-muted"}>
+    <span className={gained ? "text-timing-green" : "text-f1"}>
       <span aria-hidden>{gained ? "▲" : "▼"}</span> {Math.abs(delta)}
     </span>
   );
@@ -337,85 +189,70 @@ function GridDelta({ delta }: { delta: number | null }) {
 
 /* --------------------------- Results --------------------------- */
 
-function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
-  if (!results.length) return null;
+function DriverCell({ r }: { r: JolpicaRaceResult | JolpicaQualifyingResult }) {
+  const code = r.Driver.code ?? "";
   return (
-    <section className="px-6 md:px-10 py-10 md:py-14">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <h2 className="headline text-[10vw] md:text-[3rem]">
-            Race <em>Results</em>
-          </h2>
-          <span className="eyebrow">FINAL CLASSIFICATION</span>
-        </div>
-        <div className="rule-thin mt-4" />
+    <Link
+      href={(code ? `/drivers/${code.toLowerCase()}` : "/drivers") as Route}
+      className="flex items-center gap-3 hover:text-f1 transition-colors"
+    >
+      <span aria-hidden className="team-pip" style={{ background: teamColor(r.Constructor.name) }} />
+      <DriverName name={`${r.Driver.givenName} ${r.Driver.familyName}`} />
+    </Link>
+  );
+}
 
-        <HScroll className="mt-8" ariaLabel="Race results">
-          <table className="w-full border-collapse min-w-[720px]">
+function ResultsSection({ results }: { results: JolpicaRaceResult[] }) {
+  if (!results.length) return null;
+  const winnerLaps = Math.max(...results.map((r) => Number(r.laps) || 0));
+  return (
+    <section className="pb-4">
+      <div className="container-max">
+        <SectionTitle kicker="Final classification" title="Race results" />
+        <div className="mt-6">
+          <TableCard minWidth={760}>
             <thead>
-              <tr className="text-left">
-                <Th>Pos</Th>
-                <Th>Driver</Th>
-                <Th>Team</Th>
-                <Th>Grid</Th>
-                <Th>+/−</Th>
-                <Th>Laps</Th>
-                <Th>Time / Status</Th>
-                <Th>Pts</Th>
+              <tr>
+                <th className="w-14">Pos</th>
+                <th>Driver</th>
+                <th>Team</th>
+                <th className="num">Grid</th>
+                <th className="num">+/−</th>
+                <th className="num">Laps</th>
+                <th>Time / status</th>
+                <th className="num">Pts</th>
               </tr>
             </thead>
             <tbody>
               {results.map((r) => {
-                const code = r.Driver.code ?? "";
-                const team = r.Constructor.name;
-                const color = teamColor(team);
+                const pos = Number(r.position);
                 return (
-                  <tr key={r.Driver.driverId} className="border-t border-rule">
-                    <Td mono>
-                      <span
-                        className="inline-block w-[3px] h-[14px] mr-2 align-middle"
-                        style={{ background: color }}
-                      />
-                      {r.position}
-                    </Td>
-                    <Td>
-                      <Link
-                        href={code ? `/drivers/${code.toLowerCase()}` : "#"}
-                        className="hover:text-f1 transition-colors"
-                      >
-                        <span className="font-display italic">
-                          {r.Driver.givenName} {r.Driver.familyName}
-                        </span>
+                  <tr key={r.Driver.driverId}>
+                    <td><span className={`pos-badge ${pos === 1 ? "pos-badge--lead" : ""}`}>{r.position}</span></td>
+                    <td><DriverCell r={r} /></td>
+                    <td>
+                      <Link href={`/constructors/${teamSlug(r.Constructor.name)}` as Route} className="text-muted hover:text-f1 transition-colors">
+                        {teamShort(r.Constructor.name)}
                       </Link>
-                    </Td>
-                    <Td>
-                      <Link
-                        href={`/constructors/${teamSlug(team)}`}
-                        className="hover:text-f1 transition-colors"
-                      >
-                        {teamShort(team)}
-                      </Link>
-                    </Td>
-                    <Td mono>{r.grid}</Td>
-                    <Td mono>
-                      <GridDelta delta={gridDelta(r)} />
-                    </Td>
-                    <Td mono>{r.laps}</Td>
-                    <Td mono>
-                      {r.Time?.time ?? r.status}
+                    </td>
+                    <td className="num">{r.grid}</td>
+                    <td className="num"><GridDelta delta={gridDelta(r)} /></td>
+                    <td className="num">{r.laps}</td>
+                    <td className="tabular">
+                      {finishGap(r, winnerLaps)}
                       {r.FastestLap?.rank === "1" && (
-                        <span className="ml-2 inline-block px-1.5 border border-f1 text-f1 text-[9px] tracking-[0.16em]">
+                        <span className="chip !h-5 !px-1.5 !text-[10.5px] ml-2 !bg-timing-purple !text-white" title="Fastest lap">
                           FL
                         </span>
                       )}
-                    </Td>
-                    <Td mono>{r.points}</Td>
+                    </td>
+                    <td className="num font-semibold">{r.points}</td>
                   </tr>
                 );
               })}
             </tbody>
-          </table>
-        </HScroll>
+          </TableCard>
+        </div>
       </div>
     </section>
   );
@@ -423,104 +260,39 @@ function ResultsBlock({ results }: { results: JolpicaRaceResult[] }) {
 
 /* --------------------------- Qualifying --------------------------- */
 
-function QualifyingBlock({ results }: { results: JolpicaQualifyingResult[] }) {
+function QualifyingSection({ results }: { results: JolpicaQualifyingResult[] }) {
   if (!results.length) return null;
   return (
-    <section className="px-6 md:px-10 py-10 pb-16 md:pb-24">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <h2 className="headline text-[10vw] md:text-[3rem]">
-            Qualifying <em>Splits</em>
-          </h2>
-          <span className="eyebrow">Q1 · Q2 · Q3</span>
-        </div>
-        <div className="rule-thin mt-4" />
-
-        <HScroll className="mt-8" ariaLabel="Qualifying results">
-          <table className="w-full border-collapse min-w-[680px]">
+    <section className="section-y">
+      <div className="container-max">
+        <SectionTitle kicker="Saturday" title="Qualifying" />
+        <div className="mt-6">
+          <TableCard minWidth={680}>
             <thead>
-              <tr className="text-left">
-                <Th>Pos</Th>
-                <Th>Driver</Th>
-                <Th>Team</Th>
-                <Th>Q1</Th>
-                <Th>Q2</Th>
-                <Th>Q3</Th>
+              <tr>
+                <th className="w-14">Pos</th>
+                <th>Driver</th>
+                <th>Team</th>
+                <th className="num">Q1</th>
+                <th className="num">Q2</th>
+                <th className="num">Q3</th>
               </tr>
             </thead>
             <tbody>
-              {results.map((r) => {
-                const code = r.Driver.code ?? "";
-                const color = teamColor(r.Constructor.name);
-                return (
-                  <tr key={r.Driver.driverId} className="border-t border-rule">
-                    <Td mono>
-                      <span
-                        className="inline-block w-[3px] h-[14px] mr-2 align-middle"
-                        style={{ background: color }}
-                      />
-                      {r.position}
-                    </Td>
-                    <Td>
-                      <Link
-                        href={code ? `/drivers/${code.toLowerCase()}` : "#"}
-                        className="hover:text-f1 transition-colors"
-                      >
-                        <span className="font-display italic">
-                          {r.Driver.givenName} {r.Driver.familyName}
-                        </span>
-                      </Link>
-                    </Td>
-                    <Td>{teamShort(r.Constructor.name)}</Td>
-                    <Td mono>{r.Q1 ?? "—"}</Td>
-                    <Td mono>{r.Q2 ?? "—"}</Td>
-                    <Td mono>{r.Q3 ?? "—"}</Td>
-                  </tr>
-                );
-              })}
+              {results.map((r) => (
+                <tr key={r.Driver.driverId}>
+                  <td><span className={`pos-badge ${r.position === "1" ? "pos-badge--lead" : ""}`}>{r.position}</span></td>
+                  <td><DriverCell r={r} /></td>
+                  <td className="text-muted">{teamShort(r.Constructor.name)}</td>
+                  <td className="num">{r.Q1 ?? "—"}</td>
+                  <td className="num">{r.Q2 ?? "—"}</td>
+                  <td className="num font-semibold">{r.Q3 ?? "—"}</td>
+                </tr>
+              ))}
             </tbody>
-          </table>
-        </HScroll>
+          </TableCard>
+        </div>
       </div>
     </section>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
-  return (
-    <div>
-      <span className="eyebrow">{label}</span>
-      <span
-        className={`text-[15px] md:text-[17px] leading-snug ${
-          mono ? "font-mono tabular" : ""
-        }`}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function Th({ children }: { children: React.ReactNode }) {
-  return (
-    <th className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted py-2 pr-4 font-medium">
-      {children}
-    </th>
-  );
-}
-
-function Td({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
-  return (
-    <td className={`py-3 pr-4 text-sm ${mono ? "font-mono tabular" : ""}`}>
-      {children}
-    </td>
   );
 }

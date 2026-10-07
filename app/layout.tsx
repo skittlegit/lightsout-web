@@ -1,15 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
-import { Suspense } from "react";
 import "./globals.css";
-import CommandPaletteServer from "./components/CommandPaletteServer";
+import SiteNav from "./components/SiteNav";
+import Footer from "./components/Footer";
 import { SEASON } from "@/lib/api";
 
+// Editorial serif for headlines and big numbers.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
   axes: ["opsz", "SOFT", "WONK"],
+  style: ["normal", "italic"],
 });
 
 const dmSans = DM_Sans({
@@ -18,6 +20,7 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+// Small-caps labels and timing data.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
@@ -40,14 +43,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Matches --color-paper; the dark theme is a user toggle (class-based), not
-  // OS-derived, so a single light chrome color is the honest default.
+  // Matches --color-paper.
   themeColor: "#faf7f2",
 };
-
-// Runs before first paint. The site is light by default and ignores OS
-// preference — it only goes dark if the user has explicitly toggled it.
-const themeScript = `(function(){try{if(localStorage.getItem('lo:theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -58,17 +56,15 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
       className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col">
-        {children}
-        <Suspense fallback={null}>
-          <CommandPaletteServer />
-        </Suspense>
+        <a href="#content" className="skip-link">Skip to content</a>
+        <SiteNav />
+        <div id="content" className="flex-1 flex flex-col">
+          {children}
+        </div>
+        <Footer />
       </body>
     </html>
   );

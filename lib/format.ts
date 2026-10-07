@@ -34,6 +34,16 @@ export function formatRaceDate(iso: string): string {
   return `${month} ${d.getUTCDate()}`;
 }
 
+/**
+ * Race start as a UTC instant. Jolpica times are UTC ("12:00:00Z"); fall back
+ * to 13:00 UTC when a snapshot predates race_time. Night races start hours
+ * away from 13:00, so the real time matters for countdowns.
+ */
+export function raceStartISO(raceDate: string, raceTime?: string | null): string {
+  const hhmm = raceTime?.match(/^\d{2}:\d{2}/)?.[0] ?? "13:00";
+  return `${raceDate.slice(0, 10)}T${hhmm}:00Z`;
+}
+
 /** Whole days from `now` until an ISO date (date-only). Negative once past. */
 export function daysUntil(iso: string, now: Date = new Date()): number {
   const target = new Date(iso.slice(0, 10) + "T00:00:00Z").getTime();
@@ -58,14 +68,6 @@ export function formatRaceFullDate(iso: string): string {
     year: "numeric",
     timeZone: "UTC",
   }).format(d);
-}
-
-export function timeGreeting(now: Date = new Date()): string {
-  const h = now.getHours();
-  if (h >= 0 && h < 5) return "Late Lap";
-  if (h < 12) return "Good Morning";
-  if (h < 18) return "Good Afternoon";
-  return "Good Evening";
 }
 
 /** "Andrea Kimi Antonelli" -> "K. Antonelli", "Max Verstappen" -> "M. Verstappen" */
@@ -181,17 +183,19 @@ export function countryCode(country: string): string {
 /* ------------------------------------------------------------------ */
 
 function heatmapT(p: number): number {
-  return Math.pow(Math.max(0, Math.min(1, p)), 0.45);
+  return Math.pow(Math.max(0, Math.min(1, p)), 0.6);
 }
 
+/** Cell fill: transparent below 2% so the long tail doesn't muddy the grid. */
 export function heatmapColor(p: number): string {
-  const t = heatmapT(p);
-  return `color-mix(in srgb, var(--color-f1-deep) ${(t * 100).toFixed(1)}%, var(--color-paper))`;
+  if (p < 0.02) return "transparent";
+  const t = Math.min(1, heatmapT(p) * 1.25);
+  return `color-mix(in srgb, var(--color-f1) ${(t * 100).toFixed(1)}%, var(--color-paper-deep))`;
 }
 
 export function heatmapTextColor(p: number): string {
   // Light text once the cell is red-dominant; otherwise the theme's ink.
-  return heatmapT(p) >= 0.6 ? "#FAF7F2" : "var(--color-ink)";
+  return heatmapT(p) * 1.25 >= 0.55 ? "#ffffff" : "var(--color-ink)";
 }
 
 /* ------------------------------------------------------------------ */
@@ -209,4 +213,12 @@ export function relativeTimeUpper(iso: string, now: Date = new Date()): string {
   if (hr < 24) return `${hr} HR${hr === 1 ? "" : "S"} AGO`;
   const day = Math.floor(hr / 24);
   return `${day} DAY${day === 1 ? "" : "S"} AGO`;
+}
+
+/**
+ * A team colour darkened enough to use as text on the light page — raw
+ * Mercedes cyan or Haas grey on off-white fails contrast.
+ */
+export function inkOf(color: string): string {
+  return `color-mix(in srgb, ${color} 60%, #15151e)`;
 }

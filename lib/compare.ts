@@ -6,11 +6,7 @@
  */
 
 import type { JolpicaRace } from "./jolpica";
-
-/** Ergast/Jolpica "classified" statuses: a clean finish or laps-down. */
-function isFinished(status: string): boolean {
-  return status === "Finished" || /^\+\d+ Lap/.test(status);
-}
+import { isClassified as isFinished } from "./recap";
 
 export interface DriverSeasonStats {
   rounds: number;

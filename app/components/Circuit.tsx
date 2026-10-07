@@ -1,48 +1,12 @@
 /**
- * CircuitVisual — telemetry-styled track card.
+ * Circuit data and track outlines.
  *
  * Track outlines are projected from real OpenStreetMap circuit geometry
- * (bacinger/f1-circuits), normalised into the 0 0 200 100 viewBox. Offers:
- *   • the real circuit outline per track
- *   • sector-coloured racing line (S1 / S2 / S3) using stroke-dash slices
- *   • DRS zones referenced in the data strip (where known)
- *   • checkered start/finish line + direction-of-travel arrow at the path start
- *   • monospace data strip: lat / long / length / turns / DRS
- *
- * Falls back to a generic outline for circuits we don't yet have a path for.
+ * (bacinger/f1-circuits), normalised into the 0 0 200 100 viewBox, with
+ * reference stats (length, corners, DRS zones, lap record) where known.
  */
 
-import type { JolpicaCircuit } from "@/lib/jolpica";
-
-const COUNTRY_FLAG: Record<string, string> = {
-  Australia: "🇦🇺",
-  China: "🇨🇳",
-  Japan: "🇯🇵",
-  Bahrain: "🇧🇭",
-  "Saudi Arabia": "🇸🇦",
-  USA: "🇺🇸",
-  "United States": "🇺🇸",
-  Canada: "🇨🇦",
-  Monaco: "🇲🇨",
-  Spain: "🇪🇸",
-  Austria: "🇦🇹",
-  UK: "🇬🇧",
-  "United Kingdom": "🇬🇧",
-  Britain: "🇬🇧",
-  Belgium: "🇧🇪",
-  Hungary: "🇭🇺",
-  Netherlands: "🇳🇱",
-  Italy: "🇮🇹",
-  Azerbaijan: "🇦🇿",
-  Singapore: "🇸🇬",
-  Mexico: "🇲🇽",
-  Brazil: "🇧🇷",
-  UAE: "🇦🇪",
-  "United Arab Emirates": "🇦🇪",
-  Qatar: "🇶🇦",
-};
-
-interface CircuitMeta {
+export interface CircuitMeta {
   /** SVG path in viewBox 0 0 200 100 */
   d: string;
   /** [x,y] of the path's first point — anchors the start/finish marker */
@@ -84,205 +48,44 @@ const CIRCUITS: Record<string, CircuitMeta> = {
   jeddah: { d: "M103.9,70.5 L99.8,59.0 L98.7,59.2 L98.3,59.1 L98.0,58.5 L98.8,55.6 L98.9,54.7 L97.8,48.0 L97.5,46.6 L96.2,46.0 L95.4,45.0 L95.1,43.4 L95.4,42.3 L96.3,40.9 L96.3,39.5 L95.6,37.5 L94.8,36.9 L94.3,36.4 L94.1,33.1 L94.8,31.8 L96.3,31.1 L97.0,30.4 L97.4,28.2 L98.1,26.1 L98.4,23.8 L98.2,18.6 L97.8,12.9 L97.1,12.2 L95.9,12.1 L95.1,12.6 L94.5,14.1 L94.7,15.5 L96.1,17.9 L96.7,19.7 L96.8,21.4 L96.4,23.2 L95.6,24.9 L95.0,26.8 L95.0,27.9 L94.5,28.7 L93.2,29.2 L92.2,30.3 L91.9,31.6 L91.9,33.2 L92.1,34.8 L93.2,37.6 L94.1,40.2 L94.2,42.3 L94.2,44.3 L94.3,45.3 L95.0,47.1 L96.2,49.0 L97.1,50.8 L97.6,53.2 L97.6,55.5 L97.2,57.8 L97.0,58.6 L97.1,59.4 L97.7,60.1 L98.8,61.1 L99.6,63.9 L99.4,65.1 L97.4,69.0 L96.7,71.1 L96.5,72.5 L97.1,75.6 L97.6,77.5 L98.5,79.9 L99.8,82.1 L101.5,84.1 L103.9,86.0 L107.0,88.0 L107.9,87.6 L108.1,86.7 L106.2,77.9 L105.0,73.7 Z", start: [103.9, 70.5], ang: -109.6, km: 6.175, turns: 27, drs: 3, dir: "ccw", lapRecord: "1:30.734 — Alonso ’21" },
   bahrain: { d: "M76.0,48.0 L76.6,26.7 L77.2,12.7 L77.4,12.1 L78.0,12.0 L78.6,12.2 L79.0,12.5 L81.9,15.4 L82.7,15.7 L83.6,15.6 L88.6,14.0 L89.8,13.9 L90.9,14.0 L123.8,20.3 L124.9,20.7 L125.5,21.3 L125.6,22.1 L125.5,22.8 L125.2,23.7 L124.4,24.6 L123.6,25.3 L122.5,26.1 L118.5,29.1 L115.3,32.4 L114.6,33.2 L113.9,34.3 L112.5,37.5 L112.0,38.2 L111.3,38.7 L110.5,39.1 L109.3,39.2 L105.7,38.6 L104.8,38.6 L103.7,38.8 L102.9,39.3 L101.9,40.2 L94.6,49.4 L93.9,50.1 L92.9,50.2 L92.3,49.8 L92.0,48.8 L92.1,47.2 L93.8,36.7 L94.8,30.2 L95.0,28.9 L94.8,27.7 L94.5,26.8 L94.0,25.9 L91.0,23.3 L90.6,23.1 L90.2,23.2 L89.9,23.7 L88.8,31.8 L88.5,37.2 L88.0,46.9 L87.6,57.1 L87.2,66.3 L87.4,67.9 L88.0,68.8 L88.9,69.3 L90.2,69.5 L91.6,69.4 L93.3,69.1 L95.0,68.3 L96.4,67.2 L97.9,65.8 L98.7,64.3 L100.3,60.2 L101.2,58.4 L102.1,57.4 L103.2,56.5 L104.6,55.6 L106.4,55.2 L108.5,55.1 L110.0,55.5 L111.9,56.4 L117.0,58.9 L118.1,59.7 L119.0,60.6 L119.4,61.4 L120.0,62.4 L120.0,63.2 L119.5,64.0 L118.6,64.9 L117.4,65.8 L78.6,87.6 L77.8,88.0 L76.7,88.0 L76.2,87.5 L74.5,83.9 L74.4,82.4 L74.4,79.7 L74.9,64.6 Z", start: [76.0, 48.0], ang: -88.4, km: 5.412, turns: 15, drs: 3, dir: "cw", lapRecord: "1:31.447 — Sainz ’24" },
 };
-const GENERIC: CircuitMeta = {
-  d: "M28,54 C28,30 60,24 96,30 C130,36 162,30 178,46 C190,62 172,80 138,80 C100,80 62,82 36,72 C24,66 22,60 28,54 Z",
-  start: [28, 54],
-  ang: -90,
-};
 
-interface Props {
-  circuit: JolpicaCircuit;
-  variant?: "card" | "wide";
+/** Reference data for a Jolpica circuitId, or null if we have no outline. */
+export function circuitMeta(circuitId: string): CircuitMeta | null {
+  return CIRCUITS[circuitId] ?? null;
 }
 
-export default function CircuitVisual({ circuit, variant = "card" }: Props) {
-  const flag = COUNTRY_FLAG[circuit.Location.country] ?? "🏁";
-  const meta = CIRCUITS[circuit.circuitId] ?? GENERIC;
-  const isReal = circuit.circuitId in CIRCUITS;
-  const tall = variant === "wide";
-
-  const SECTOR = ["#ffd60a", "#27f4d2", "#e10600"];
-
+/**
+ * Bare track outline for dark surfaces (the homepage hero): tarmac plus a
+ * lap line that draws itself in once. Renders nothing for circuits without
+ * a traced outline, so the hero never shows the generic placeholder.
+ */
+export function TrackOutline({
+  circuitId,
+  label,
+  className,
+}: {
+  circuitId: string;
+  label: string;
+  className?: string;
+}) {
+  const meta = CIRCUITS[circuitId];
+  if (!meta) return null;
   return (
-    <div
-      className={`relative bg-ink text-paper overflow-hidden border border-ink ${
-        tall ? "min-h-[300px]" : ""
-      }`}
-    >
-      <div className="absolute inset-0 chevron-bg-soft pointer-events-none" aria-hidden />
-      <div className="absolute inset-0 scanline pointer-events-none" aria-hidden />
-      <span aria-hidden className="absolute top-0 left-0 right-0 h-[2px] bg-f1" />
-
-      <div className="relative p-6 md:p-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <span className="font-mono text-[10px] tracking-[0.22em] uppercase text-f1-soft">
-              ◢ Telemetry · Track Card
-            </span>
-            <div className="mt-2 font-display italic text-[clamp(1.4rem,3.2vw,2rem)] leading-tight text-paper">
-              {circuit.circuitName}
-            </div>
-            <div className="mt-1 font-mono text-[11px] tracking-[0.16em] uppercase text-paper/55">
-              {circuit.Location.locality} · {circuit.Location.country}
-            </div>
-          </div>
-          <span className="text-3xl md:text-4xl leading-none shrink-0" aria-hidden>
-            {flag}
-          </span>
-        </div>
-
-        <div className="mt-6 relative">
-          <svg
-            viewBox="0 0 200 100"
-            className="w-full h-auto"
-            role="img"
-            aria-label={`${circuit.circuitName} stylised layout`}
-          >
-            <defs>
-              <pattern
-                id={`check-${circuit.circuitId}`}
-                x="0"
-                y="0"
-                width="2"
-                height="2"
-                patternUnits="userSpaceOnUse"
-              >
-                <rect width="2" height="2" fill="#ffffff" />
-                <rect width="1" height="1" fill="#0e0e0e" />
-                <rect x="1" y="1" width="1" height="1" fill="#0e0e0e" />
-              </pattern>
-            </defs>
-
-            {/* faint guide grid */}
-            <g stroke="rgba(250,247,242,0.05)" strokeWidth="0.3">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <line key={`h${i}`} x1="0" y1={(i + 1) * 10} x2="200" y2={(i + 1) * 10} />
-              ))}
-              {Array.from({ length: 19 }).map((_, i) => (
-                <line key={`v${i}`} x1={(i + 1) * 10} y1="0" x2={(i + 1) * 10} y2="100" />
-              ))}
-            </g>
-
-            {/* Outer glow halo */}
-            <path
-              d={meta.d}
-              fill="none"
-              stroke="rgba(225,6,0,0.18)"
-              strokeWidth="6"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-
-            {/* Tarmac base */}
-            <path
-              d={meta.d}
-              fill="none"
-              stroke="rgba(250,247,242,0.10)"
-              strokeWidth="3.6"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-
-            {/* Sector 1 / 2 / 3 */}
-            {SECTOR.map((color, i) => (
-              <path
-                key={i}
-                d={meta.d}
-                pathLength={300}
-                fill="none"
-                stroke={color}
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-                strokeLinecap="butt"
-                strokeDasharray="100 200"
-                strokeDashoffset={-i * 100}
-              />
-            ))}
-
-            {/* Start/finish marker, direction arrow and pulsing dot,
-                anchored to the real path start and oriented along it. */}
-            <g
-              aria-hidden
-              transform={`translate(${meta.start[0]},${meta.start[1]}) rotate(${meta.ang})`}
-            >
-              <rect
-                x="-1.5"
-                y="-5"
-                width="3"
-                height="10"
-                fill={`url(#check-${circuit.circuitId})`}
-              />
-              <path d="M5,-3 L11,0 L5,3 Z" fill="#ffffff" opacity="0.85" />
-              <circle cx="0" cy="0" r="2.4" fill="#e10600">
-                <animate
-                  attributeName="opacity"
-                  values="1;0.35;1"
-                  dur="1.6s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-            </g>
-
-            {/* Sector legend */}
-            <g fontFamily="var(--font-mono)" fontSize="4.2" letterSpacing="0.2">
-              {SECTOR.map((color, i) => (
-                <g key={i} transform={`translate(${146 + i * 16},90)`}>
-                  <rect
-                    width="14"
-                    height="6"
-                    fill="rgba(0,0,0,0.5)"
-                    stroke={color}
-                    strokeWidth="0.4"
-                  />
-                  <text x="2.2" y="4.4" fill={color}>
-                    S{i + 1}
-                  </text>
-                </g>
-              ))}
-            </g>
-          </svg>
-        </div>
-
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 font-mono tabular text-[12px]">
-          <DataCell label="Lat" value={`${Number(circuit.Location.lat).toFixed(3)}°`} />
-          <DataCell label="Long" value={`${Number(circuit.Location.long).toFixed(3)}°`} />
-          <DataCell label="Length" value={meta.km ? `${meta.km.toFixed(3)} km` : "—"} />
-          <DataCell
-            label="Turns / DRS"
-            value={
-              meta.turns
-                ? `${meta.turns} · ${meta.drs ? `${meta.drs} DRS` : "—"}`
-                : "—"
-            }
-          />
-        </div>
-
-        <p className="mt-5 text-[11px] leading-relaxed text-paper/55">
-          {isReal
-            ? "Track outline traced from OpenStreetMap survey data."
-            : "Generic placeholder — true outline pending."}{" "}
-          {meta.lapRecord && (
-            <span className="text-paper/75">Lap record · {meta.lapRecord}. </span>
-          )}
-          <a
-            href={circuit.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-paper/30 hover:decoration-f1 hover:text-f1 transition-colors"
-          >
-            Reference ↗
-          </a>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function DataCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-1 min-w-0">
-      <span className="text-[9px] tracking-[0.2em] uppercase text-paper/40">{label}</span>
-      <span className="text-paper">{value}</span>
-    </div>
+    <svg viewBox="0 0 200 100" className={className} role="img" aria-label={`${label} layout`}>
+            <path d={meta.d} fill="none" stroke="rgba(242,244,247,0.1)" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" />
+      <path
+        d={meta.d}
+        pathLength={100}
+        className="track-draw"
+        fill="none"
+        stroke="#f2f4f7"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <circle cx={meta.start[0]} cy={meta.start[1]} r="2.4" fill="#e10600">
+        <animate attributeName="opacity" values="1;0.35;1" dur="1.6s" repeatCount="indefinite" />
+      </circle>
+    </svg>
   );
 }

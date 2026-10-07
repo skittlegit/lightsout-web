@@ -1,29 +1,38 @@
 @import "tailwindcss";
 
-/* Class-based dark mode: `dark:` utilities activate under `.dark` on <html>. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ============================================================
-   LightsOut — editorial almanac theme (Phase 2 polish)
+   LightsOut — editorial theme
+   Cream paper, serif headlines with italic red emphasis, monospaced
+   small-caps labels, hairline rules, near-square corners. Red is an
+   accent, not a surface. Team colours carry the data.
    Tailwind v4 CSS-first config. No tailwind.config.ts.
+
+   Token names are semantic: `paper` is the page, `paper-deep` a card,
+   `ink` the text colour.
    ============================================================ */
 
 @theme {
   /* Surfaces & ink */
-  --color-paper: #faf7f2;
-  --color-paper-deep: #f2eee6;
-  --color-paper-deeper: #ebe6db;
-  --color-ink: #0e0e0e;
-  --color-ink-soft: #1f1f1f;
-  --color-muted: #5e5b55;        /* darker for AA on paper */
-  --color-muted-soft: #8a857c;
-  --color-rule: #d9d2c5;
-  --color-rule-strong: #b8b0a0;
+  --color-paper: #faf7f2;        /* page */
+  --color-paper-deep: #fffdf9;   /* cards — a touch lighter than the page */
+  --color-paper-deeper: #f1ece3; /* tracks, insets, hovers */
+  --color-ink: #141414;
+  --color-ink-soft: #2b2a28;
+  --color-muted: #6a655d;        /* AA on page + card */
+  --color-muted-soft: #9b958b;
+  --color-rule: #e3dccf;
+  --color-rule-strong: #cbc2b2;
+  --color-carbon: #151412;
 
   /* F1 red */
   --color-f1: #e10600;
-  --color-f1-deep: #c20500;
-  --color-f1-soft: #ff2a1f;
+  --color-f1-deep: #b30500;
+  --color-f1-soft: #ff4a3d;
+
+  /* Timing-screen colours, used sparingly for data states */
+  --color-timing-purple: #9b51e0;
+  --color-timing-green: #1f9d55;
+  --color-timing-yellow: #d4a017;
 
   /* Team accents */
   --color-team-mercedes: #27f4d2;
@@ -32,11 +41,11 @@
   --color-team-mclaren: #ff8000;
   --color-team-aston: #229971;
   --color-team-alpine: #0093cc;
-  --color-team-williams: #64c4ff;
+  --color-team-williams: #1868db;
   --color-team-racingbulls: #6692ff;
   --color-team-sauber: #52e252;
   --color-team-haas: #b6babd;
-  --color-team-cadillac: #ffd700;
+  --color-team-cadillac: #c9b47b;
 
   /* Fonts (variables defined in layout.tsx via next/font) */
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
@@ -48,50 +57,37 @@
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 160ms;
   --dur-mid: 240ms;
-  --dur-slow: 480ms;
 
   /* Layout */
-  --container-max: 1320px;
+  --container-max: 1240px;
   --gutter-x: clamp(1.25rem, 3.5vw, 2.5rem);
-  --section-y: clamp(3rem, 7vw, 5rem);
+  --section-y: clamp(3rem, 6vw, 5rem);
+  --nav-h: 68px;
+  --radius-card: 3px;
+  --radius-panel: 4px;
 }
-
-/* ============================================================
-   Theme — light (default) / dark ("night race")
-   The neutral ramp is inverted under `.dark`; every `bg-paper`,
-   `text-ink`, `border-rule`, etc. follows automatically. F1 reds and
-   team accents are intentionally shared across both themes.
-   ============================================================ */
 
 :root { color-scheme: light; }
 
-:root.dark {
-  color-scheme: dark;
-  --color-paper: #0c0d0f;        /* page base — clean neutral near-black */
-  --color-paper-deep: #15161a;   /* cards / panels — clearly above base */
-  --color-paper-deeper: #1e2026; /* highest surface */
-  --color-ink: #f3f2ef;          /* primary text — near-white */
-  --color-ink-soft: #c9c8c5;
-  --color-muted: #a2a1a6;        /* secondary text — cool grey, AA on base */
-  --color-muted-soft: #6f6e74;
-  --color-rule: #2d2f35;         /* hairlines — visible so the grid still reads */
-  --color-rule-strong: #474a53;
+/* Dark editorial surface (race banners, home hero, predicted winner, team
+   cards' base). Re-pins the neutral ramp so token utilities inside
+   (bg-paper-deeper, text-ink, text-muted, border-rule) read on dark. */
+.panel-carbon {
+  --color-paper: #151412;
+  --color-paper-deep: #1d1b18;
+  --color-paper-deeper: #282521;
+  --color-ink: #faf7f2;
+  --color-ink-soft: #ddd7cc;
+  --color-muted: #a8a196;
+  --color-muted-soft: #6f695f;
+  --color-rule: #2f2c27;
+  --color-rule-strong: #403c35;
+  color: var(--color-ink);
+  background: var(--color-carbon);
+  border-radius: var(--radius-panel);
 }
-
-/* Panels that stay a dark "cockpit" surface in BOTH themes (hero, ticker).
-   Re-pin the neutral ramp locally to its light-theme values so the
-   `bg-ink` / `text-paper` treatment inside them never flips. */
-.surface-invert {
-  --color-paper: #faf7f2;
-  --color-paper-deep: #f2eee6;
-  --color-paper-deeper: #ebe6db;
-  --color-ink: #0e0e0e;
-  --color-ink-soft: #1f1f1f;
-  --color-muted: #5e5b55;
-  --color-muted-soft: #8a857c;
-  --color-rule: #d9d2c5;
-  --color-rule-strong: #b8b0a0;
-}
+/* Full-width band (home hero): edge to edge, no corner. */
+.panel-carbon.panel-flat { border-radius: 0; }
 
 /* ============================================================
    Base
@@ -103,7 +99,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 64px;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -116,54 +112,22 @@ body {
 body {
   font-family: var(--font-sans);
   font-size: 15.5px;
-  line-height: 1.55;
-  font-feature-settings: "ss01", "kern";
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-@media (min-width: 1024px) {
-  body { font-size: 16px; }
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 18% 8%, rgba(14, 14, 14, 0.028) 0%, transparent 55%),
-    radial-gradient(ellipse at 82% 88%, rgba(193, 5, 0, 0.018) 0%, transparent 60%),
-    radial-gradient(circle at 50% 50%, transparent 0%, rgba(217, 210, 197, 0.16) 100%);
-  mix-blend-mode: multiply;
-}
-
-/* On dark, a faint top-left light + bottom-right red glow instead of multiply. */
-:root.dark body::before {
-  background:
-    radial-gradient(ellipse at 18% 8%, rgba(255, 255, 255, 0.035) 0%, transparent 55%),
-    radial-gradient(ellipse at 82% 88%, rgba(255, 42, 31, 0.06) 0%, transparent 60%);
-  mix-blend-mode: screen;
-}
-
-main,
-header,
-footer,
-section { position: relative; z-index: 1; }
-
-::selection { background: var(--color-f1); color: var(--color-paper); }
+::selection { background: var(--color-f1); color: #fff; }
 
 :focus-visible {
   outline: 2px solid var(--color-f1);
   outline-offset: 3px;
-  border-radius: 1px;
 }
 
 .skip-link {
-  position: absolute;
+  position: fixed;
   left: 50%;
   top: -100px;
   transform: translateX(-50%);
@@ -172,37 +136,58 @@ section { position: relative; z-index: 1; }
   padding: 8px 14px;
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  z-index: 100;
+  z-index: 200;
   transition: top var(--dur-fast) var(--ease-out-soft);
 }
 .skip-link:focus { top: 12px; }
 
 /* ============================================================
-   Typography utilities
+   Typography
    ============================================================ */
 
-.tabular {
+.tabular,
+.font-mono {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
 
-.font-display { font-family: var(--font-display); }
+/* Serif display: headlines, names, big numbers. Regular weight is the
+   elegant default; italics carry emphasis. */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
 
 .eyebrow,
 .eyebrow-ink,
 .eyebrow-red {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 .eyebrow      { color: var(--color-muted); }
 .eyebrow-ink  { color: var(--color-ink); }
-.eyebrow-red  { color: var(--color-f1); font-weight: 600; }
+.eyebrow-red  { color: var(--color-f1); }
+
+/* Small label above titles: monospaced, red, tracked out. */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-f1);
+}
 
 .rule-thin   { border-top: 1px solid var(--color-rule); }
 .rule-red    { border-top: 2px solid var(--color-f1); }
@@ -213,24 +198,25 @@ section { position: relative; z-index: 1; }
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.025em;
-  line-height: 0.95;
+  line-height: 0.98;
   text-wrap: balance;
 }
 .headline em {
   font-style: italic;
   color: var(--color-f1);
-  font-weight: 400;
 }
 
 /* Fluid display sizes */
-.h-mark       { font-size: clamp(3.5rem, 16vw, 13rem);  letter-spacing: -0.04em; }
-.h-hero       { font-size: clamp(2.75rem, 11vw, 8rem); }
-.h-section    { font-size: clamp(2.25rem, 7.5vw, 4.75rem); }
-.h-subsection { font-size: clamp(1.5rem, 4vw, 2.5rem); }
-.h-detail     { font-size: clamp(2.25rem, 8vw, 5rem); }
+.h-hero       { font-size: clamp(2.75rem, 7vw, 5.75rem); }
+.h-section    { font-size: clamp(1.9rem, 3.6vw, 2.8rem); }
+.h-subsection { font-size: clamp(1.4rem, 2.4vw, 1.8rem); }
+.h-detail     { font-size: clamp(2.4rem, 5.6vw, 4.25rem); }
 
-.numeric-xl { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(2.5rem, 7vw, 3.5rem); line-height: 1; }
-.numeric-lg { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 28px; line-height: 1; }
+.numeric-xl { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 3.5rem); line-height: 1; }
+.numeric-lg { font-family: var(--font-display); font-size: 30px; line-height: 1; }
+
+/* Driver names: given name regular, surname in small capitals. */
+.surname { font-weight: 600; font-variant: all-small-caps; letter-spacing: 0.04em; font-size: 1.06em; }
 
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -239,7 +225,7 @@ section { position: relative; z-index: 1; }
 summary::-webkit-details-marker { display: none; }
 
 /* ============================================================
-   Components / utilities
+   Layout
    ============================================================ */
 
 .container-max {
@@ -250,17 +236,87 @@ summary::-webkit-details-marker { display: none; }
 }
 .section-y { padding-block: var(--section-y); }
 
-.card {
-  background: var(--color-paper);
-  border: 1px solid var(--color-rule);
-  transition: border-color var(--dur-fast) var(--ease-out-soft),
-              transform var(--dur-fast) var(--ease-out-soft);
+/* Sticky paper nav with a hairline */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  backdrop-filter: saturate(1.2) blur(10px);
+  -webkit-backdrop-filter: saturate(1.2) blur(10px);
+  border-bottom: 1px solid var(--color-rule);
 }
-.card:hover { border-color: var(--color-ink); }
-.card-deep { background: color-mix(in srgb, var(--color-paper-deep) 60%, var(--color-paper)); }
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out-soft);
+}
+.nav-link:hover,
+.nav-link[aria-current="page"] { color: var(--color-ink); }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-f1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-mid) var(--ease-out-soft);
+}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+
+/* ============================================================
+   Components
+   ============================================================ */
+
+/* Card: warm white, hairline border, near-square corners, no shadow. */
+.card {
+  background: var(--color-paper-deep);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  transition: border-color var(--dur-fast) var(--ease-out-soft),
+              transform var(--dur-mid) var(--ease-out-soft);
+}
+a.card:hover, .card-link:hover { border-color: var(--color-ink); }
+.card-deep { background: var(--color-paper-deep); }
 
 .row-hover { transition: background-color var(--dur-fast) var(--ease-out-soft); }
-.row-hover:hover { background: color-mix(in srgb, var(--color-paper-deep) 50%, transparent); }
+.row-hover:hover { background: color-mix(in srgb, var(--color-paper-deeper) 55%, transparent); }
+
+/* Data tables (standings, results) */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-ink);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--color-rule);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table tbody tr { transition: background-color var(--dur-fast) var(--ease-out-soft); }
+.data-table tbody tr:hover { background: color-mix(in srgb, var(--color-paper-deeper) 55%, transparent); }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Horizontal data scroller (HScroll.tsx) — thin themed scrollbar that only
    appears when content actually overflows, plus dynamic edge-fade hints. */
@@ -273,8 +329,6 @@ summary::-webkit-details-marker { display: none; }
 .hscroll::-webkit-scrollbar-track { background: transparent; }
 .hscroll::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 3px; }
 
-/* Edge fades toggled from JS: visible only on a side with more content, so
-   nothing is veiled once you've scrolled all the way there. */
 .hscroll-fade {
   position: absolute;
   top: 0;
@@ -284,48 +338,8 @@ summary::-webkit-details-marker { display: none; }
   z-index: 2;
   transition: opacity var(--dur-mid) var(--ease-out-soft);
 }
-.hscroll-fade--l { left: 0;  background: linear-gradient(90deg, var(--color-paper), transparent); }
-.hscroll-fade--r { right: 0; background: linear-gradient(-90deg, var(--color-paper), transparent); }
-
-/* Snap assists touch flicks. Snap targets are the cards themselves
-   (`.snap-start`), so every round is a valid resting point. */
-.scroll-snap-x {
-  scroll-snap-type: x proximity;
-  scroll-padding-left: var(--gutter-x);
-  overscroll-behavior-x: contain;
-}
-/* On mouse/trackpad the wheel + drag handlers pan by assigning scrollLeft,
-   and each assignment re-snaps — the strip judders and the far end can
-   become unreachable. Fine pointers pan free; touch keeps the snap. */
-@media (pointer: fine) {
-  .scroll-snap-x { scroll-snap-type: none; }
-}
-
-.anchor-link {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  transition: color var(--dur-fast) var(--ease-out-soft);
-  display: block;
-  padding: 4px 0;
-  position: relative;
-}
-.anchor-link:hover { color: var(--color-ink); }
-.anchor-link::before {
-  content: "";
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  width: 4px;
-  height: 1px;
-  background: currentColor;
-  transform: translateY(-50%) scaleX(0);
-  transform-origin: right center;
-  transition: transform var(--dur-fast) var(--ease-out-soft);
-}
-.anchor-link:hover::before { transform: translateY(-50%) scaleX(1); }
+.hscroll-fade--l { left: 0;  background: linear-gradient(90deg, var(--color-paper-deep), transparent); }
+.hscroll-fade--r { right: 0; background: linear-gradient(-90deg, var(--color-paper-deep), transparent); }
 
 .hover-lift {
   transition: transform var(--dur-fast) var(--ease-out-soft),
@@ -333,198 +347,134 @@ summary::-webkit-details-marker { display: none; }
 }
 .hover-lift:hover { transform: translateY(-2px); }
 
-.headline-link {
-  display: inline-block;
-  position: relative;
-  text-decoration: none;
-}
-.headline-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0.05em;
-  width: 100%;
-  height: 2px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform var(--dur-mid) var(--ease-out-soft);
-}
-.headline-link:hover::after { transform: scaleX(1); }
+.headline-link { text-decoration: none; transition: color var(--dur-fast) var(--ease-out-soft); }
+.headline-link:hover { color: var(--color-f1); }
 
+/* Chip: monospaced tag with a hairline border */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border: 1px solid var(--color-rule);
-  background: var(--color-paper);
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 2px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+.chip-red { border-color: var(--color-f1); background: var(--color-f1); color: #fff; }
+
+/* Buttons: near-square, monospaced labels */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out-soft),
+              border-color var(--dur-fast) var(--ease-out-soft),
+              color var(--dur-fast) var(--ease-out-soft);
+}
+.btn-primary { background: var(--color-f1); color: #fff; }
+.btn-primary:hover { background: var(--color-f1-deep); }
+.btn-ghost { border: 1px solid var(--color-ink); color: var(--color-ink); background: transparent; }
+.btn-ghost:hover { background: var(--color-ink); color: var(--color-paper); }
+
+/* "View all →" text link */
+.more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-ink);
-  white-space: nowrap;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--color-rule-strong);
+  transition: color var(--dur-fast) var(--ease-out-soft), border-color var(--dur-fast) var(--ease-out-soft);
 }
-.chip-dark {
-  border-color: rgba(250, 247, 242, 0.2);
-  background: transparent;
-  color: var(--color-paper);
-}
+.more-link:hover { color: var(--color-f1); border-color: var(--color-f1); }
 
-/* stat-strip: applied alongside `grid grid-cols-N` for responsive count.
-   Hairline divider is achieved via 1px gap with rule-color bg. */
+/* stat-strip: applied alongside `grid grid-cols-N` for responsive count. */
 .stat-strip {
   display: grid;
   gap: 1px;
   background: var(--color-rule);
   border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
 }
 .stat-strip > * {
-  background: var(--color-paper);
+  background: var(--color-paper-deep);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 @media (min-width: 768px) {
   .stat-strip > * { padding: 20px 22px; }
 }
 
-/* ============================================================
-   Race aesthetic — checker, chevron, scanline, ticker, shift lights
-   ============================================================ */
-
-/* Checker — used as S/F line and accent strips */
-.checker-strip {
-  --c1: var(--color-ink);
-  --c2: var(--color-paper);
-  background-image:
-    linear-gradient(45deg, var(--c1) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--c1) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--c1) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--c1) 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
-  background-color: var(--c2);
+/* Position marker (standings, odds board, calendar list) */
+.pos-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted);
+  flex: none;
 }
-.checker-strip-sm { background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0; }
+.pos-badge--lead { background: var(--color-f1); color: #fff; }
 
-/* Chevron pattern — diagonal racing stripes */
-.chevron-bg {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0,
-    transparent 14px,
-    color-mix(in srgb, var(--color-f1) 14%, transparent) 14px,
-    color-mix(in srgb, var(--color-f1) 14%, transparent) 16px
-  );
-}
-.chevron-bg-soft {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0,
-    transparent 18px,
-    rgba(255, 255, 255, 0.04) 18px,
-    rgba(255, 255, 255, 0.04) 20px
-  );
-}
+/* Team colour pip */
+.team-pip { width: 3px; height: 22px; flex: none; }
 
-/* Scanlines — telemetry HUD vibe */
-.scanline {
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0,
-    transparent 3px,
-    rgba(255, 255, 255, 0.025) 3px,
-    rgba(255, 255, 255, 0.025) 4px
-  );
-}
-
-/* Italic + slight forward skew — "speed" treatment for marquee numbers */
-.skew-fwd { transform: skewX(-7deg); transform-origin: bottom left; }
-
-/* ============================================================
-   Ticker (marquee)
-   ============================================================ */
-
-.ticker {
+/* Team card: dark editorial surface, team colour as a top rule and a soft
+   glow in the corner — the colour accents the card instead of flooding it. */
+.team-card {
+  /* Same dark-surface tokens as .panel-carbon so labels inside stay legible. */
+  --color-ink: #faf7f2;
+  --color-ink-soft: #ddd7cc;
+  --color-muted: #b3aca0;
+  --color-muted-soft: #7a7469;
+  --color-rule: #34302a;
+  --color-paper-deeper: #2a2723;
   position: relative;
   overflow: hidden;
-  background: var(--color-ink);
-  color: var(--color-paper);
-  border-block: 1px solid var(--color-ink);
+  color: #faf7f2;
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--team) 32%, transparent) 0%, transparent 60%),
+    var(--color-carbon);
+  transition: transform var(--dur-mid) var(--ease-out-soft);
 }
-.ticker__track {
-  display: flex;
-  width: max-content;
-  animation: ticker-scroll 48s linear infinite;
-  will-change: transform;
-}
-.ticker__group {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  padding-block: 10px;
-}
-.ticker__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding-inline: 28px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--color-paper);
-}
-.ticker__item--accent { color: var(--color-f1-soft); }
-.ticker__sep {
-  width: 6px; height: 6px; background: var(--color-f1);
-  flex: none; transform: rotate(45deg);
-}
-.ticker__edge {
-  position: absolute; top: 0; bottom: 0; width: 60px; pointer-events: none; z-index: 2;
-}
-.ticker__edge--l { left: 0;  background: linear-gradient(90deg, var(--color-ink) 0, transparent 100%); }
-.ticker__edge--r { right: 0; background: linear-gradient(-90deg, var(--color-ink) 0, transparent 100%); }
-.ticker:hover .ticker__track { animation-play-state: paused; }
-
-@keyframes ticker-scroll {
-  from { transform: translate3d(0,0,0); }
-  to   { transform: translate3d(-50%,0,0); }
-}
-
-/* ============================================================
-   Shift lights — 5-light start sequence
-   ============================================================ */
-
-.shift-lights {
-  display: inline-flex;
-  gap: 6px;
-  padding: 6px 8px;
-  background: #050505;
-  border: 1px solid #1a1a1a;
-  border-radius: 2px;
-}
-.shift-lights__dot {
-  width: 12px; height: 12px; border-radius: 999px;
-  background: #2a0707;
-  box-shadow: inset 0 0 0 1px #0a0a0a;
-  animation: shift-on 4.4s steps(1, end) infinite;
-}
-.shift-lights__dot:nth-child(1) { animation-delay: 0.0s; }
-.shift-lights__dot:nth-child(2) { animation-delay: 0.5s; }
-.shift-lights__dot:nth-child(3) { animation-delay: 1.0s; }
-.shift-lights__dot:nth-child(4) { animation-delay: 1.5s; }
-.shift-lights__dot:nth-child(5) { animation-delay: 2.0s; }
-
-@keyframes shift-on {
-  0%, 9%   { background: #2a0707; box-shadow: inset 0 0 0 1px #0a0a0a; }
-  10%, 65% { background: var(--color-f1-soft); box-shadow: 0 0 8px rgba(255,42,31,0.7), inset 0 0 0 1px #ff8a82; }
-  66%, 100% { background: #2a0707; box-shadow: inset 0 0 0 1px #0a0a0a; }
+.team-card:hover { transform: translateY(-2px); }
+.team-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--team);
 }
 
 /* ============================================================
@@ -537,25 +487,23 @@ summary::-webkit-details-marker { display: none; }
 }
 .pulse-dot { animation: pulse-dot 1.6s var(--ease-editorial) infinite; }
 
-@keyframes colon-pulse {
-  0%, 55%   { opacity: 0.92; }
-  75%, 100% { opacity: 0.4; }
-}
-.colon-pulse { animation: colon-pulse 1.6s var(--ease-out-soft) infinite; }
-
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 0.85; }
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
 }
 .skeleton {
-  background: var(--color-paper-deep);
+  background: var(--color-paper-deeper);
   animation: skeleton-pulse 1.6s ease-in-out infinite;
   border-radius: 2px;
 }
 
-/* ============================================================
-   Reduced motion
-   ============================================================ */
+/* Hero track outline (TrackOutline): the lap line traces itself in once. */
+.track-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: track-draw 2.2s var(--ease-editorial) 0.2s forwards;
+}
+@keyframes track-draw { to { stroke-dashoffset: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -566,9 +514,7 @@ summary::-webkit-details-marker { display: none; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .pulse-dot, .colon-pulse, .skeleton { animation: none !important; }
-  .ticker__track { animation: none !important; }
-  .shift-lights__dot { animation: none !important; background: #2a0707 !important; }
+  .pulse-dot, .skeleton { animation: none !important; }
   .hover-lift:hover { transform: none !important; }
-  .headline-link::after { transition: none !important; }
+  .track-draw { animation: none !important; stroke-dashoffset: 0; }
 }

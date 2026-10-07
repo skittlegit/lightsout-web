@@ -47,6 +47,8 @@ export interface Race {
   circuit: string;
   country: string;
   race_date: string; // ISO date "YYYY-MM-DD"
+  /** UTC start time, e.g. "13:00:00Z"; absent in older snapshots. */
+  race_time?: string | null;
   is_next: boolean;
   is_completed: boolean;
   has_sprint?: boolean;
@@ -90,12 +92,24 @@ export interface ModePrediction {
 
 export type PredictionStatus = "ok" | "model_unavailable";
 
+export interface RaceWeather {
+  /** 0–1 chance of a wet race window. */
+  rain_probability: number;
+  temp_c: number;
+  /** Live forecast within ~15 days, observed for past races, else circuit average. */
+  source: "forecast" | "observed" | "climatology";
+}
+
 export interface PredictionResponse {
   season: number;
   round: number;
   race_name: string;
   circuit: string;
   race_date: string;
+  /** UTC start time, e.g. "12:00:00Z" (newer API versions only). */
+  race_time?: string | null;
+  /** Weather the model used (newer API versions only). */
+  weather?: RaceWeather | null;
   pre_quali: ModePrediction | null;
   post_quali: ModePrediction | null;
   status: PredictionStatus;
